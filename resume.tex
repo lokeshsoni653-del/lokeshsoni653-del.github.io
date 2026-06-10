@@ -1,0 +1,154 @@
+%% ============================================================
+%%  LOKESH KUMAR — Single-Page LaTeX Resume
+%%  Compile with: pdflatex resume.tex
+%% ============================================================
+\documentclass[10pt, a4paper]{article}
+
+%% ── Packages ────────────────────────────────────────────────
+\usepackage[a4paper, top=0.45in, bottom=0.45in, left=0.5in, right=0.5in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{helvet}                        % Clean sans-serif font
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{fontawesome5}
+\pagestyle{empty}
+
+%% ── Colors ──────────────────────────────────────────────────
+\definecolor{accent}{RGB}{37, 99, 235}       % Blue
+\definecolor{dark}{RGB}{20, 20, 20}
+\definecolor{muted}{RGB}{90, 90, 90}
+\definecolor{rule}{RGB}{200, 210, 230}
+
+%% ── Hyperlinks ──────────────────────────────────────────────
+\hypersetup{colorlinks=true, urlcolor=accent, linkcolor=accent, pdfborder={0 0 0}}
+
+%% ── Section Titles ──────────────────────────────────────────
+\titleformat{\section}
+  {\large\bfseries\color{accent}}{}{0em}{}
+  [\vspace{-2pt}\textcolor{rule}{\hrule height 0.8pt}\vspace{2pt}]
+\titlespacing{\section}{0pt}{7pt}{3pt}
+
+%% ── List Settings ───────────────────────────────────────────
+\setlist[itemize]{
+  leftmargin=1.2em, itemsep=1pt, topsep=1pt,
+  parsep=0pt, partopsep=0pt,
+  label=\textcolor{accent}{\textbullet}
+}
+
+%% ── Custom Commands ─────────────────────────────────────────
+% \job{Company}{Role}{Date}{Location}
+\newcommand{\job}[4]{%
+  \textbf{#1} \hfill \textit{\small #3}\\[-2pt]
+  \textit{\small\color{muted}#2} \hfill \textit{\small\color{muted}#4}
+}
+% \proj{Title}{Link label}{URL}
+\newcommand{\proj}[3]{%
+  \textbf{#1}%
+  \ifx&#3&\else~\href{#3}{\small\textcolor{accent}{[\faExternalLinkAlt~#2]}}\fi
+}
+
+%% ============================================================
+\begin{document}
+\color{dark}
+
+%% ── HEADER ──────────────────────────────────────────────────
+\begin{center}
+  {\LARGE\bfseries Lokesh Kumar}\\[3pt]
+  {\small\color{muted}
+    \textbf{Software Engineer} \textemdash{} Supply Chain \& Data Systems Architect\\[3pt]
+    \faMapMarker*~Hyderabad, Sindh, Pakistan \enspace
+    \faPhone*~\href{tel:+923033021048}{0303-3021048} \enspace
+    \faEnvelope~\href{mailto:lokeshsoni653@gmail.com}{lokeshsoni653@gmail.com}\\[2pt]
+    \faGlobe~\href{https://lokeshsoni653-del.github.io/lokesh-kumar-portfolio-website/}%
+      {lokeshsoni653-del.github.io/lokesh-kumar-portfolio-website} \enspace
+    \faGithub~\href{https://github.com/lokeshsoni653-del}{github.com/lokeshsoni653-del} \enspace
+    \faLinkedin~\href{https://www.linkedin.com/in/lokesh-kumar-76060722a}{linkedin.com/in/lokesh-kumar-76060722a}
+  }
+\end{center}
+
+\vspace{-2pt}
+
+%% ── SUMMARY ─────────────────────────────────────────────────
+\section{Professional Summary}
+Final-year Software Engineering student (CGPA: 3.00/4.00) with \textbf{20+ live deployed Python applications} built for Pakistan's leading enterprises — Engro, Nestlé, Telenor, Hamdard, Colgate, and more. Specializing in geospatial supply chain routing, retail telematics dashboards, and operational data pipelines. Proven ability to translate complex logistics and inventory data into secure, real-time web applications that reduce dispatch latency and optimize FMCG distribution networks.
+
+%% ── SKILLS ──────────────────────────────────────────────────
+\section{Technical Skills}
+\begin{tabular}{@{}lp{13.2cm}@{}}
+  \textbf{Supply Chain \& Retail IT} & Geospatial Route Optimization, Decentralized Inventory Reporting, Live ETA Tracking, Cold Chain Analytics, Demand Forecasting\\[2pt]
+  \textbf{Languages \& Data Eng.}    & Python (Pandas, NumPy, NetworkX), SQL, JavaScript (ES6+), HTML5, CSS3\\[2pt]
+  \textbf{Frameworks \& Arch.}       & Streamlit, Custom WebSocket Engines, Folium/Leaflet, NLP/RAG Pipelines\\[2pt]
+  \textbf{Tools \& Methods}          & Git/GitHub, Agile/Scrum, CI/CD, WordPress/Elementor, Advanced MS Excel\\
+\end{tabular}
+
+%% ── EXPERIENCE ──────────────────────────────────────────────
+\section{Professional Experience}
+
+\job{Pakistan Hindu Council}{Data, Operations \& AI Intern}{March 2026 -- Present}{Karachi, Pakistan}
+\begin{itemize}
+  \item Architected a secure \textbf{NLP/RAG chatbot} in Python enabling staff to query internal databases in natural language, replacing manual document sorting and reducing data retrieval time across decentralized regional hubs.
+  \item Restructured manual data collection pipelines with automated Python workflows, significantly reducing reporting latency and improving data accuracy for executive decision-making.
+  \item Built custom Python scripts to clean, filter, and aggregate multi-source operational data into executive-ready reports.
+\end{itemize}
+
+\vspace{4pt}
+
+\job{Interns Pakistan}{Web Development Intern}{December 2024 -- January 2025}{Remote}
+\begin{itemize}
+  \item Built responsive digital interfaces using HTML5, CSS3, and JavaScript as part of the Career Accelerator Internship Program; performance rated above expectations (ID: IPB5078277).
+\end{itemize}
+
+%% ── PROJECTS ─────────────────────────────────────────────────
+\section{Key Projects \textnormal{\small\color{muted}(20+ live deployments — full portfolio at link above)}}
+
+\proj{Nestlé Agri-Logistics \& Supply Chain Optimizer}{Live App}{https://nestle-agri-logistics-optimizer-irgdbj84hmrf7m7zq6ktir.streamlit.app/}
+\begin{itemize}
+  \item Geospatial routing engine mapping milk collection from 1,000+ rural farms to processing facilities. Enforces freshness time-windows, vehicle capacity constraints, and spoilage risk scoring.
+\end{itemize}
+
+\vspace{2pt}
+
+\proj{FMCG Telemetry Engine — Industrial Hub Digital Twin}{GitHub}{https://github.com/lokeshsoni653-del/mondelez-digital-twin-engine}
+\begin{itemize}
+  \item High-velocity telemetry pipeline using pure Python WebSockets to monitor FMCG manufacturing line velocity and capacity thresholds in real time.
+\end{itemize}
+
+\vspace{2pt}
+
+\proj{S\&P Global CI/CD Pipeline Simulator \& Visualizer}{Live App}{https://sp-global-cicd-pipeline-jscgp9kscdwknuwctqvo7v.streamlit.app/}
+\begin{itemize}
+  \item Developed an interactive Python-based DevOps dashboard simulating automated Salesforce release stages, static code analysis verification, UAT staging checks, and deployment validation workflows to visually demonstrate enterprise pipeline best practices.
+\end{itemize}
+
+%% ── EDUCATION ────────────────────────────────────────────────
+\section{Education}
+
+\begin{tabularx}{\textwidth}{@{}Xr@{}}
+  \textbf{Sindh Agriculture University, Tando Jam} & \textit{Expected December 2026}\\
+  BS in Software Engineering \hspace{1em}\textcolor{muted}{\small CGPA: \textbf{3.00} / 4.00} &\\[3pt]
+  \textbf{Higher Secondary School Certificate (Pre-Medical)} & \textit{2022}\\
+  \textcolor{muted}{\small Score: \textbf{94.18\%}} &\\
+\end{tabularx}
+
+%% ── CERTIFICATIONS ───────────────────────────────────────────
+\section{Certifications \& Achievements}
+
+\begin{itemize}
+  \item \textbf{IBM} — Introduction to Software Engineering Professional Certificate \textit{(Coursera, 2025)}
+    \href{https://coursera.org/verify/E42GWWF22X5S}{\small\textcolor{muted}{[Verify]}}
+  \item \textbf{DeepLearning.AI} — AI For Everyone, taught by Andrew Ng \textit{(Coursera, 2025)}
+    \href{https://www.coursera.org/account/accomplishments/verify/BTJWB77W6W2Q}{\small\textcolor{muted}{[Verify]}}
+  \item \textbf{World Bank Group} — Sustainable MSME Finance \textit{(2025)}
+  \item \textbf{Digital Skills Pakistan} — Kamyaab Freelancer Program \textit{(2025)}
+  \item \textbf{Great Future Pakistan} — \textbf{National Talent Award}, Great Future Talent Olympiad Batch VI \textit{(December 2025)}
+  \item \textbf{SAU Tando Jam STEP} — Certificate of Achievement, Web Development Training \textit{(2024)}
+\end{itemize}
+
+\end{document}

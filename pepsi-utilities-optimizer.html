@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Smart Energy & Water Optimizer — Haidri Beverages (Pepsi)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --pepsi-blue: #004B93;
+  --pepsi-red: #E31837;
+  --pepsi-dark: #001E3C;
+  --accent-cyan: #00D4FF;
+  --accent-green: #00E676;
+  --accent-amber: #FFB300;
+  --accent-danger: #FF5252;
+  --surface: rgba(0,30,60,0.85);
+  --surface-2: rgba(0,50,100,0.6);
+  --glass: rgba(255,255,255,0.05);
+  --border: rgba(0,212,255,0.2);
+  --text: #E8F4FD;
+  --muted: #7BB3D4;
+  --font: 'Inter', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: #000C1F;
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ANIMATED GRID BACKGROUND */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: 0;
+}
+body::after {
+  content: '';
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(ellipse at 30% 20%, rgba(0,75,147,0.15) 0%, transparent 50%),
+              radial-gradient(ellipse at 70% 80%, rgba(0,212,255,0.08) 0%, transparent 50%);
+  z-index: 0;
+  animation: bgPulse 12s ease-in-out infinite alternate;
+}
+@keyframes bgPulse {
+  0% { transform: translate(0,0) rotate(0deg); }
+  100% { transform: translate(-2%,-2%) rotate(1deg); }
+}
+
+/* LAYOUT */
+.wrapper { position: relative; z-index: 1; min-height: 100vh; }
+
+/* TOP HEADER */
+.topbar {
+  background: rgba(0,10,30,0.95);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(20px);
+}
+.topbar-left { display: flex; align-items: center; gap: 1rem; }
+.pepsi-logo {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: conic-gradient(var(--pepsi-red) 0deg 180deg, var(--pepsi-blue) 180deg 360deg);
+  position: relative;
+  box-shadow: 0 0 20px rgba(0,212,255,0.4);
+  flex-shrink: 0;
+}
+.pepsi-logo::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  clip-path: polygon(0 40%, 100% 40%, 100% 60%, 0 60%);
+}
+.topbar-brand { line-height: 1.2; }
+.topbar-title { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+.topbar-sub { font-size: 0.72rem; color: var(--muted); font-family: var(--mono); }
+.topbar-right { display: flex; align-items: center; gap: 1.5rem; }
+.status-pill {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  background: rgba(0,230,118,0.1);
+  border: 1px solid rgba(0,230,118,0.3);
+  border-radius: 20px;
+  font-size: 0.72rem; font-weight: 600;
+  color: var(--accent-green);
+}
+.status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  animation: blink 1.5s ease-in-out infinite;
+}
+@keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+
+.author-badge {
+  font-size: 0.72rem;
+  color: var(--accent-cyan);
+  font-family: var(--mono);
+  border: 1px solid var(--border);
+  padding: 0.3rem 0.75rem;
+  border-radius: 6px;
+  background: var(--glass);
+}
+.time-display {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* HERO SECTION */
+.hero {
+  padding: 3rem 2rem 2rem;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(0,75,147,0.12) 0%, transparent 100%);
+  border-bottom: 1px solid var(--border);
+}
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(0,212,255,0.1);
+  border: 1px solid rgba(0,212,255,0.3);
+  border-radius: 20px;
+  padding: 0.4rem 1rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+  margin-bottom: 1.5rem;
+}
+.hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #fff 0%, var(--accent-cyan) 50%, var(--pepsi-blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero p {
+  font-size: 1rem;
+  color: var(--muted);
+  max-width: 660px;
+  margin: 0 auto 2rem;
+  line-height: 1.7;
+}
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+.hero-stat {
+  text-align: center;
+  padding: 1rem 1.5rem;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  min-width: 140px;
+}
+.hero-stat .val {
+  font-size: 1.8rem;
+  font-weight: 800;
+  font-family: var(--mono);
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-green));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-stat .lbl { font-size: 0.72rem; color: var(--muted); margin-top: 0.25rem; text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* MAIN GRID */
+.main { padding: 2rem; display: flex; flex-direction: column; gap: 2rem; max-width: 1600px; margin: 0 auto; }
+
+/* KPI ROW */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.kpi-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,212,255,0.15); }
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 16px 16px 0 0;
+}
+.kpi-card.blue::before { background: var(--pepsi-blue); }
+.kpi-card.cyan::before { background: var(--accent-cyan); }
+.kpi-card.green::before { background: var(--accent-green); }
+.kpi-card.amber::before { background: var(--accent-amber); }
+.kpi-card.red::before { background: var(--pepsi-red); }
+
+.kpi-icon { font-size: 1.8rem; margin-bottom: 0.75rem; }
+.kpi-value {
+  font-size: 1.9rem;
+  font-weight: 800;
+  font-family: var(--mono);
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+.kpi-card.blue .kpi-value { color: #5BB3FF; }
+.kpi-card.cyan .kpi-value { color: var(--accent-cyan); }
+.kpi-card.green .kpi-value { color: var(--accent-green); }
+.kpi-card.amber .kpi-value { color: var(--accent-amber); }
+.kpi-card.red .kpi-value { color: #FF7070; }
+
+.kpi-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.kpi-delta {
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex; align-items: center; gap: 0.4rem;
+}
+.kpi-delta.good { color: var(--accent-green); }
+.kpi-delta.warn { color: var(--accent-amber); }
+.kpi-delta.bad { color: var(--accent-danger); }
+
+/* SECTION TITLES */
+.section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.section-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  background: rgba(0,212,255,0.1);
+  border: 1px solid rgba(0,212,255,0.3);
+  color: var(--accent-cyan);
+}
+
+/* CHARTS GRID */
+.charts-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+.charts-3col {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.5rem;
+}
+@media(max-width: 1100px) { .charts-2col { grid-template-columns: 1fr; } }
+@media(max-width: 1300px) { .charts-3col { grid-template-columns: 1fr 1fr; } }
+@media(max-width: 900px) { .charts-3col { grid-template-columns: 1fr; } }
+
+.chart-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  backdrop-filter: blur(12px);
+}
+.chart-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+}
+.chart-card-title { font-size: 0.9rem; font-weight: 700; color: var(--text); }
+.chart-card-sub { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; }
+.chart-canvas-wrap { position: relative; height: 240px; }
+
+/* PEAK LOAD SHIFTER */
+.peak-load-section { display: grid; grid-template-columns: 1fr 380px; gap: 1.5rem; }
+@media(max-width:1100px) { .peak-load-section { grid-template-columns: 1fr; } }
+
+.schedule-grid {
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  gap: 2px;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+.schedule-hour {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.schedule-hour:hover { transform: scaleY(1.08); }
+.schedule-bar {
+  width: 100%;
+  border-radius: 4px 4px 0 0;
+  transition: height 0.4s ease, background 0.4s ease;
+  min-height: 4px;
+}
+.schedule-bar.peak { background: linear-gradient(180deg, var(--pepsi-red), #ff8a80); }
+.schedule-bar.offpeak { background: linear-gradient(180deg, var(--accent-green), #69f0ae); }
+.schedule-bar.shifted { background: linear-gradient(180deg, var(--accent-amber), #ffe082); }
+.schedule-label { font-family: var(--mono); font-size: 0.55rem; color: var(--muted); }
+
+.shifter-controls {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.control-row { display: flex; flex-direction: column; gap: 0.5rem; }
+.control-label { font-size: 0.78rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.control-val { font-size: 1.4rem; font-weight: 800; font-family: var(--mono); color: var(--accent-cyan); }
+
+input[type=range] {
+  width: 100%;
+  -webkit-appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--glass);
+  outline: none;
+  border: 1px solid var(--border);
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0,212,255,0.5);
+}
+
+.savings-box {
+  background: rgba(0,230,118,0.08);
+  border: 1px solid rgba(0,230,118,0.25);
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+}
+.savings-val { font-size: 1.8rem; font-weight: 800; font-family: var(--mono); color: var(--accent-green); }
+.savings-lbl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.25rem; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.7rem 1.5rem;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--pepsi-blue), var(--accent-cyan));
+  color: #fff;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,212,255,0.35); }
+.btn-danger {
+  background: linear-gradient(135deg, var(--pepsi-red), #ff8a80);
+  color: #fff;
+}
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.btn-outline:hover { background: var(--glass); border-color: var(--accent-cyan); color: var(--accent-cyan); }
+
+/* ETP AUDITOR */
+.etp-section { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+@media(max-width:1000px) { .etp-section { grid-template-columns: 1fr; } }
+
+.param-table { width: 100%; border-collapse: collapse; }
+.param-table th {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.param-table td {
+  padding: 0.85rem 1rem;
+  font-size: 0.85rem;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  vertical-align: middle;
+}
+.param-table tr:hover td { background: var(--glass); }
+.param-name { font-weight: 600; color: var(--text); }
+.param-val { font-family: var(--mono); font-weight: 700; }
+.param-range { font-size: 0.72rem; color: var(--muted); }
+.status-chip {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+.chip-ok { background: rgba(0,230,118,0.15); color: var(--accent-green); border: 1px solid rgba(0,230,118,0.3); }
+.chip-warn { background: rgba(255,179,0,0.15); color: var(--accent-amber); border: 1px solid rgba(255,179,0,0.3); }
+.chip-bad { background: rgba(255,82,82,0.15); color: var(--accent-danger); border: 1px solid rgba(255,82,82,0.3); }
+
+.bar-mini {
+  height: 6px; border-radius: 3px;
+  background: var(--glass);
+  overflow: hidden;
+  margin-top: 4px;
+  width: 120px;
+}
+.bar-mini-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s ease;
+}
+
+/* BATCH LOG TABLE */
+.log-table { width: 100%; border-collapse: collapse; }
+.log-table th {
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--muted); padding: 0.75rem 0.85rem; border-bottom: 1px solid var(--border); text-align: left;
+}
+.log-table td { padding: 0.75rem 0.85rem; font-size: 0.82rem; border-bottom: 1px solid rgba(255,255,255,0.03); }
+.log-table tr:hover td { background: var(--glass); }
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-family: var(--mono);
+}
+.badge-green { background: rgba(0,230,118,0.15); color: var(--accent-green); }
+.badge-amber { background: rgba(255,179,0,0.15); color: var(--accent-amber); }
+.badge-red { background: rgba(255,82,82,0.15); color: var(--accent-danger); }
+
+/* ALERT PANEL */
+.alerts-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.alerts-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.alerts-list { max-height: 280px; overflow-y: auto; }
+.alerts-list::-webkit-scrollbar { width: 4px; }
+.alerts-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.alert-item {
+  padding: 0.85rem 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex; align-items: flex-start; gap: 1rem;
+  animation: slideIn 0.4s ease;
+}
+@keyframes slideIn { from { opacity:0; transform: translateX(-10px); } to { opacity:1; transform: translateX(0); } }
+.alert-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+.alert-msg { font-size: 0.82rem; color: var(--text); line-height: 1.5; }
+.alert-time { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); margin-top: 0.2rem; }
+.alert-item.critical { border-left: 3px solid var(--accent-danger); }
+.alert-item.warning { border-left: 3px solid var(--accent-amber); }
+.alert-item.info { border-left: 3px solid var(--accent-cyan); }
+.alert-item.success { border-left: 3px solid var(--accent-green); }
+
+/* GAUGE METERS */
+.gauges-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; }
+.gauge-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  text-align: center;
+  backdrop-filter: blur(12px);
+}
+.gauge-wrap { position: relative; width: 120px; margin: 0 auto 0.75rem; }
+.gauge-svg { transform: rotate(-90deg); }
+.gauge-label { font-size: 0.78rem; font-weight: 700; color: var(--text); }
+.gauge-sub { font-size: 0.68rem; color: var(--muted); margin-top: 0.25rem; }
+.gauge-value {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) rotate(0deg);
+  font-size: 1.2rem;
+  font-weight: 800;
+  font-family: var(--mono);
+}
+
+/* FOOTER */
+.footer {
+  text-align: center;
+  padding: 2rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin-top: 1rem;
+}
+.footer strong { color: var(--accent-cyan); }
+
+/* PULSE ANIMATION FOR LIVE DATA */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,212,255,0); }
+  50% { box-shadow: 0 0 0 6px rgba(0,212,255,0.1); }
+}
+.live { animation: pulseGlow 2s ease-in-out infinite; }
+
+/* LEGEND ROW */
+.legend-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+.legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: var(--muted); }
+.legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="pepsi-logo"></div>
+    <div class="topbar-brand">
+      <div class="topbar-title">Smart Energy & Water Conservation Optimizer</div>
+      <div class="topbar-sub">Haidri Beverages (Pepsi) · Plant Operations Intelligence Platform</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="status-pill"><div class="status-dot"></div>Live Telemetry</div>
+    <div class="author-badge">👨‍💻 Lokesh Kumar</div>
+    <div class="time-display" id="liveTime">--:--:--</div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-tag">⚡ Plant Utilities Operations Intelligence</div>
+  <h1>Energy & Water<br>Conservation Dashboard</h1>
+  <p>Real-time monitoring of utility consumption, peak-load shifting optimization, ETP chemical auditing, and batch-level resource efficiency tracking for Haidri Beverages bottling operations.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="val" id="totalSaving">23.7%</div><div class="lbl">Energy Cost Saved</div></div>
+    <div class="hero-stat"><div class="val" id="waterSaved">18.4%</div><div class="lbl">Water Recycled</div></div>
+    <div class="hero-stat"><div class="val" id="batchCount">142</div><div class="lbl">Batches Logged Today</div></div>
+    <div class="hero-stat"><div class="val" id="carbonSaved">4.2 T</div><div class="lbl">CO₂ Emissions Offset</div></div>
+  </div>
+</section>
+
+<!-- MAIN DASHBOARD -->
+<main class="main">
+
+  <!-- KPI ROW -->
+  <div>
+    <div class="section-title">⚡ Live Plant KPIs <span class="section-badge">Real-Time</span></div>
+    <div class="kpi-row">
+      <div class="kpi-card cyan live">
+        <div class="kpi-icon">⚡</div>
+        <div class="kpi-value" id="kpiKwh">847</div>
+        <div class="kpi-label">kWh Consumption (Current Hour)</div>
+        <div class="kpi-delta good">↓ 12.4% vs. peak rate</div>
+      </div>
+      <div class="kpi-card green live">
+        <div class="kpi-icon">💧</div>
+        <div class="kpi-value" id="kpiWater">3,240</div>
+        <div class="kpi-label">Liters Water Used Today</div>
+        <div class="kpi-delta good">↓ 8.3% vs. last week</div>
+      </div>
+      <div class="kpi-card amber live">
+        <div class="kpi-icon">📦</div>
+        <div class="kpi-value" id="kpiEfficiency">2.28</div>
+        <div class="kpi-label">kWh / 1000 Bottles Bottled</div>
+        <div class="kpi-delta good">↓ 5.1% vs. target</div>
+      </div>
+      <div class="kpi-card blue live">
+        <div class="kpi-icon">♻️</div>
+        <div class="kpi-value" id="kpiRecycle">84%</div>
+        <div class="kpi-label">Effluent Recycling Rate</div>
+        <div class="kpi-delta good">↑ 6.2% vs. last month</div>
+      </div>
+      <div class="kpi-card red live">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-value" id="kpiCost">PKR 48K</div>
+        <div class="kpi-label">Estimated Energy Cost Today</div>
+        <div class="kpi-delta good">↓ PKR 8.2K saved</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENERGY CHARTS -->
+  <div>
+    <div class="section-title">📊 Energy Consumption Analytics <span class="section-badge">24-Hour View</span></div>
+    <div class="charts-2col">
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div>
+            <div class="chart-card-title">Hourly Energy Consumption vs. Optimized Schedule</div>
+            <div class="chart-card-sub">kWh consumed per hour with peak-shifted baseline</div>
+          </div>
+        </div>
+        <div class="chart-canvas-wrap"><canvas id="energyChart"></canvas></div>
+        <div class="legend-row">
+          <div class="legend-item"><div class="legend-dot" style="background:#FF5252;"></div>Actual Consumption</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#00E676;"></div>Optimized Target</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#FFB300;"></div>Peak Rate Window</div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div>
+            <div class="chart-card-title">Daily Water Consumption per Batch</div>
+            <div class="chart-card-sub">Liters per 1000 bottles across production batches</div>
+          </div>
+        </div>
+        <div class="chart-canvas-wrap"><canvas id="waterChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3-COL CHARTS -->
+  <div class="charts-3col">
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div>
+          <div class="chart-card-title">Utility Type Breakdown</div>
+          <div class="chart-card-sub">kWh share by utility system</div>
+        </div>
+      </div>
+      <div class="chart-canvas-wrap"><canvas id="pieChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div>
+          <div class="chart-card-title">7-Day Energy Cost Trend</div>
+          <div class="chart-card-sub">PKR cost with vs. without optimization</div>
+        </div>
+      </div>
+      <div class="chart-canvas-wrap"><canvas id="costChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div>
+          <div class="chart-card-title">Water Recycling Efficiency</div>
+          <div class="chart-card-sub">Recycled vs. discharged vs. consumed</div>
+        </div>
+      </div>
+      <div class="chart-canvas-wrap"><canvas id="recycleChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- PEAK LOAD SHIFTER -->
+  <div>
+    <div class="section-title">🔄 Peak-Load Shifting Optimizer <span class="section-badge">AI-Powered</span></div>
+    <div class="peak-load-section">
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div>
+            <div class="chart-card-title">24-Hour Chiller Load Distribution</div>
+            <div class="chart-card-sub">Drag sliders below to simulate load shifting. Green = off-peak. Red = peak. Yellow = shifted.</div>
+          </div>
+          <button class="btn btn-primary" id="optimizeBtn" onclick="runOptimizer()">⚡ Run Optimizer</button>
+        </div>
+        <div class="schedule-grid" id="scheduleGrid"></div>
+        <div class="legend-row" style="margin-top:1rem">
+          <div class="legend-item"><div class="legend-dot" style="background:#FF5252;"></div>Peak Rate (High Cost)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#00E676;"></div>Off-Peak (Low Cost)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#FFB300;"></div>Shifted Load (Saved)</div>
+        </div>
+      </div>
+      <div class="shifter-controls">
+        <div class="section-title" style="margin-bottom:0.5rem">⚙️ Optimization Controls</div>
+        <div class="control-row">
+          <div class="control-label">Chiller Rated Power (kW)</div>
+          <div class="control-val" id="chillerPow">380 kW</div>
+          <input type="range" min="100" max="800" value="380" id="chillerSlider" oninput="updateChiller(this.value)"/>
+        </div>
+        <div class="control-row">
+          <div class="control-label">Peak Rate Window (hours)</div>
+          <div class="control-val" id="peakHours">8–18h</div>
+          <input type="range" min="4" max="16" value="10" id="peakSlider" oninput="updatePeak(this.value)"/>
+        </div>
+        <div class="control-row">
+          <div class="control-label">Off-Peak Tariff (PKR/kWh)</div>
+          <div class="control-val" id="offpeakRate">PKR 18</div>
+          <input type="range" min="10" max="30" value="18" id="tariffSlider" oninput="updateTariff(this.value)"/>
+        </div>
+        <div class="savings-box">
+          <div class="savings-val" id="savingsAmount">PKR 14,220</div>
+          <div class="savings-lbl">Projected Daily Savings</div>
+        </div>
+        <div class="savings-box" style="background:rgba(0,212,255,0.08);border-color:rgba(0,212,255,0.25);">
+          <div class="savings-val" style="color:var(--accent-cyan)" id="co2Reduction">1.8 Tons</div>
+          <div class="savings-lbl">CO₂ Reduction Equivalent</div>
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="runOptimizer()">🧠 Re-Optimize Schedule</button>
+        <button class="btn btn-outline" style="width:100%" onclick="resetSchedule()">↩ Reset to Baseline</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAUGES -->
+  <div>
+    <div class="section-title">🎯 Live System Gauges <span class="section-badge">Telemetry</span></div>
+    <div class="gauges-row" id="gaugesRow"></div>
+  </div>
+
+  <!-- ETP AUDITOR -->
+  <div>
+    <div class="section-title">🌊 Effluent Treatment Plant (ETP) Auditor <span class="section-badge">Compliance</span></div>
+    <div class="etp-section">
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div>
+            <div class="chart-card-title">Chemical Parameters — Real-Time Readings</div>
+            <div class="chart-card-sub">Wastewater quality before discharge. NEQS = National Environmental Quality Standards.</div>
+          </div>
+          <button class="btn btn-outline" onclick="refreshETP()">🔄 Refresh</button>
+        </div>
+        <table class="param-table" id="etpTable">
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>Reading</th>
+              <th>NEQS Limit</th>
+              <th>Status</th>
+              <th>Level</th>
+            </tr>
+          </thead>
+          <tbody id="etpBody"></tbody>
+        </table>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div>
+            <div class="chart-card-title">pH & TDS Trend (Last 12 Hours)</div>
+            <div class="chart-card-sub">Chemical stability monitoring over operating shift</div>
+          </div>
+        </div>
+        <div class="chart-canvas-wrap"><canvas id="etpChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM GRID: BATCH LOG + ALERTS -->
+  <div class="charts-2col">
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div>
+          <div class="chart-card-title">📋 Batch Production Log</div>
+          <div class="chart-card-sub">Resource consumption per batch with efficiency rating</div>
+        </div>
+        <button class="btn btn-primary" onclick="addBatch()">+ Log New Batch</button>
+      </div>
+      <table class="log-table" id="batchTable">
+        <thead>
+          <tr>
+            <th>Batch ID</th>
+            <th>Volume (L)</th>
+            <th>kWh</th>
+            <th>Water (L)</th>
+            <th>kWh/kL</th>
+            <th>Rating</th>
+          </tr>
+        </thead>
+        <tbody id="batchBody"></tbody>
+      </table>
+    </div>
+    <div class="alerts-panel">
+      <div class="alerts-header">
+        <div class="section-title" style="margin-bottom:0">🔔 System Alerts & Notifications</div>
+        <button class="btn btn-outline" style="font-size:0.72rem;padding:0.35rem 0.7rem" onclick="clearAlerts()">Clear All</button>
+      </div>
+      <div class="alerts-list" id="alertsList"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM CHART: CO2 EMISSIONS TRACKER -->
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div>
+        <div class="chart-card-title">🌱 Carbon Emissions vs. Reduction Target (Monthly)</div>
+        <div class="chart-card-sub">Actual CO₂ emissions vs. optimized trajectory vs. Pepsi sustainability target</div>
+      </div>
+    </div>
+    <div class="chart-canvas-wrap" style="height:200px"><canvas id="co2Chart"></canvas></div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  Developed by <strong>Lokesh Kumar</strong> — Final Year Software Engineering, Sindh Agriculture University &nbsp;|&nbsp;
+  Designed for <strong>Haidri Beverages (Pepsi)</strong> Plant Operations &nbsp;|&nbsp;
+  Stack: Python · SQLite · Plotly · NetworkX · Streamlit (Production Version)
+  <br><br>
+  Portfolio: <strong>lokeshsoni653-del.github.io</strong> &nbsp;|&nbsp; Email: <strong>lokeshsoni653@gmail.com</strong>
+</footer>
+
+</div><!-- /wrapper -->
+
+<script>
+'use strict';
+
+/* ─── LIVE CLOCK ─── */
+function updateClock() {
+  const now = new Date();
+  document.getElementById('liveTime').textContent =
+    now.toLocaleTimeString('en-GB', { hour12: false });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* ─── CHART.JS DEFAULT THEME ─── */
+Chart.defaults.color = '#7BB3D4';
+Chart.defaults.borderColor = 'rgba(0,212,255,0.08)';
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.font.size = 11;
+
+const COLORS = {
+  cyan: '#00D4FF', green: '#00E676', amber: '#FFB300',
+  red: '#FF5252', blue: '#004B93', lightBlue: '#5BB3FF'
+};
+
+function rgba(hex, a) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+/* ─── ENERGY CHART ─── */
+const hours24 = Array.from({length:24}, (_,i) => `${String(i).padStart(2,'0')}:00`);
+
+const actualEnergy = [
+  320, 280, 260, 245, 255, 340, 620, 890, 940, 960, 980, 950,
+  920, 900, 950, 940, 860, 750, 610, 480, 440, 400, 370, 340
+];
+const optimizedTarget = [
+  380, 380, 380, 360, 360, 360, 400, 680, 730, 760, 780, 750,
+  720, 700, 740, 730, 680, 680, 680, 680, 440, 400, 380, 380
+];
+
+const energyCtx = document.getElementById('energyChart').getContext('2d');
+new Chart(energyCtx, {
+  type: 'line',
+  data: {
+    labels: hours24,
+    datasets: [
+      {
+        label: 'Actual kWh',
+        data: actualEnergy,
+        borderColor: COLORS.red,
+        backgroundColor: rgba(COLORS.red, 0.08),
+        fill: true,
+        tension: 0.4,
+        borderWidth: 2,
+        pointRadius: 0,
+      },
+      {
+        label: 'Optimized Target',
+        data: optimizedTarget,
+        borderColor: COLORS.green,
+        backgroundColor: rgba(COLORS.green, 0.05),
+        fill: false,
+        tension: 0.4,
+        borderWidth: 2,
+        borderDash: [6,3],
+        pointRadius: 0,
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: rgba('#00D4FF', 0.06) }, ticks: { maxTicksLimit: 8 } },
+      y: { grid: { color: rgba('#00D4FF', 0.06) }, beginAtZero: true, title: { display: true, text: 'kWh', color: '#7BB3D4' } }
+    }
+  }
+});
+
+/* ─── WATER CHART ─── */
+const batches = Array.from({length:18}, (_,i) => `B-${String(i+1).padStart(3,'0')}`);
+const waterData = batches.map(() => +(2.8 + Math.random()*1.4).toFixed(2));
+
+const waterCtx = document.getElementById('waterChart').getContext('2d');
+new Chart(waterCtx, {
+  type: 'bar',
+  data: {
+    labels: batches,
+    datasets: [{
+      label: 'Liters / 1000 Bottles',
+      data: waterData,
+      backgroundColor: waterData.map(v => v < 3.2 ? rgba(COLORS.green, 0.7) : v < 3.8 ? rgba(COLORS.amber, 0.7) : rgba(COLORS.red, 0.7)),
+      borderRadius: 6,
+      borderWidth: 0,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { maxTicksLimit: 9, font: { size: 9 } } },
+      y: { grid: { color: rgba('#00D4FF', 0.06) }, beginAtZero: true, title: { display: true, text: 'L/1000 Bottles', color: '#7BB3D4' } }
+    }
+  }
+});
+
+/* ─── PIE CHART ─── */
+const pieCtx = document.getElementById('pieChart').getContext('2d');
+new Chart(pieCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['Glycol Chillers', 'Compressed Air', 'CO₂ Purif.', 'Boilers', 'Lighting', 'Conveyors'],
+    datasets: [{
+      data: [38, 22, 14, 12, 8, 6],
+      backgroundColor: [COLORS.cyan, COLORS.blue, COLORS.green, COLORS.amber, COLORS.red, COLORS.lightBlue].map(c => rgba(c, 0.75)),
+      borderColor: [COLORS.cyan, COLORS.blue, COLORS.green, COLORS.amber, COLORS.red, COLORS.lightBlue],
+      borderWidth: 1.5,
+      hoverOffset: 8
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom', labels: { padding: 12, boxWidth: 10, font: { size: 10 } } }
+    },
+    cutout: '62%'
+  }
+});
+
+/* ─── COST CHART ─── */
+const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const costWith = [62000, 58000, 65000, 60000, 63000, 55000, 52000];
+const costWithout = [72000, 68000, 75000, 70000, 73000, 66000, 61000];
+const costCtx = document.getElementById('costChart').getContext('2d');
+new Chart(costCtx, {
+  type: 'bar',
+  data: {
+    labels: days,
+    datasets: [
+      { label: 'Without Optimization', data: costWithout, backgroundColor: rgba(COLORS.red, 0.6), borderRadius: 6, borderWidth: 0 },
+      { label: 'With Optimization', data: costWith, backgroundColor: rgba(COLORS.green, 0.6), borderRadius: 6, borderWidth: 0 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { labels: { boxWidth: 10, font: { size: 10 } } } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { grid: { color: rgba('#00D4FF', 0.06) }, title: { display: true, text: 'PKR', color: '#7BB3D4' } }
+    }
+  }
+});
+
+/* ─── RECYCLE CHART ─── */
+const recycleCtx = document.getElementById('recycleChart').getContext('2d');
+new Chart(recycleCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['Recycled', 'Treated & Discharged', 'Process Loss'],
+    datasets: [{
+      data: [84, 12, 4],
+      backgroundColor: [rgba(COLORS.green, 0.75), rgba(COLORS.amber, 0.75), rgba(COLORS.red, 0.65)],
+      borderColor: [COLORS.green, COLORS.amber, COLORS.red],
+      borderWidth: 1.5,
+      hoverOffset: 8
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { padding: 10, boxWidth: 10, font: { size: 10 } } } },
+    cutout: '60%'
+  }
+});
+
+/* ─── CO2 CHART ─── */
+const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const co2Actual = [48, 45, 47, 43, 42, 40, null, null, null, null, null, null];
+const co2Target = [48, 44, 42, 40, 38, 36, 34, 32, 30, 28, 26, 24];
+const co2Ctx = document.getElementById('co2Chart').getContext('2d');
+new Chart(co2Ctx, {
+  type: 'line',
+  data: {
+    labels: months,
+    datasets: [
+      { label: 'Actual Emissions (Tons CO₂)', data: co2Actual, borderColor: COLORS.red, backgroundColor: rgba(COLORS.red, 0.08), fill: true, tension: 0.4, borderWidth: 2, pointRadius: 4, pointBackgroundColor: COLORS.red },
+      { label: 'Sustainability Target', data: co2Target, borderColor: COLORS.green, borderDash: [6,3], fill: false, tension: 0.4, borderWidth: 2, pointRadius: 3 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { labels: { boxWidth: 12, font: { size: 11 } } } },
+    scales: {
+      x: { grid: { color: rgba('#00D4FF', 0.06) } },
+      y: { grid: { color: rgba('#00D4FF', 0.06) }, title: { display: true, text: 'Tons CO₂/month', color: '#7BB3D4' } }
+    }
+  }
+});
+
+/* ─── ETP CHART ─── */
+const etpHours = Array.from({length:13}, (_,i) => `${String(i+6).padStart(2,'0')}:00`);
+const pHData = etpHours.map(() => +(7.0 + (Math.random()-0.5)*1.5).toFixed(2));
+const tdsData = etpHours.map(() => +(480 + (Math.random()-0.5)*180).toFixed(0));
+const etpCtx = document.getElementById('etpChart').getContext('2d');
+new Chart(etpCtx, {
+  type: 'line',
+  data: {
+    labels: etpHours,
+    datasets: [
+      { label: 'pH Level', data: pHData, borderColor: COLORS.cyan, backgroundColor: rgba(COLORS.cyan,0.07), fill: true, tension: 0.4, yAxisID: 'y', borderWidth: 2, pointRadius: 3 },
+      { label: 'TDS (mg/L ÷ 100)', data: tdsData.map(v => v/100), borderColor: COLORS.amber, fill: false, tension: 0.4, yAxisID: 'y', borderWidth: 2, borderDash:[4,2], pointRadius: 3 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { labels: { boxWidth: 10, font: { size: 10 } } } },
+    scales: {
+      x: { grid: { color: rgba('#00D4FF', 0.06) } },
+      y: { grid: { color: rgba('#00D4FF', 0.06) } }
+    }
+  }
+});
+
+/* ─── SCHEDULE GRID ─── */
+const baseLoads = [
+  20, 18, 18, 18, 20, 35, 85, 95, 100, 98, 95, 92,
+  90, 88, 92, 95, 90, 78, 55, 40, 32, 28, 24, 22
+];
+let currentLoads = [...baseLoads];
+let isOptimized = false;
+
+function renderScheduleGrid() {
+  const grid = document.getElementById('scheduleGrid');
+  grid.innerHTML = '';
+  const max = Math.max(...currentLoads);
+  currentLoads.forEach((load, i) => {
+    const isPeak = i >= 8 && i <= 18;
+    const wasShifted = isOptimized && isPeak && load < baseLoads[i] - 5;
+    const div = document.createElement('div');
+    div.className = 'schedule-hour';
+    const barH = Math.round((load / max) * 100);
+    const barClass = wasShifted ? 'shifted' : isPeak ? 'peak' : 'offpeak';
+    div.innerHTML = `
+      <div class="schedule-bar ${barClass}" style="height:${barH}px;" title="${load}kW at ${String(i).padStart(2,'0')}:00"></div>
+      <div class="schedule-label">${String(i).padStart(2,'0')}</div>
+    `;
+    grid.appendChild(div);
+  });
+}
+renderScheduleGrid();
+
+let chillerPow = 380, peakWindow = 10, offpeakTariff = 18;
+
+function updateChiller(v) { chillerPow = +v; document.getElementById('chillerPow').textContent = `${v} kW`; recalcSavings(); }
+function updatePeak(v) { peakWindow = +v; document.getElementById('peakHours').textContent = `8–${8+parseInt(v)}h`; recalcSavings(); }
+function updateTariff(v) { offpeakTariff = +v; document.getElementById('offpeakRate').textContent = `PKR ${v}`; recalcSavings(); }
+
+function recalcSavings() {
+  const peakTariff = offpeakTariff * 2.2;
+  const peakHoursCount = peakWindow;
+  const offPeakSaving = chillerPow * peakHoursCount * 0.35 * (peakTariff - offpeakTariff);
+  const savingK = Math.round(offPeakSaving / 1000) * 1000;
+  document.getElementById('savingsAmount').textContent = `PKR ${savingK.toLocaleString()}`;
+  const co2 = (chillerPow * peakHoursCount * 0.35 * 0.0004).toFixed(1);
+  document.getElementById('co2Reduction').textContent = `${co2} Tons`;
+}
+recalcSavings();
+
+function runOptimizer() {
+  isOptimized = true;
+  const btn = document.getElementById('optimizeBtn');
+  btn.textContent = '⏳ Optimizing...';
+  btn.disabled = true;
+  setTimeout(() => {
+    currentLoads = baseLoads.map((load, i) => {
+      if (i >= 8 && i <= 18) return Math.max(load * 0.58, 20);
+      if (i <= 7 || i >= 19) return Math.min(load * 1.45, 100);
+      return load;
+    });
+    renderScheduleGrid();
+    btn.textContent = '✅ Optimized!';
+    btn.disabled = false;
+    addAlert('success', '✅ Optimizer ran successfully. Projected saving: PKR 14,220 today.', 'Now');
+    recalcSavings();
+  }, 1200);
+}
+
+function resetSchedule() {
+  isOptimized = false;
+  currentLoads = [...baseLoads];
+  renderScheduleGrid();
+  document.getElementById('optimizeBtn').textContent = '⚡ Run Optimizer';
+  addAlert('info', 'ℹ️ Schedule reset to baseline. Optimizer cleared.', 'Now');
+}
+
+/* ─── GAUGES ─── */
+const gauges = [
+  { label: 'Boiler Steam Pressure', sub: 'Bar', val: 76, color: COLORS.cyan, max: 100, unit: '%' },
+  { label: 'Chiller-A Temp.', sub: '°C', val: 52, color: COLORS.green, max: 100, unit: '%' },
+  { label: 'Compressed Air', sub: 'kPa', val: 84, color: COLORS.amber, max: 100, unit: '%' },
+  { label: 'CO₂ Purity', sub: 'Quality Index', val: 98, color: COLORS.blue, max: 100, unit: '%' },
+  { label: 'Water Pressure', sub: 'PSI', val: 63, color: COLORS.lightBlue, max: 100, unit: '%' },
+  { label: 'ETP Flow Rate', sub: 'm³/hr', val: 45, color: COLORS.red, max: 100, unit: '%' },
+];
+
+function buildGauges() {
+  const row = document.getElementById('gaugesRow');
+  gauges.forEach(g => {
+    const r = 46; const circ = 2 * Math.PI * r;
+    const fill = (g.val / g.max) * circ;
+    const card = document.createElement('div');
+    card.className = 'gauge-card';
+    card.innerHTML = `
+      <div class="gauge-wrap">
+        <svg class="gauge-svg" width="120" height="120" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="${r}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+          <circle cx="60" cy="60" r="${r}" fill="none" stroke="${g.color}" stroke-width="10"
+            stroke-dasharray="${fill.toFixed(1)} ${circ.toFixed(1)}"
+            stroke-linecap="round"
+            style="filter:drop-shadow(0 0 6px ${g.color})"
+          />
+        </svg>
+        <div class="gauge-value" style="color:${g.color}">${g.val}${g.unit}</div>
+      </div>
+      <div class="gauge-label">${g.label}</div>
+      <div class="gauge-sub">${g.sub}</div>
+    `;
+    row.appendChild(card);
+  });
+}
+buildGauges();
+
+/* ─── ETP PARAMETERS ─── */
+const etpParams = [
+  { name: 'pH Level', val: 7.4, unit: '', min: 6.5, max: 8.5, status: 'ok' },
+  { name: 'Total Dissolved Solids (TDS)', val: 520, unit: 'mg/L', min: 0, max: 1000, status: 'ok' },
+  { name: 'Chemical Oxygen Demand (COD)', val: 148, unit: 'mg/L', min: 0, max: 150, status: 'warn' },
+  { name: 'Biochemical O₂ Demand (BOD)', val: 42, unit: 'mg/L', min: 0, max: 80, status: 'ok' },
+  { name: 'Total Suspended Solids (TSS)', val: 38, unit: 'mg/L', min: 0, max: 50, status: 'ok' },
+  { name: 'Temperature of Effluent', val: 36, unit: '°C', min: 0, max: 40, status: 'ok' },
+  { name: 'Residual Chlorine', val: 0.8, unit: 'mg/L', min: 0, max: 2.0, status: 'ok' },
+  { name: 'Oil & Grease', val: 9.2, unit: 'mg/L', min: 0, max: 10, status: 'warn' },
+];
+
+function renderETP() {
+  const tbody = document.getElementById('etpBody');
+  tbody.innerHTML = '';
+  etpParams.forEach(p => {
+    const limitStr = `${p.min}–${p.max} ${p.unit}`;
+    const pct = Math.min((p.val / p.max) * 100, 100);
+    const barColor = p.status === 'ok' ? COLORS.green : p.status === 'warn' ? COLORS.amber : COLORS.red;
+    const chipClass = p.status === 'ok' ? 'chip-ok' : p.status === 'warn' ? 'chip-warn' : 'chip-bad';
+    const chipText = p.status === 'ok' ? '✓ PASS' : p.status === 'warn' ? '⚠ CAUTION' : '✗ BREACH';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="param-name">${p.name}</td>
+      <td class="param-val" style="color:${barColor}">${p.val} ${p.unit}</td>
+      <td class="param-range">${limitStr}</td>
+      <td><span class="status-chip ${chipClass}">${chipText}</span></td>
+      <td>
+        <div class="bar-mini"><div class="bar-mini-fill" style="width:${pct}%;background:${barColor}"></div></div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+renderETP();
+
+function refreshETP() {
+  etpParams.forEach(p => {
+    const jitter = (Math.random() - 0.5) * (p.max - p.min) * 0.08;
+    p.val = +Math.max(p.min, Math.min(p.max, p.val + jitter)).toFixed(2);
+    const pct = p.val / p.max;
+    p.status = pct > 0.95 ? 'bad' : pct > 0.85 ? 'warn' : 'ok';
+  });
+  renderETP();
+  addAlert('info', '🔄 ETP parameters refreshed from plant sensors.', 'Now');
+}
+
+/* ─── BATCH LOG ─── */
+const batchData = [
+  { id: 'B-001', vol: 5000, kwh: 11.4, water: 14800 },
+  { id: 'B-002', vol: 5000, kwh: 10.8, water: 14200 },
+  { id: 'B-003', vol: 4800, kwh: 11.1, water: 14600 },
+  { id: 'B-004', vol: 5200, kwh: 10.2, water: 13900 },
+  { id: 'B-005', vol: 5000, kwh: 13.8, water: 17200 },
+  { id: 'B-006', vol: 4900, kwh: 10.9, water: 14100 },
+];
+let batchCounter = 7;
+
+function renderBatchTable() {
+  const tbody = document.getElementById('batchBody');
+  tbody.innerHTML = '';
+  batchData.slice(-8).forEach(b => {
+    const eff = (b.kwh / (b.vol / 1000)).toFixed(2);
+    const rating = eff < 2.5 ? ['badge-green','Excellent'] : eff < 3.2 ? ['badge-amber','Good'] : ['badge-red','Needs Review'];
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="font-family:var(--mono);color:var(--accent-cyan)">${b.id}</td>
+      <td>${b.vol.toLocaleString()}</td>
+      <td style="font-family:var(--mono)">${b.kwh}</td>
+      <td>${b.water.toLocaleString()}</td>
+      <td style="font-family:var(--mono);color:var(--accent-amber)">${eff}</td>
+      <td><span class="badge ${rating[0]}">${rating[1]}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+renderBatchTable();
+
+function addBatch() {
+  const vol = 4800 + Math.round(Math.random() * 600);
+  const kwh = +(9.8 + Math.random() * 4.5).toFixed(1);
+  const water = 13500 + Math.round(Math.random() * 4000);
+  const id = `B-${String(batchCounter).padStart(3,'0')}`;
+  batchCounter++;
+  batchData.push({ id, vol, kwh, water });
+  renderBatchTable();
+  document.getElementById('batchCount').textContent = batchCounter + 135;
+  addAlert('success', `📦 New batch ${id} logged. Volume: ${vol.toLocaleString()}L, Energy: ${kwh} kWh.`, 'Now');
+}
+
+/* ─── ALERTS ─── */
+const initialAlerts = [
+  { type: 'warning', msg: '⚠️ COD reading approaching NEQS limit (148 / 150 mg/L). Aeration increase recommended.', time: '20:44' },
+  { type: 'info', msg: 'ℹ️ Chiller-B scheduled for off-peak restart at 23:00 as per optimized schedule.', time: '20:30' },
+  { type: 'success', msg: '✅ Daily water recycling target of 80% exceeded. Current: 84%.', time: '19:52' },
+  { type: 'critical', msg: '🚨 Boiler feed pump pressure dropped below 90 Bar. Maintenance crew notified.', time: '18:20' },
+  { type: 'info', msg: 'ℹ️ Peak-load optimizer triggered: Chillers A & B shifted to off-peak window.', time: '18:00' },
+  { type: 'success', msg: '✅ ETP discharge parameters all within NEQS limits. Cleared for discharge at 17:40.', time: '17:40' },
+];
+
+function renderAlerts(list) {
+  const container = document.getElementById('alertsList');
+  container.innerHTML = '';
+  list.forEach(a => {
+    const div = document.createElement('div');
+    div.className = `alert-item ${a.type}`;
+    div.innerHTML = `<div class="alert-msg">${a.msg}<div class="alert-time">${a.time}</div></div>`;
+    container.appendChild(div);
+  });
+}
+renderAlerts(initialAlerts);
+
+function addAlert(type, msg, time) {
+  const now = new Date();
+  const t = time === 'Now' ? now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : time;
+  initialAlerts.unshift({ type, msg, time: t });
+  renderAlerts(initialAlerts);
+}
+
+function clearAlerts() { initialAlerts.length = 0; renderAlerts([]); }
+
+/* ─── LIVE KPI FLICKER ─── */
+function jitter(base, pct) {
+  return Math.round(base * (1 + (Math.random() - 0.5) * pct));
+}
+function updateKPIs() {
+  document.getElementById('kpiKwh').textContent = jitter(847, 0.04);
+  document.getElementById('kpiWater').textContent = (jitter(3240, 0.02)).toLocaleString();
+  document.getElementById('kpiEfficiency').textContent = (2.1 + Math.random()*0.4).toFixed(2);
+  document.getElementById('kpiRecycle').textContent = jitter(84, 0.02) + '%';
+}
+setInterval(updateKPIs, 4000);
+
+/* ─── HERO STAT ANIMATION ─── */
+function animateHeroStats() {
+  const totalS = 20 + Math.random()*7;
+  const waterS = 16 + Math.random()*5;
+  document.getElementById('totalSaving').textContent = totalS.toFixed(1) + '%';
+  document.getElementById('waterSaved').textContent = waterS.toFixed(1) + '%';
+}
+setInterval(animateHeroStats, 6000);
+</script>
+</body>
+</html>

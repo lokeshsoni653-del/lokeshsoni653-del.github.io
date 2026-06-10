@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Projects — Lokesh Kumar</title>
+  <meta name="description" content="Lokesh Kumar's 34 live projects — built for companies like Engro, Nestlé, Telenor, Hamdard, Colgate, Akhuwat, and more."/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .filter-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+    .filter-btn {
+      font-size: 0.78rem; font-weight: 600; padding: 0.4rem 0.9rem; border-radius: 100px;
+      border: 1.5px solid var(--clr-border); color: var(--clr-muted);
+      cursor: pointer; transition: all 0.2s; background: var(--clr-surface);
+    }
+    .filter-btn:hover, .filter-btn.active { background: var(--clr-accent); border-color: var(--clr-accent); color: #fff; }
+
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 1.5rem; }
+    .project-card {
+      background: var(--clr-surface); border: 1px solid var(--clr-border);
+      border-radius: var(--radius-lg); overflow: hidden;
+      transition: all 0.3s var(--ease-out);
+      display: flex; flex-direction: column;
+    }
+    .project-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: rgba(37,99,235,0.2); }
+    .project-card__header {
+      padding: 1.25rem 1.5rem 0.9rem;
+      background: linear-gradient(135deg, var(--clr-accent-lt), #f8f6ff);
+      border-bottom: 1px solid var(--clr-border);
+      display: flex; align-items: center; gap: 0.85rem;
+    }
+    .project-card__emoji { font-size: 2rem; flex-shrink: 0; }
+    .project-card__meta { flex: 1; min-width: 0; }
+    .project-card__num { font-size: 0.65rem; font-weight: 700; color: var(--clr-accent); letter-spacing: 0.1em; text-transform: uppercase; }
+    .project-card__title { font-size: 0.95rem; font-weight: 700; line-height: 1.3; }
+    .project-card__company { font-size: 0.75rem; color: var(--clr-muted); font-weight: 500; margin-top: 0.1rem; }
+    .project-card__body { padding: 1.25rem 1.5rem; flex: 1; display: flex; flex-direction: column; gap: 0.85rem; }
+    .project-card__story {
+      font-size: 0.825rem; color: var(--clr-accent); line-height: 1.6;
+      background: var(--clr-accent-lt); border-left: 3px solid var(--clr-accent);
+      padding: 0.6rem 0.85rem; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-style: italic;
+    }
+    .project-card__desc { font-size: 0.85rem; color: var(--clr-muted); line-height: 1.65; flex: 1; }
+    .project-card__footer {
+      padding: 0.85rem 1.5rem; border-top: 1px solid var(--clr-border);
+      display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+    }
+    .project-card__actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+    .project-card__btn {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      font-size: 0.75rem; font-weight: 700; padding: 0.4rem 0.85rem; border-radius: var(--radius-sm);
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .project-card__btn.primary { background: var(--clr-accent); color: #fff; }
+    .project-card__btn.primary:hover { background: var(--clr-accent-dk); transform: scale(1.03); }
+    .project-card__btn.secondary { border: 1px solid var(--clr-border); color: var(--clr-muted); }
+    .project-card__btn.secondary:hover { border-color: var(--clr-accent); color: var(--clr-accent); }
+
+    .streamlit-banner {
+      background: linear-gradient(135deg, #FF4B4B, #FF6B35);
+      border-radius: var(--radius-lg); padding: 2rem 2.5rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 2rem;
+      color: #fff; margin-bottom: 2.5rem;
+    }
+    .streamlit-banner h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .streamlit-banner p { font-size: 0.875rem; opacity: 0.9; }
+    .streamlit-btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(255,255,255,0.2); border: 1.5px solid rgba(255,255,255,0.4);
+      color: #fff; font-size: 0.875rem; font-weight: 700;
+      padding: 0.65rem 1.25rem; border-radius: var(--radius-sm);
+      white-space: nowrap; transition: background 0.2s;
+    }
+    .streamlit-btn:hover { background: rgba(255,255,255,0.3); }
+
+    .count-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: var(--clr-accent); color: #fff; font-size: 0.75rem; font-weight: 700;
+      padding: 0.2rem 0.6rem; border-radius: 100px; margin-left: 0.5rem;
+    }
+    @media(max-width:600px){ .streamlit-banner{ flex-direction: column; } .projects-grid{ grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<nav class="nav" id="main-nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">Lokesh<span>.</span></a>
+    <div class="nav__links">
+      <a href="index.html"          class="nav__link">Home</a>
+      <a href="about.html"          class="nav__link">About</a>
+      <a href="skills.html"         class="nav__link">Skills</a>
+      <a href="projects.html"       class="nav__link active">Projects</a>
+      <a href="experience.html"     class="nav__link">Experience</a>
+      <a href="education.html"      class="nav__link">Education</a>
+      <a href="certifications.html" class="nav__link">Certs</a>
+      <a href="testimonials.html"   class="nav__link">Testimonials</a>
+    </div>
+    <a href="contact.html" class="nav__cta">Hire Me →</a>
+    <button class="nav__hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+  <div class="nav__mobile" id="mobile-menu">
+    <a href="index.html" class="nav__link">Home</a>
+    <a href="about.html" class="nav__link">About</a>
+    <a href="skills.html" class="nav__link">Skills</a>
+    <a href="projects.html" class="nav__link active">Projects</a>
+    <a href="experience.html" class="nav__link">Experience</a>
+    <a href="education.html" class="nav__link">Education</a>
+    <a href="certifications.html" class="nav__link">Certifications</a>
+    <a href="testimonials.html" class="nav__link">Testimonials</a>
+    <a href="contact.html" class="nav__cta btn btn-primary">Hire Me →</a>
+  </div>
+</nav>
+
+<header class="page-header">
+  <p class="label page-header__label">My Work</p>
+  <h1 class="h1 page-header__title">34 Live Projects</h1>
+  <p class="page-header__sub">Every project was built with a purpose — for real companies, real communities, and real problems I personally witnessed. All deployed live on cloud platforms.</p>
+</header>
+
+<section class="section">
+  <div class="container">
+
+    <!-- Streamlit Banner -->
+    <div class="streamlit-banner reveal">
+      <div>
+        <h3>🚀 All 34 Projects Are Live</h3>
+        <p>Built for Pakistan's leading companies — Engro, Nestlé, Telenor, Hamdard, Colgate, Akhuwat, PKCERT, and more. Click any "Live Demo" to launch the app instantly.</p>
+      </div>
+      <a href="https://share.streamlit.io/user/lokeshsoni653-del" target="_blank" rel="noopener" class="streamlit-btn">
+        View All ↗
+      </a>
+    </div>
+
+    <!-- Filter -->
+    <div class="filter-bar reveal">
+      <button class="filter-btn active" data-filter="all">All <span class="count-badge" id="count-all">34</span></button>
+      <button class="filter-btn" data-filter="supply-chain">Supply Chain</button>
+      <button class="filter-btn" data-filter="ai">AI / NLP</button>
+      <button class="filter-btn" data-filter="energy">Energy</button>
+      <button class="filter-btn" data-filter="telemetry">Telemetry</button>
+      <button class="filter-btn" data-filter="social">Social Impact</button>
+      <button class="filter-btn" data-filter="pharma">Pharma / FMCG</button>
+      <button class="filter-btn" data-filter="cybersecurity">🛡️ Cybersecurity</button>
+    </div>
+
+    <!-- Projects Grid -->
+    <div class="projects-grid" id="projects-grid">
+
+      <!-- FLAGSHIP PROJECT 00: BATTLE-THEATER WARGAMING HUD -->
+      <div class="project-card reveal" data-category="supply-chain telemetry ai social" style="grid-column: 1 / -1; background: linear-gradient(135deg, #070e1b 0%, #03060c 100%); border: 2px solid #85754e; position: relative;">
+        <div class="project-card__header" style="background: rgba(133,117,78,0.1); border-bottom: 1px solid rgba(133,117,78,0.25);">
+          <div class="project-card__emoji">🎖️</div>
+          <div class="project-card__meta">
+            <div class="project-card__num" style="color: #c9a84c;">Flagship Project 00</div>
+            <div class="project-card__title" style="color: #fcfbf9; font-family: var(--ff-serif); font-size: 1.25rem;">Battle-Theater Operational Command &amp; Wargaming HUD</div>
+            <div class="project-card__company" style="color: #dfceb1;">Army Institute of Military History (AIMH Special Release)</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story" style="background: rgba(133,117,78,0.06); border-left-color: #85754e; color: #dfceb1;">Developed specifically for the AIMH Research Internship selection board to demonstrate computational modeling of historical troop movements and logistics supply networks.</div>
+          <p class="project-card__desc" style="color: #9f9b90;">A standalone, state-of-the-art interactive digital wargaming installation mapping critical South Asian operations sectors (Operation Zojila 1948, Thar Desert Campaign, and Karakoram Highway). Fully models operational variables such as weather parameters, altitude de-rating, tactical formations, defensive postures, and force protection units (Armed Escorts, Mine Sweepers, Air Cover). Integrates Leaflet GIS tracking overlays, Chart.js wargaming telemetry curves, real-time synthesized radio sweep sound feedback (via browser Web Audio API), and an operations brief.</p>
+          <div class="tags-row">
+            <span class="tag accent" style="background: rgba(133,117,78,0.15); border-color: #85754e; color: #dfceb1;">Leaflet.js GIS</span>
+            <span class="tag accent" style="background: rgba(133,117,78,0.15); border-color: #85754e; color: #dfceb1;">Async Monte Carlo JS</span>
+            <span class="tag accent" style="background: rgba(133,117,78,0.15); border-color: #85754e; color: #dfceb1;">Web Audio API Synthesizer</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">Chart.js Analytics</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">Digital Humanities Brief</span>
+          </div>
+        </div>
+        <div class="project-card__footer" style="border-top: 1px solid rgba(133,117,78,0.25);">
+          <div class="project-card__actions">
+            <a href="aimh-simulation.html" class="project-card__btn primary" style="background: linear-gradient(135deg, #85754e 0%, #63532c 100%); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; box-shadow: 0 0 15px rgba(133, 117, 78, 0.4);">⚡ Launch Simulation ↗</a>
+          </div>
+          <span class="tag" style="background: rgba(133,117,78,0.1); color: #dfceb1; border-color: rgba(133,117,78,0.25);">Defense Analytics</span>
+        </div>
+      </div>
+
+      <!-- FLAGSHIP PROJECT 01: TELENOR SENTINEL CYBER SOC & COMPLIANCE HUD -->
+      <div class="project-card reveal" data-category="energy supply-chain telemetry social" style="grid-column: 1 / -1; background: linear-gradient(135deg, #050a14 0%, #020408 100%); border: 2px solid #dc2626; position: relative;">
+        <div class="project-card__header" style="background: rgba(220,38,38,0.1); border-bottom: 1px solid rgba(220,38,38,0.25);">
+          <div class="project-card__emoji">📡</div>
+          <div class="project-card__meta">
+            <div class="project-card__num" style="color: #ef4444;">Flagship Project 01</div>
+            <div class="project-card__title" style="color: #fcfbf9; font-family: var(--ff-serif); font-size: 1.25rem;">Telenor Sentinel: Cyber SOC &amp; Access Compliance HUD</div>
+            <div class="project-card__company" style="color: #fca5a5;">Telenor Pakistan (Technology Fellowship Special Release)</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story" style="background: rgba(220, 38, 38, 0.06); border-left-color: #dc2626; color: #fca5a5;">Developed specifically for the Telenor Business Security Fellowship selection board to demonstrate real-time alert triage, role-based user access reviews (RBAC), and regulatory PTA auditing.</div>
+          <p class="project-card__desc" style="color: #94a3b8;">A standalone, state-of-the-art interactive digital operations HUD console simulating enterprise-grade network threats (SQL Injection, SSH brute force attacks). Integrates an active threat alert incident queue, a live Role-Based Access Control (RBAC) permission auditor to resolve least privilege policy violations, an ISO 27001 system patch board, and a PTA regulatory framework compliance scorecard—complete with dynamic synthesized Web Audio API breach sirens and emergency warning strobes.</p>
+          <div class="tags-row">
+            <span class="tag accent" style="background: rgba(220, 38, 38, 0.15); border-color: #dc2626; color: #fca5a5;">Cyber SOC Triage</span>
+            <span class="tag accent" style="background: rgba(220, 38, 38, 0.15); border-color: #dc2626; color: #fca5a5;">RBAC Auditor</span>
+            <span class="tag accent" style="background: rgba(220, 38, 38, 0.15); border-color: #dc2626; color: #fca5a5;">Web Audio Breach Alarm</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">ISO 27001 Patching</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">PTA Regulatory Compliance</span>
+          </div>
+        </div>
+        <div class="project-card__footer" style="border-top: 1px solid rgba(220, 38, 38, 0.25);">
+          <div class="project-card__actions">
+            <a href="telenor-sentinel.html" class="project-card__btn primary" style="background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; box-shadow: 0 0 15px rgba(220, 38, 38, 0.4);">⚡ Launch Simulation ↗</a>
+          </div>
+          <span class="tag" style="background: rgba(220, 38, 38, 0.1); color: #fca5a5; border-color: rgba(220, 38, 38, 0.25);">Information Security</span>
+        </div>
+      </div>
+
+      <!-- FLAGSHIP PROJECT 02: SAUDI PAK AGRIINVEST FEASIBILITY HUD -->
+      <div class="project-card reveal" data-category="energy supply-chain telemetry social" style="grid-column: 1 / -1; background: linear-gradient(135deg, #022c22 0%, #020617 100%); border: 2px solid #10b981; position: relative;">
+        <div class="project-card__header" style="background: rgba(16, 185, 129, 0.1); border-bottom: 1px solid rgba(16, 185, 129, 0.25);">
+          <div class="project-card__emoji">🌾</div>
+          <div class="project-card__meta">
+            <div class="project-card__num" style="color: #10b981;">Flagship Project 02</div>
+            <div class="project-card__title" style="color: #fcfbf9; font-family: var(--ff-serif); font-size: 1.25rem;">Saudi Pak AgriInvest: Agribusiness Credit Scoring &amp; Feasibility HUD</div>
+            <div class="project-card__company" style="color: #a7f3d0;">Saudi Pak Industrial and Agricultural Investment Company (YEP 2026 Special Release)</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story" style="background: rgba(16, 185, 129, 0.06); border-left-color: #10b981; color: #a7f3d0;">Developed specifically for the Saudi Pak Youth Engagement Program (YEP 2026) selection board to demonstrate financial risk auditing, credit rating scorecard systems, and regional agricultural modeling.</div>
+          <p class="project-card__desc" style="color: #94a3b8;">A standalone, state-of-the-art agribusiness credit scoring and investment feasibility console simulating corporate agricultural loan requests (e.g. Solar Drip-Irrigation Citrus Orchard in Punjab, Modern Dairy Farm in Sindh). Integrates Leaflet GIS tracking overlays of funded sites across Pakistan, Chart.js cash flow feasibility curves, loan amortization repayment schedules, real-time climate/market stress test sliders, ESG sustainability scoring criteria, and browser-synthesized audio feedback (Web Audio API).</p>
+          <div class="tags-row">
+            <span class="tag accent" style="background: rgba(16, 185, 129, 0.15); border-color: #10b981; color: #a7f3d0;">Leaflet GIS Mapping</span>
+            <span class="tag accent" style="background: rgba(16, 185, 129, 0.15); border-color: #10b981; color: #a7f3d0;">Credit Risk Engine</span>
+            <span class="tag accent" style="background: rgba(16, 185, 129, 0.15); border-color: #10b981; color: #a7f3d0;">NPV / IRR / DSCR Console</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">ESG Sustainability Scorecard</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">Audio Telemetry</span>
+          </div>
+        </div>
+        <div class="project-card__footer" style="border-top: 1px solid rgba(16, 185, 129, 0.25);">
+          <div class="project-card__actions">
+            <a href="https://frabjous-lebkuchen-9d27b9.netlify.app/" target="_blank" rel="noopener" class="project-card__btn primary" style="background: linear-gradient(135deg, #059669 0%, #047857 100%); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; box-shadow: 0 0 15px rgba(16, 185, 129, 0.45);">⚡ Launch Simulation ↗</a>
+          </div>
+          <span class="tag" style="background: rgba(16, 185, 129, 0.1); color: #a7f3d0; border-color: rgba(16, 185, 129, 0.25);">Agricultural Finance</span>
+        </div>
+      </div>
+
+      <!-- FLAGSHIP PROJECT 03: POWER CEMENT LINE III KILNOPTIMA & ENERGY HUD -->
+      <div class="project-card reveal" data-category="energy supply-chain telemetry social" style="grid-column: 1 / -1; background: linear-gradient(135deg, #0a0c10 0%, #10141d 100%); border: 2px solid #00ff66; position: relative;">
+        <div class="project-card__header" style="background: rgba(0, 255, 102, 0.15); border-bottom: 1px solid rgba(0, 255, 102, 0.3);">
+          <div class="project-card__emoji">⚙️</div>
+          <div class="project-card__meta">
+            <div class="project-card__num" style="color: #00ff66;">Flagship Project 03</div>
+            <div class="project-card__title" style="color: #fcfbf9; font-family: var(--ff-serif); font-size: 1.25rem;">Power Cement Line III: KilnOptima &amp; Energy Cogeneration HUD</div>
+            <div class="project-card__company" style="color: #a7f3d0;">Power Cement Limited (RISE YEP 2026 Special Release)</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story" style="background: rgba(0, 255, 102, 0.05); border-left-color: #00ff66; color: #a7f3d0;">Developed specifically for the Power Cement Limited "RISE" summer internship selection board to demonstrate industrial process automation, Waste Heat Recovery (WHR) cogeneration, and predictive maintenance sensors.</div>
+          <p class="project-card__desc" style="color: #cbd5e1;">A state-of-the-art interactive digital operations room console simulating PCL’s European-designed Line III plant. Controls thermal rotary kiln raw meal feed (tph), coal input, alternative biomass fuel mix, and clinker cooling. Tracks cogeneration output (MW) across boilers and steam turbines, calculates real-time PKR savings per bag, and integrates live predictive maintenance sensors for vibrations and bearing temperatures. Complete with ambient steam turbine audio drone feedback.</p>
+          <div class="tags-row">
+            <span class="tag accent" style="background: rgba(0, 255, 102, 0.1); border-color: #00ff66; color: #00ff66;">Rotary Kiln Control</span>
+            <span class="tag accent" style="background: rgba(0, 255, 102, 0.1); border-color: #00ff66; color: #00ff66;">WHR / Solar Cogeneration</span>
+            <span class="tag accent" style="background: rgba(0, 255, 102, 0.1); border-color: #00ff66; color: #00ff66;">Predictive Diagnostics Log</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">Chart.js Analytics</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">Web Audio API Drone</span>
+          </div>
+        </div>
+        <div class="project-card__footer" style="border-top: 1px solid rgba(0, 255, 102, 0.25);">
+          <div class="project-card__actions">
+            <a href="../power-cement-kilnoptima/index.html" class="project-card__btn primary" style="background: linear-gradient(135deg, #047857 0%, #065f46 100%); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; box-shadow: 0 0 15px rgba(0, 255, 102, 0.35);">⚡ Launch Simulation ↗</a>
+          </div>
+          <span class="tag" style="background: rgba(0, 255, 102, 0.1); color: #00ff66; border-color: rgba(0, 255, 102, 0.25);">Industrial Systems</span>
+        </div>
+      </div>
+
+      <!-- FLAGSHIP PROJECT 04: NOWPDP ACCESSLINK A11Y AUDITOR & INCLUSIVE HUB -->
+      <div class="project-card reveal" data-category="social telemetry ai" style="grid-column: 1 / -1; background: linear-gradient(135deg, #070e17 0%, #0d1a30 100%); border: 2px solid #f68b1f; position: relative;">
+        <div class="project-card__header" style="background: rgba(246, 139, 31, 0.1); border-bottom: 1px solid rgba(246, 139, 31, 0.25);">
+          <div class="project-card__emoji">♿</div>
+          <div class="project-card__meta">
+            <div class="project-card__num" style="color: #f68b1f;">Flagship Project 04</div>
+            <div class="project-card__title" style="color: #fcfbf9; font-family: var(--ff-serif); font-size: 1.25rem;">AccessLink: Web Accessibility Auditor &amp; Inclusive Career Matcher</div>
+            <div class="project-card__company" style="color: #fca5a5;">NOWPDP (Disability Inclusion Summer Internship Special Release)</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story" style="background: rgba(246, 139, 31, 0.05); border-left-color: #f68b1f; color: #ffedd5;">Developed specifically for the NOWPDP Summer Internship Program 2026 selection board to demonstrate software engineering applied to web accessibility (WCAG), assistive design, and inclusive career matching.</div>
+          <p class="project-card__desc" style="color: #94a3b8;">A standalone, high-fidelity compliance room dashboard for inclusive design. Features an automated WCAG 2.1 Level A/AA/AAA code auditor, a Khudhukhtari PWD profile-to-job matcher mapping workplace adaptations, a Yaqeen NADRA Special CNIC diagnostic workflow, and an interactive assistive simulator (blur, deuteranopia, keyboard traps, and Web Speech API screen reader synthesizers).</p>
+          <div class="tags-row">
+            <span class="tag accent" style="background: rgba(246, 139, 31, 0.1); border-color: #f68b1f; color: #f68b1f;">WCAG 2.1 Auditor</span>
+            <span class="tag accent" style="background: rgba(246, 139, 31, 0.1); border-color: #f68b1f; color: #f68b1f;">Assistive TTS &amp; Filters</span>
+            <span class="tag accent" style="background: rgba(246, 139, 31, 0.1); border-color: #f68b1f; color: #f68b1f;">SCNIC Eligibility Guide</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">Chart.js Representation</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">Workplace Accommodation Plan</span>
+          </div>
+        </div>
+        <div class="project-card__footer" style="border-top: 1px solid rgba(246, 139, 31, 0.25);">
+          <div class="project-card__actions">
+            <a href="../nowpdp-accesslink/index.html" class="project-card__btn primary" style="background: linear-gradient(135deg, #005f9e 0%, #004473 100%); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; box-shadow: 0 0 15px rgba(0, 95, 158, 0.45);">⚡ Launch Simulation ↗</a>
+          </div>
+          <span class="tag" style="background: rgba(0, 95, 158, 0.1); color: #94a3b8; border-color: rgba(0, 95, 158, 0.25);">Disability Inclusion</span>
+        </div>
+      </div>
+
+      <!-- FLAGSHIP PROJECT 05: NTDC TRANSMISSION SCADA & LOAD DISPATCH HUD -->
+      <div class="project-card reveal" data-category="energy telemetry ai social" style="grid-column: 1 / -1; background: linear-gradient(135deg, #050a14 0%, #0c1830 100%); border: 2px solid #3b82f6; position: relative;">
+        <div class="project-card__header" style="background: rgba(59, 130, 246, 0.1); border-bottom: 1px solid rgba(59, 130, 246, 0.25);">
+          <div class="project-card__emoji">⚡</div>
+          <div class="project-card__meta">
+            <div class="project-card__num" style="color: #3b82f6;">Flagship Project 05</div>
+            <div class="project-card__title" style="color: #fcfbf9; font-family: var(--ff-serif); font-size: 1.25rem;">NTDC Transmission SCADA &amp; Load Dispatch HUD</div>
+            <div class="project-card__company" style="color: #bfdbfe;">NTDC (NPCC Power Control Room Simulation Special Release)</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story" style="background: rgba(59, 130, 246, 0.05); border-left-color: #3b82f6; color: #bfdbfe;">Developed specifically for the NTDC summer internship selection board to demonstrate power grid telemetry, real-time frequency stabilization (50 Hz), Sindh ambient heat thermal derating, and secure Role-Based Access Controls (RBAC).</div>
+          <p class="project-card__desc" style="color: #cbd5e1;">A standalone, high-fidelity SCADA control room console. Models national power flow from generation sources to regional DISCOs. Features active frequency load balancing, under-frequency relay alarms with synthesized Web Audio hums, a dual-line Chart.js AI predictive load forecasting grid, and circuit breaker trip/auto-reclosure diagnostics for Hyderabad Jamshoro and Hala Road substations.</p>
+          <div class="tags-row">
+            <span class="tag accent" style="background: rgba(59, 130, 246, 0.15); border-color: #3b82f6; color: #3b82f6;">Grid SCADA Telemetry</span>
+            <span class="tag accent" style="background: rgba(59, 130, 246, 0.15); border-color: #3b82f6; color: #3b82f6;">Frequency Stabilization</span>
+            <span class="tag accent" style="background: rgba(59, 130, 246, 0.15); border-color: #3b82f6; color: #3b82f6;">AI Load Forecast</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">Thermal Derating</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">RBAC Security Gates</span>
+          </div>
+        </div>
+        <div class="project-card__footer" style="border-top: 1px solid rgba(59, 130, 246, 0.25);">
+          <div class="project-card__actions">
+            <a href="https://heartfelt-rabanadas-049851.netlify.app/" target="_blank" rel="noopener" class="project-card__btn primary" style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; box-shadow: 0 0 15px rgba(59, 130, 246, 0.45);">⚡ Launch Simulation ↗</a>
+          </div>
+          <span class="tag" style="background: rgba(59, 130, 246, 0.1); color: #bfdbfe; border-color: rgba(59, 130, 246, 0.25);">Power Transmission</span>
+        </div>
+      </div>
+      
+      <!-- FLAGSHIP PROJECT 06: HIRENUM BRANDFORGE AI LINKEDIN OPTIMIZER -->
+      <div class="project-card reveal" data-category="ai telemetry social" style="grid-column: 1 / -1; background: linear-gradient(135deg, #09061a 0%, #03020a 100%); border: 2px solid #8b5cf6; position: relative;">
+        <div class="project-card__header" style="background: rgba(139, 92, 246, 0.1); border-bottom: 1px solid rgba(139, 92, 246, 0.25);">
+          <div class="project-card__emoji">✍️</div>
+          <div class="project-card__meta">
+            <div class="project-card__num" style="color: #8b5cf6;">Flagship Project 06</div>
+            <div class="project-card__title" style="color: #fcfbf9; font-family: var(--ff-serif); font-size: 1.25rem;">BrandForge AI: LinkedIn Founder Authority &amp; Growth Suite</div>
+            <div class="project-card__company" style="color: #ddd6fe;">Hirenum (LinkedIn Branding &amp; Content Automation Special Release)</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story" style="background: rgba(139, 92, 246, 0.05); border-left-color: #8b5cf6; color: #ddd6fe;">Developed specifically for the Hirenum summer internship selection board to demonstrate profile analytics parsing, NLP-based content composition, and automated brand report audits.</div>
+          <p class="project-card__desc" style="color: #cbd5e1;">A standalone, high-fidelity LinkedIn brand optimization and content composer dashboard designed to automate executive brand positioning. Features an NLP-style Profile Auditor evaluating headlines and biographies, a content pillar generator generating formatted post drafts, dynamic Chart.js engagement timelines, an onsite DHA Phase 5 Lahore scheduling console, and Web Audio click synth systems.</p>
+          <div class="tags-row">
+            <span class="tag accent" style="background: rgba(139, 92, 246, 0.15); border-color: #8b5cf6; color: #ddd6fe;">Profile Auditor</span>
+            <span class="tag accent" style="background: rgba(139, 92, 246, 0.15); border-color: #8b5cf6; color: #ddd6fe;">NLP Post Composer</span>
+            <span class="tag accent" style="background: rgba(139, 92, 246, 0.15); border-color: #8b5cf6; color: #ddd6fe;">Chart.js Timelines</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">Lahore Onsite Scheduler</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">Web Audio Synthesizer</span>
+          </div>
+        </div>
+        <div class="project-card__footer" style="border-top: 1px solid rgba(139, 92, 246, 0.25);">
+          <div class="project-card__actions">
+            <a href="https://musical-parfait-3370c5.netlify.app/" target="_blank" rel="noopener" class="project-card__btn primary" style="background: linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; box-shadow: 0 0 15px rgba(139, 92, 246, 0.455);">⚡ Launch Simulation ↗</a>
+          </div>
+          <span class="tag" style="background: rgba(139, 92, 246, 0.1); color: #ddd6fe; border-color: rgba(139, 92, 246, 0.25);">Content Marketing</span>
+        </div>
+      </div>
+      
+      <!-- FLAGSHIP PROJECT 07: METI JAPAN SME DX TELEMETRY HUB -->
+      <div class="project-card reveal" data-category="supply-chain telemetry ai social" style="grid-column: 1 / -1; background: linear-gradient(135deg, #18050a 0%, #0c0205 100%); border: 2px solid #c8162a; position: relative;">
+        <div class="project-card__header" style="background: rgba(200, 22, 42, 0.1); border-bottom: 1px solid rgba(200, 22, 42, 0.25);">
+          <div class="project-card__emoji">🇯🇵</div>
+          <div class="project-card__meta">
+            <div class="project-card__num" style="color: #c8162a;">Flagship Project 07</div>
+            <div class="project-card__title" style="color: #fcfbf9; font-family: var(--ff-serif); font-size: 1.25rem;">METI Japan SME DX &amp; Operations Telemetry Hub</div>
+            <div class="project-card__company" style="color: #fca5a5;">METI Japan Government Internship Program 2026 (Monozukuri &amp; Regional Logistics Special Release)</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story" style="background: rgba(200, 22, 42, 0.05); border-left-color: #c8162a; color: #fca5a5;">Developed specifically for the Ministry of Economy, Trade and Industry (METI) Japan Government Internship Program selection board to demonstrate legacy inventory database transition, thermal kiln control stabilization, JIT logistics routing, and bilingual localization (i18n).</div>
+          <p class="project-card__desc" style="color: #cbd5e1;">A standalone, high-fidelity operations telemetry hub designed to modernise traditional Japanese manufacturing SMEs into the Industry 4.0 era. Features an automated Kaizen ETL pipeline migrating manual/paper ledger sheets to SQLite databases, a precision high-temp ceramic/metal kiln IoT monitor with simulated fuel-airflow control and AI equipment fatigue alerts, a Kansai regional JIT supply chain router planning Kyoto/Osaka routes to Kobe and Osaka Port Terminals under weather/traffic disruptions, and an enterprise bilingual English/Japanese toggle localization engine with YYYY/MM/DD and Japanese Era (Reiwa) calendar compatibility. Integrates ambient factory hum Web Audio API synthesizers and A4-formatted Japanese corporate PDF report generation.</p>
+          <div class="tags-row">
+            <span class="tag accent" style="background: rgba(200, 22, 42, 0.15); border-color: #c8162a; color: #c8162a;">Kaizen ETL Bridge</span>
+            <span class="tag accent" style="background: rgba(200, 22, 42, 0.15); border-color: #c8162a; color: #c8162a;">IoT Kiln Monitor</span>
+            <span class="tag accent" style="background: rgba(200, 22, 42, 0.15); border-color: #c8162a; color: #c8162a;">AI Fatigue Anomaly</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">JIT Route Optimizer</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">i18n English/Japanese</span>
+          </div>
+        </div>
+        <div class="project-card__footer" style="border-top: 1px solid rgba(200, 22, 42, 0.25);">
+          <div class="project-card__actions">
+            <a href="../meti-sme-dx/index.html" target="_blank" rel="noopener" class="project-card__btn primary" style="background: linear-gradient(135deg, #c8162a 0%, #850c18 100%); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; box-shadow: 0 0 15px rgba(200, 22, 42, 0.455);">🇯🇵 Launch Simulation ↗</a>
+          </div>
+          <span class="tag" style="background: rgba(200, 22, 42, 0.1); color: #fca5a5; border-color: rgba(200, 22, 42, 0.25);">Industrial DX</span>
+        </div>
+      </div>
+
+      <!-- FLAGSHIP PROJECT 08: PHENTECH PROMPTFORGE AI OPTIMIZER -->
+      <div class="project-card reveal" data-category="ai telemetry social" style="grid-column: 1 / -1; background: linear-gradient(135deg, #021a0e 0%, #010804 100%); border: 2px solid #009E49; position: relative;">
+        <div class="project-card__header" style="background: rgba(0, 158, 73, 0.1); border-bottom: 1px solid rgba(0, 158, 73, 0.25);">
+          <div class="project-card__emoji">🤖</div>
+          <div class="project-card__meta">
+            <div class="project-card__num" style="color: #009E49;">Flagship Project 08</div>
+            <div class="project-card__title" style="color: #fcfbf9; font-family: var(--ff-serif); font-size: 1.25rem;">PromptForge AI: Enterprise Prompt Optimizer &amp; LLM Router</div>
+            <div class="project-card__company" style="color: #a7f3d0;">PhenTech (AI Internship &amp; Generative AI Optimization Special Release)</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story" style="background: rgba(0, 158, 73, 0.05); border-left-color: #009E49; color: #a7f3d0;">Developed specifically for the PhenTech AI Internship Program 2026 selection board to demonstrate prompt engineering optimization heuristics, cost-performance LLM routing, and interactive chat overlay assistance.</div>
+          <p class="project-card__desc" style="color: #cbd5e1;">A standalone, high-fidelity prompt engineering suite. Features a Prompt Workbench with custom presets for Few-Shot classification and Chain-of-Thought (CoT) templates, an automatic multi-LLM cost and latency projection routing table, a real-time diff visualizer comparing optimized versus raw prompts, an interactive prompt specialist chat assistant, and actual PDF assessment report downloads using html2pdf.js. Inspired by the clean, light-themed financial UI of MCB iSave. Deployed on Netlify.</p>
+          <div class="tags-row">
+            <span class="tag accent" style="background: rgba(0, 158, 73, 0.15); border-color: #009E49; color: #a7f3d0;">Prompt Engineering</span>
+            <span class="tag accent" style="background: rgba(0, 158, 73, 0.15); border-color: #009E49; color: #a7f3d0;">LLM Cost Routing</span>
+            <span class="tag accent" style="background: rgba(0, 158, 73, 0.15); border-color: #009E49; color: #a7f3d0;">Interactive Chat</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">html2pdf.js Report</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">Vanilla JS / Netlify</span>
+          </div>
+        </div>
+        <div class="project-card__footer" style="border-top: 1px solid rgba(0, 158, 73, 0.25);">
+          <div class="project-card__actions">
+            <a href="https://graceful-raindrop-3dee29.netlify.app/" target="_blank" rel="noopener" class="project-card__btn primary" style="background: linear-gradient(135deg, #009E49 0%, #007A38 100%); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; box-shadow: 0 0 15px rgba(0, 158, 73, 0.455);">⚡ Launch Simulation ↗</a>
+          </div>
+          <span class="tag" style="background: rgba(0, 158, 73, 0.1); color: #a7f3d0; border-color: rgba(0, 158, 73, 0.25);">Prompt Engineering</span>
+        </div>
+      </div>
+
+      <!-- FLAGSHIP PROJECT 09: HAIER SMARTFACTORY IOT SIMULATOR -->
+      <div class="project-card reveal" data-category="supply-chain telemetry ai social" style="grid-column: 1 / -1; background: linear-gradient(135deg, #021221 0%, #01070c 100%); border: 2px solid #005A9C; position: relative;">
+        <div class="project-card__header" style="background: rgba(0, 90, 156, 0.1); border-bottom: 1px solid rgba(0, 90, 156, 0.25);">
+          <div class="project-card__emoji">⚙️</div>
+          <div class="project-card__meta">
+            <div class="project-card__num" style="color: #005A9C;">Flagship Project 09</div>
+            <div class="project-card__title" style="color: #fcfbf9; font-family: var(--ff-serif); font-size: 1.25rem;">SmartFactory: IoT Production Control &amp; Supply Chain Dispatch Console</div>
+            <div class="project-card__company" style="color: #bfdbfe;">Haier Pakistan (Management Trainee Engineer Program 2026 Special Release)</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story" style="background: rgba(0, 90, 156, 0.05); border-left-color: #005A9C; color: #bfdbfe;">Developed specifically for the Haier Pakistan MTE (Supply Chain) selection board to demonstrate real-time foaming conveyor line telemetry, transit weather delay calculations for M-2/M-4 motorways, and Six Sigma DMAIC auditing.</div>
+          <p class="project-card__desc" style="color: #cbd5e1;">A standalone, high-fidelity manufacturing operations room dashboard. Models a refrigerator assembly line conveyor system with live Takt Time monitoring, out-of-stock shipping dispatch logs for motorways (M-2, M-4) with monsoon/fog weather delay coefficients, an interactive Six Sigma DPMO calculator, and PDF report exporting using html2pdf.js. Deployed locally and loaded with browser synthesized sounds.</p>
+          <div class="tags-row">
+            <span class="tag accent" style="background: rgba(0, 90, 156, 0.15); border-color: #005A9C; color: #bfdbfe;">IoT Assembly Telemetry</span>
+            <span class="tag accent" style="background: rgba(0, 90, 156, 0.15); border-color: #005A9C; color: #bfdbfe;">Motorway Dispatch Route</span>
+            <span class="tag accent" style="background: rgba(0, 90, 156, 0.15); border-color: #005A9C; color: #bfdbfe;">Six Sigma DMAIC</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">html2pdf.js Report</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">Web Audio API hum</span>
+          </div>
+        </div>
+        <div class="project-card__footer" style="border-top: 1px solid rgba(0, 90, 156, 0.25);">
+          <div class="project-card__actions">
+            <a href="https://jade-snickerdoodle-674e77.netlify.app/" target="_blank" rel="noopener" class="project-card__btn primary" style="background: linear-gradient(135deg, #005A9C 0%, #004578 100%); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; box-shadow: 0 0 15px rgba(0, 90, 156, 0.45);">⚡ Launch Simulation ↗</a>
+          </div>
+          <span class="tag" style="background: rgba(0, 90, 156, 0.1); color: #bfdbfe; border-color: rgba(0, 90, 156, 0.25);">Industrial Systems</span>
+        </div>
+      </div>
+
+      <!-- FLAGSHIP PROJECT 10: MOFA CERTISECURE CONSULAR SIMULATOR -->
+      <div class="project-card reveal" data-category="telemetry ai social cybersecurity" style="grid-column: 1 / -1; background: linear-gradient(135deg, #002610 0%, #001205 100%); border: 2px solid #00401A; position: relative;">
+        <div class="project-card__header" style="background: rgba(0, 64, 26, 0.1); border-bottom: 1px solid rgba(0, 64, 26, 0.25);">
+          <div class="project-card__emoji">🇵🇰</div>
+          <div class="project-card__meta">
+            <div class="project-card__num" style="color: #00401A;">Flagship Project 10</div>
+            <div class="project-card__title" style="color: #fcfbf9; font-family: var(--ff-serif); font-size: 1.25rem;">MoFA CertiSecure: Consular Document Attestation &amp; Apostille Registry HUD</div>
+            <div class="project-card__company" style="color: #a7f3d0;">Ministry of Foreign Affairs (Consular Services Wing Internship Program 2026 Special Release)</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story" style="background: rgba(0, 64, 26, 0.05); border-left-color: #00401A; color: #a7f3d0;">Developed specifically for the Ministry of Foreign Affairs (MoFA) Consular Services internship selection board to model secure public sector document verification workflows, database compliance auditing, and standardized Hague Apostille generation.</div>
+          <p class="project-card__desc" style="color: #cbd5e1;">A high-fidelity operations room simulator for consular document processing. Features an interactive triage review queue with compliance check verification lists (cross-referencing HEC database records and NADRA seals), cryptographic tracking ID generators, Web Audio API synthesizers simulating mechanical stamps ("thud-stamp"), a public registry verification lookup portal, and print-ready A4 PDF export using html2pdf.js. Deployed on Netlify.</p>
+          <div class="tags-row">
+            <span class="tag accent" style="background: rgba(0, 64, 26, 0.15); border-color: #00401A; color: #a7f3d0;">Hague Apostille 10-Point</span>
+            <span class="tag accent" style="background: rgba(0, 64, 26, 0.15); border-color: #00401A; color: #a7f3d0;">Consular Queue Triage</span>
+            <span class="tag accent" style="background: rgba(0, 64, 26, 0.15); border-color: #00401A; color: #a7f3d0;">Web Audio Synth Stamp</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">Verification Lookup</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">html2pdf.js Export</span>
+          </div>
+        </div>
+        <div class="project-card__footer" style="border-top: 1px solid rgba(0, 64, 26, 0.25);">
+          <div class="project-card__actions">
+            <a href="https://bucolic-daifuku-ebedc7.netlify.app/" target="_blank" rel="noopener" class="project-card__btn primary" style="background: linear-gradient(135deg, #00401A 0%, #002610 100%); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; box-shadow: 0 0 15px rgba(0, 64, 26, 0.4);">⚡ Launch Simulation ↗</a>
+          </div>
+          <span class="tag" style="background: rgba(0, 64, 26, 0.1); color: #a7f3d0; border-color: rgba(0, 64, 26, 0.25);">Public Services</span>
+        </div>
+      </div>
+
+      <!-- 1. Zia Foods AI Smart Shelf & Planogram Optimizer -->
+      <div class="project-card reveal" data-category="supply-chain telemetry ai pharma">
+        <div class="project-card__header">
+          <div class="project-card__emoji">🛒</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 01</div>
+            <div class="project-card__title">Zia Foods AI Shelf &amp; Planogram Optimizer</div>
+            <div class="project-card__company">Zia Foods Pakistan</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">I designed this retail shelf optimizer simulating out-of-stock monitoring, planogram compliance, eye-tracking heatmaps, and AI insights regarding revenue risk.</div>
+          <p class="project-card__desc">An advanced digital visual retail shelf optimizer simulating live store cameras. Integrates shelf slots with real-time stock alert flashing, a drag-and-drop planogram builder that dynamically grades layout efficiency, canvas-based eye-tracking fixation maps, and detailed AI insights.</p>
+          <div class="tags-row">
+            <span class="tag accent">Planogram Compliance</span><span class="tag accent">Drag &amp; Drop</span><span class="tag">Canvas Heatmap</span><span class="tag green">FMCG / Retail</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="../zia-planogram/index.html" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">Retail Tech</span>
+        </div>
+      </div>
+
+      <!-- 2. Telenor Telecom Site Energy & Solar Optimizer -->
+      <div class="project-card reveal delay-1" data-category="energy supply-chain telemetry">
+        <div class="project-card__header">
+          <div class="project-card__emoji">☀️</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 02</div>
+            <div class="project-card__title">Telenor Site Energy &amp; Solar Irradiance Optimizer</div>
+            <div class="project-card__company">Telenor Pakistan</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">Developed to model green energy migration (Solar/Lithium battery systems) across regional telecom switch stations, reducing reliance on grid energy and diesel backup generators.</div>
+          <p class="project-card__desc">An interactive telematics operations console integrating Leaflet GIS station mapping across Pakistan. Models hourly solar irradiance curves, battery state-of-charge tracking, automatic diesel fuel flow regulation thresholds, and projections for ROI and carbon offset metrics.</p>
+          <div class="tags-row">
+            <span class="tag accent">Leaflet GIS Mapping</span><span class="tag accent">Solar Irradiance Models</span><span class="tag">Battery SOC</span><span class="tag green">Telecom</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="telenor-energy-optimizer.html" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">Green Energy</span>
+        </div>
+      </div>
+
+      <!-- 1. S&P Global CI/CD Pipeline Simulator -->
+      <div class="project-card reveal" data-category="telemetry ai">
+        <div class="project-card__header">
+          <div class="project-card__emoji">⚙️</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 03</div>
+            <div class="project-card__title">S&P Global CI/CD Pipeline Simulator</div>
+            <div class="project-card__company">S&P Global (Simulation)</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">Built as a modern DevOps visualization tool — to simulate enterprise-grade deployment validation, UAT staging, static code analysis, and release coordination workflows.</div>
+          <p class="project-card__desc">A live, interactive DevOps dashboard built in Python that simulates an enterprise-level CI/CD release pipeline. Demonstrates metadata validation checks, automated quality gates, status notifications, and rollback mechanisms in a user-friendly Streamlit interface.</p>
+          <div class="tags-row">
+            <span class="tag accent">Python</span><span class="tag accent">DevOps / CI/CD</span><span class="tag">Streamlit</span><span class="tag green">Enterprise</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="https://sp-global-cicd-pipeline-jscgp9kscdwknuwctqvo7v.streamlit.app/" target="_blank" rel="noopener" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">DevOps Simulator</span>
+        </div>
+      </div>
+
+      <!-- 1. PHC Final Bot -->
+      <div class="project-card reveal" data-category="ai social">
+        <div class="project-card__header">
+          <div class="project-card__emoji">🤖</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 04</div>
+            <div class="project-card__title">PHC Community Intelligence Bot</div>
+            <div class="project-card__company">Pakistan Hindu Council</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">Built during my internship at PHC — to help staff retrieve community data and policy documents through natural language, without needing technical expertise.</div>
+          <p class="project-card__desc">An AI-powered conversational bot built for Pakistan Hindu Council that enables staff to query community records, operational documents, and internal data using plain Urdu or English. Uses a custom RAG pipeline with secure document indexing.</p>
+          <div class="tags-row">
+            <span class="tag accent">Python</span><span class="tag accent">NLP / RAG</span><span class="tag">Streamlit</span><span class="tag green">NGO / Community</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="https://phc-final-bot-fwsh2atnkxrfzjzjgzvamr.streamlit.app" target="_blank" rel="noopener" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">AI Bot</span>
+        </div>
+      </div>
+
+      <!-- 2. MGI Supply Chain Predictor -->
+      <div class="project-card reveal delay-1" data-category="supply-chain ai">
+        <div class="project-card__header">
+          <div class="project-card__emoji">📦</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 05</div>
+            <div class="project-card__title">MGI Supply Chain Demand Predictor</div>
+            <div class="project-card__company">MGI (Manufacturing & Goods)</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">I built this targeting MGI to demonstrate how AI-driven demand forecasting can reduce overstock and prevent supply shortfalls in manufacturing supply chains.</div>
+          <p class="project-card__desc">A predictive analytics engine that models demand patterns, inventory levels, and supplier lead times for manufacturing companies. Generates procurement recommendations with risk scoring and visualizes supply chain bottlenecks.</p>
+          <div class="tags-row">
+            <span class="tag accent">Python</span><span class="tag accent">Pandas</span><span class="tag">ML Forecasting</span><span class="tag green">Manufacturing</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="https://mgi-supply-chain-predictor-k838qzwlxlbql3pm6lwdvf.streamlit.app" target="_blank" rel="noopener" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">Supply Chain</span>
+        </div>
+      </div>
+
+      <!-- 3. Engro Energy Thar -->
+      <div class="project-card reveal delay-2" data-category="energy supply-chain">
+        <div class="project-card__header">
+          <div class="project-card__emoji">⚡</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 06</div>
+            <div class="project-card__title">Engro Energy Thar — Operations Dashboard</div>
+            <div class="project-card__company">Engro Energy / Thar Coal Block</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">I'm from Tharparkar — I grew up watching the Thar Coal project transform our desert. I built this dashboard specifically targeting Engro Energy to showcase how operational data can be turned into real-time intelligence for their Thar coal plants.</div>
+          <p class="project-card__desc">An operational monitoring and analytics dashboard for Engro Energy's Thar coal power generation units. Tracks coal extraction rates, energy output KPIs, equipment uptime, and logistics from pit to plant — giving management live operational visibility.</p>
+          <div class="tags-row">
+            <span class="tag accent">Python</span><span class="tag accent">Pandas</span><span class="tag">Folium</span><span class="tag green">Energy / Thar</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="https://engro-energy-thar-desrcjzdodrm3qkycszgmd.streamlit.app" target="_blank" rel="noopener" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">Energy</span>
+        </div>
+      </div>
+
+      <!-- 4. Engro Tech AI -->
+      <div class="project-card reveal" data-category="ai supply-chain">
+        <div class="project-card__header">
+          <div class="project-card__emoji">🏭</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 07</div>
+            <div class="project-card__title">Engro Tech AI — Smart Operations Engine</div>
+            <div class="project-card__company">Engro Corporation</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">Built as a direct pitch to Engro's technology division — to show that a final-year student from Thar could build an AI operations tool as sophisticated as anything from a big-city consultant.</div>
+          <p class="project-card__desc">An intelligent operations assistant for Engro's technology arm — featuring predictive maintenance alerts, AI-generated operational summaries, and an NLP interface that lets managers query plant and process data in natural language.</p>
+          <div class="tags-row">
+            <span class="tag accent">Python</span><span class="tag accent">NLP</span><span class="tag">Streamlit</span><span class="tag green">Industrial AI</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="https://engro-tech-ai-jyua6bcnyddb4jqmiqyzp3.streamlit.app" target="_blank" rel="noopener" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">AI</span>
+        </div>
+      </div>
+
+      <!-- 5. Colgate B2B Optimizer -->
+      <div class="project-card reveal delay-1" data-category="supply-chain pharma">
+        <div class="project-card__header">
+          <div class="project-card__emoji">🛒</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 08</div>
+            <div class="project-card__title">Colgate B2B Route & Order Optimizer</div>
+            <div class="project-card__company">Colgate-Palmolive Pakistan</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">FMCG companies lose millions in inefficient distributor routes. I built this targeting Colgate Pakistan to show how graph-based route optimization can cut their B2B delivery costs significantly.</div>
+          <p class="project-card__desc">A B2B distribution optimization engine for FMCG companies. Uses NetworkX graph algorithms to compute optimal delivery routes from warehouse to distributor to retailer, with order batching logic and territory balancing — reducing last-mile costs.</p>
+          <div class="tags-row">
+            <span class="tag accent">NetworkX</span><span class="tag accent">Pandas</span><span class="tag">Route Optimization</span><span class="tag green">FMCG</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="https://colgate-b2b-optimizer-2v9rznsae3ahibmeu7dkd5.streamlit.app" target="_blank" rel="noopener" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">Supply Chain</span>
+        </div>
+      </div>
+
+      <!-- 6. Nestlé Agri Logistics -->
+      <div class="project-card reveal delay-2" data-category="supply-chain pharma">
+        <div class="project-card__header">
+          <div class="project-card__emoji">🌾</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 09</div>
+            <div class="project-card__title">Nestlé Agri Logistics Optimizer</div>
+            <div class="project-card__company">Nestlé Pakistan</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">Nestlé Pakistan sources milk from thousands of rural farmers. I built this to demonstrate how route intelligence can reduce their farm-to-factory milk collection time and spoilage — a problem I understood growing up near agricultural communities.</div>
+          <p class="project-card__desc">An agricultural logistics optimization platform for dairy and FMCG supply chains. Maps milk collection routes from rural farms to processing facilities using Folium, with freshness time-windows, vehicle capacity constraints, and spoilage risk scoring.</p>
+          <div class="tags-row">
+            <span class="tag accent">Python</span><span class="tag accent">Folium</span><span class="tag">NetworkX</span><span class="tag green">Agri-Logistics</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="https://nestle-agri-logistics-optimizer-irgdbj84hmrf7m7zq6ktir.streamlit.app" target="_blank" rel="noopener" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">Supply Chain</span>
+        </div>
+      </div>
+
+      <!-- 7. CCI Smart Cooler -->
+      <div class="project-card reveal" data-category="telemetry ai">
+        <div class="project-card__header">
+          <div class="project-card__emoji">🧊</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 10</div>
+            <div class="project-card__title">CCI Smart Cooler Monitoring System</div>
+            <div class="project-card__company">Coca-Cola İçecek (CCI) Pakistan</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">CCI manages thousands of coolers across retailers nationwide. A faulty cooler means spoiled product and a lost customer. I built this IoT telemetry dashboard targeting CCI to prove how real-time monitoring can eliminate cooler failures before they happen.</div>
+          <p class="project-card__desc">An IoT-powered smart cooler monitoring dashboard for beverage companies. Tracks real-time temperature, compressor health, door-open events, and energy consumption across a cooler fleet — with predictive maintenance alerts and territory heat maps for field teams.</p>
+          <div class="tags-row">
+            <span class="tag accent">Python</span><span class="tag accent">WebSockets</span><span class="tag">Telemetry</span><span class="tag green">Beverages / FMCG</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="https://cci-smart-cooler-m4lczxusqj5cxn8dappkmwm.streamlit.app" target="_blank" rel="noopener" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">Telemetry</span>
+        </div>
+      </div>
+
+      <!-- 8. Pharma Cold Chain -->
+      <div class="project-card reveal delay-1" data-category="pharma supply-chain">
+        <div class="project-card__header">
+          <div class="project-card__emoji">💊</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 11</div>
+            <div class="project-card__title">Pharma Cold Chain Inventory Analytics Engine</div>
+            <div class="project-card__company">Pharmaceutical Sector (Pakistan)</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">A spoiled vaccine or insulin batch can cost lives. I built this cold-chain analytics platform to help Pakistani pharma companies protect temperature-sensitive medicines from warehouse to patient — a problem that hits rural Sindh hardest.</div>
+          <p class="project-card__desc">A comprehensive cold chain inventory management system for pharmaceutical companies. Monitors temperature-sensitive drug stock levels, tracks warehouse cold storage compliance, models expiry risk, and routes distribution with cold-chain constraint enforcement.</p>
+          <div class="tags-row">
+            <span class="tag accent">Python</span><span class="tag accent">Pandas</span><span class="tag">Cold Chain</span><span class="tag green">Pharma</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="https://pharma-cold-chain-inventory-analytics-engine-ckhvwmarfqkyx2aaj.streamlit.app" target="_blank" rel="noopener" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">Pharma</span>
+        </div>
+      </div>
+
+      <!-- 9. Project 09 (short URL) -->
+      <div class="project-card reveal delay-2" data-category="ai supply-chain">
+        <div class="project-card__header">
+          <div class="project-card__emoji">📊</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 12</div>
+            <div class="project-card__title">Operational Intelligence Dashboard</div>
+            <div class="project-card__company">Enterprise Data Platform</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">Built to demonstrate enterprise-grade data intelligence — combining multiple operational datasets into a single command center for business managers to make faster, evidence-based decisions.</div>
+          <p class="project-card__desc">An integrated operational intelligence platform that aggregates KPIs across departments — sales, logistics, inventory, and finance — into a unified executive dashboard with drill-down analytics, trend detection, and automated anomaly alerts.</p>
+          <div class="tags-row">
+            <span class="tag accent">Python</span><span class="tag accent">Pandas</span><span class="tag">NumPy</span><span class="tag green">Enterprise</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="https://huvkb5ozprfjely8m6ggra.streamlit.app" target="_blank" rel="noopener" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">Analytics</span>
+        </div>
+      </div>
+
+      <!-- 10. Project 10 (short URL) -->
+      <div class="project-card reveal" data-category="ai social">
+        <div class="project-card__header">
+          <div class="project-card__emoji">🧠</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 13</div>
+            <div class="project-card__title">Data-Driven Decision Support System</div>
+            <div class="project-card__company">Public Sector / NGO</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">Designed for organizations that collect a lot of data but struggle to turn it into decisions — built to bridge the gap between raw community data and the policy actions that can actually change lives.</div>
+          <p class="project-card__desc">A structured decision-support system that processes raw survey and operational data, applies scoring models and thresholds, and outputs prioritized intervention recommendations — helping organizations allocate resources where they matter most.</p>
+          <div class="tags-row">
+            <span class="tag accent">Python</span><span class="tag accent">NLP</span><span class="tag">Data Pipelines</span><span class="tag green">NGO / Policy</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="https://idy3attyvbo2daudgh4nwx.streamlit.app" target="_blank" rel="noopener" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">Decision AI</span>
+        </div>
+      </div>
+
+      <!-- 11. Telenor CAPEX Optimizer -->
+      <div class="project-card reveal delay-1" data-category="ai supply-chain">
+        <div class="project-card__header">
+          <div class="project-card__emoji">📡</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 14</div>
+            <div class="project-card__title">Telenor CAPEX Investment Optimizer</div>
+            <div class="project-card__company">Telenor Pakistan</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">Living in rural Tharparkar, I experienced firsthand how poor telecom infrastructure isolates communities. I built this for Telenor to show how data can pinpoint where capital investment in towers and infrastructure will create the most connectivity impact.</div>
+          <p class="project-card__desc">A capital expenditure optimization engine for telecom infrastructure planning. Models network coverage gaps, population density, revenue potential, and infrastructure costs to recommend priority tower rollout zones — maximizing ROI on every rupee of CAPEX deployed.</p>
+          <div class="tags-row">
+            <span class="tag accent">Python</span><span class="tag accent">NetworkX</span><span class="tag">Folium</span><span class="tag green">Telecom</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="https://telenor-capex-optimizer-lvzv3avnjrxiesdjukweie.streamlit.app" target="_blank" rel="noopener" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">Telecom</span>
+        </div>
+      </div>
+
+      <!-- 12. Engro Agri Logistics -->
+      <div class="project-card reveal delay-2" data-category="supply-chain energy">
+        <div class="project-card__header">
+          <div class="project-card__emoji">🌱</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 15</div>
+            <div class="project-card__title">Engro Agri Logistics Optimizer</div>
+            <div class="project-card__company">Engro Fertilizers / Agri Division</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">Sindh farmers depend on Engro fertilizers arriving on time. A delayed shipment means a missed planting season. I built this logistics optimizer for Engro's agri division to solve the last-mile distribution challenge across Sindh's sprawling rural network.</div>
+          <p class="project-card__desc">A precision logistics platform for Engro's agricultural supply chain — from fertilizer production to rural dealer to farmer. Maps distributor networks on interactive Folium maps, optimizes delivery schedules by crop calendar, and tracks inventory across the agri-dealer network.</p>
+          <div class="tags-row">
+            <span class="tag accent">Python</span><span class="tag accent">Folium</span><span class="tag">Pandas</span><span class="tag green">Agri / Fertilizer</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="https://engro-agri-logistics-gmcux5zsyqqe4mpvaijzhx.streamlit.app" target="_blank" rel="noopener" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">Supply Chain</span>
+        </div>
+      </div>
+
+      <!-- 13. AppCo Thar Strategy -->
+      <div class="project-card reveal" data-category="social supply-chain">
+        <div class="project-card__header">
+          <div class="project-card__emoji">🏜️</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 16</div>
+            <div class="project-card__title">AppCo Thar — Regional Strategy Platform</div>
+            <div class="project-card__company">AppCo / Tharparkar Development</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">I am from Tharparkar — I know every district, every challenge. I built this platform to help organisations operating in Thar plan operations strategically, because data-driven planning is what our region needs most to reach its potential.</div>
+          <p class="project-card__desc">A regional strategic planning and operational intelligence platform for organizations working in the Thar desert region. Layers geographic, demographic, infrastructure, and operational data on interactive maps to support evidence-based program design and resource allocation across Tharparkar.</p>
+          <div class="tags-row">
+            <span class="tag accent">Python</span><span class="tag accent">Folium</span><span class="tag">Tharparkar</span><span class="tag green">Regional Dev</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="https://appco-thar-strategy-t8kcbxrgjyg8unakk2xqhu.streamlit.app" target="_blank" rel="noopener" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">Tharparkar</span>
+        </div>
+      </div>
+
+      <!-- 14. Akhuwat Aid Distribution -->
+      <div class="project-card reveal delay-1" data-category="social ai">
+        <div class="project-card__header">
+          <div class="project-card__emoji">🤝</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 17</div>
+            <div class="project-card__title">Akhuwat Aid Distribution M&amp;E Engine</div>
+            <div class="project-card__company">Akhuwat Foundation</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">Akhuwat serves Pakistan's poorest communities with interest-free loans and humanitarian aid. I built this M&amp;E platform so their field teams could track how aid reaches beneficiaries — making sure every rupee of help actually arrives where it's needed most.</div>
+          <p class="project-card__desc">A Monitoring &amp; Evaluation engine for Akhuwat Foundation's aid distribution programs. Tracks beneficiary registration, disbursement timelines, geographic coverage, repayment rates, and impact metrics — giving program managers real-time visibility into field operations across Pakistan.</p>
+          <div class="tags-row">
+            <span class="tag accent">Python</span><span class="tag accent">Pandas</span><span class="tag">Data Pipelines</span><span class="tag green">NGO / Microfinance</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="https://akhuwat-aid-distribution-m-e-engine-jzpzraleh2agvr8huez3hb.streamlit.app" target="_blank" rel="noopener" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">Social Impact</span>
+        </div>
+      </div>
+
+      <!-- 15. Skills Development M&E -->
+      <div class="project-card reveal delay-2" data-category="social ai">
+        <div class="project-card__header">
+          <div class="project-card__emoji">📚</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 18</div>
+            <div class="project-card__title">Skills Development M&amp;E Tracker</div>
+            <div class="project-card__company">Education / Development Sector</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">Youth unemployment in Sindh is a crisis I see every day. I built this M&amp;E system to help skills training programs prove their impact with data — tracking who was trained, what they learned, and whether they actually got jobs afterwards.</div>
+          <p class="project-card__desc">A comprehensive Monitoring &amp; Evaluation platform for vocational and skills development programs. Tracks trainee enrollment, course completion rates, assessment scores, job placement outcomes, and income changes — enabling evidence-based program reporting for donors and government stakeholders.</p>
+          <div class="tags-row">
+            <span class="tag accent">Python</span><span class="tag accent">Pandas</span><span class="tag">M&amp;E</span><span class="tag green">Education / Skills</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="https://skills-development-me-app-7o6a997xkhvvlbcj22dh7x.streamlit.app" target="_blank" rel="noopener" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">Education</span>
+        </div>
+      </div>
+
+      <!-- 16. Dhatki Digital Inclusion -->
+      <div class="project-card reveal" data-category="social ai">
+        <div class="project-card__header">
+          <div class="project-card__emoji">🌐</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 19</div>
+            <div class="project-card__title">Dhatki–Chinese Digital Inclusion Engine</div>
+            <div class="project-card__company">Tharparkar Community / CPEC Workers</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">I am from Tharparkar. When CPEC brought thousands of Chinese workers to Thar Coal, our local Thari people — who speak Dhatki — couldn't communicate with them. I built this Dhatki-to-Chinese translator myself, for my community, so they could finally be heard in their own land.</div>
+          <p class="project-card__desc">A multi-lingual digital inclusion platform enabling real-time translation between Dhatki (the native language of Tharparkar) and Mandarin Chinese — built specifically for Thari workers and Chinese engineers at the Thar Coal CPEC sites. Features voice input, cultural phrase guides, and offline mode.</p>
+          <div class="tags-row">
+            <span class="tag accent">Python</span><span class="tag accent">NLP</span><span class="tag">Dhatki Language</span><span class="tag green">CPEC / Thar</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="https://dhatki-to-global-digital-inclusion-engine-w4fatyp8ta3mzgajqntd.streamlit.app" target="_blank" rel="noopener" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">🌍 Language Bridge</span>
+        </div>
+      </div>
+
+      <!-- 17. ASER Data Tracker -->
+      <div class="project-card reveal delay-1" data-category="social ai">
+        <div class="project-card__header">
+          <div class="project-card__emoji">🏫</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 20</div>
+            <div class="project-card__title">ASER Data Tracker &amp; Intervention Simulator</div>
+            <div class="project-card__company">ASER Pakistan (Education Assessment)</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">ASER surveys measure whether Pakistan's children can actually read and count. But the data often sits unused. I built this tracker so ASER teams could not only visualize learning deficits by district, but also simulate which interventions would have the most impact per rupee spent.</div>
+          <p class="project-card__desc">An education data analytics and policy simulation platform for ASER Pakistan. Tracks literacy and numeracy assessment data by district and school, visualizes learning outcome trends on maps, and simulates the projected impact of different educational interventions using historical data models.</p>
+          <div class="tags-row">
+            <span class="tag accent">Python</span><span class="tag accent">Pandas</span><span class="tag">Folium</span><span class="tag green">Education / Policy</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="https://aser-data-tracker-and-intervention-simulator-tv62ufs2dmajcj7tc.streamlit.app" target="_blank" rel="noopener" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">Social Impact</span>
+        </div>
+      </div>
+
+      <!-- 18. Tanker Routing Engine -->
+      <div class="project-card reveal delay-2" data-category="supply-chain telemetry">
+        <div class="project-card__header">
+          <div class="project-card__emoji">🚛</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 21</div>
+            <div class="project-card__title">Tanker Routing Engine</div>
+            <div class="project-card__company">Fuel / Logistics Sector</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">Fuel tanker routing is one of the most expensive and safety-critical logistics problems in Pakistan. I built this engine to solve it — computing optimal routes that minimize fuel costs, avoid unsafe roads, and respect tanker capacity and timing constraints.</div>
+          <p class="project-card__desc">A specialized routing engine for fuel tanker fleet management. Computes multi-stop tanker delivery routes using graph algorithms, applies time-window and load constraints, generates driver schedules, and provides a live map view of the fleet on Folium — reducing fuel and operational costs significantly.</p>
+          <div class="tags-row">
+            <span class="tag accent">Python</span><span class="tag accent">NetworkX</span><span class="tag">Folium</span><span class="tag green">Fuel Logistics</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="https://tanker-routing-engine-gzcem3qsmuqilsfzqwehev.streamlit.app" target="_blank" rel="noopener" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">Routing</span>
+        </div>
+      </div>
+
+      <!-- 19. Faisal Movers Telemetry -->
+      <div class="project-card reveal" data-category="telemetry supply-chain">
+        <div class="project-card__header">
+          <div class="project-card__emoji">🚌</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 22</div>
+            <div class="project-card__title">Faisal Movers Fleet Telemetry Engine</div>
+            <div class="project-card__company">Faisal Movers (Transport Company)</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">Having traveled Faisal Movers buses across Sindh many times, I noticed how much manual coordination goes into their fleet. I built this real-time telemetry platform to show how modern IoT data can transform traditional Pakistani transport companies into data-driven operations.</div>
+          <p class="project-card__desc">A real-time fleet telemetry and operations dashboard for Pakistan's intercity bus network. Tracks live bus locations via GPS, monitors driver behavior (speed, braking, idle time), flags route deviations, calculates on-time performance, and generates automated incident reports for the operations team.</p>
+          <div class="tags-row">
+            <span class="tag accent">Python</span><span class="tag accent">WebSockets</span><span class="tag">Leaflet Maps</span><span class="tag green">Transport / Fleet</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="https://faisal-movers-telemetry-engine-wgpjnabmfl3mhnextrekex.streamlit.app" target="_blank" rel="noopener" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">Telemetry</span>
+        </div>
+      </div>
+
+      <!-- 20. Hamdard Demand Forecaster -->
+      <div class="project-card reveal delay-1" data-category="pharma ai">
+        <div class="project-card__header">
+          <div class="project-card__emoji">🌿</div>
+          <div class="project-card__meta">
+            <div class="project-card__num">Project 23</div>
+            <div class="project-card__title">Hamdard Demand Forecasting Engine</div>
+            <div class="project-card__company">Hamdard Pakistan</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story">Hamdard's herbal medicines have seasonal demand spikes — Rooh Afza in Ramadan, herbal tonics in winter. I built this demand forecasting engine for them to predict those spikes months in advance, so they never face a stockout during peak season again.</div>
+          <p class="project-card__desc">An AI-powered demand forecasting platform for Hamdard Pakistan's herbal product portfolio. Models seasonal demand patterns, promotional effects, and regional consumption variations using time-series analysis — generating 12-week production and procurement plans to eliminate costly stockouts and overproduction.</p>
+          <div class="tags-row">
+            <span class="tag accent">Python</span><span class="tag accent">Pandas</span><span class="tag">ML Forecasting</span><span class="tag green">Pharma / Herbal</span>
+          </div>
+        </div>
+        <div class="project-card__footer">
+          <div class="project-card__actions">
+            <a href="https://hamdard-demand-forecaster-ibxjrlmiufafukn7uilorx.streamlit.app" target="_blank" rel="noopener" class="project-card__btn primary">🚀 Live Demo ↗</a>
+          </div>
+          <span class="tag">Forecasting</span>
+        </div>
+      </div>
+
+      <!-- FLAGSHIP PROJECT 02: PhishShield — AI Phishing URL Detector -->
+      <div class="project-card reveal" data-category="ai telemetry cybersecurity" style="grid-column: 1 / -1; background: linear-gradient(135deg, #010b13 0%, #020f1c 100%); border: 2px solid #00d4aa; position: relative;">
+        <div class="project-card__header" style="background: rgba(0,212,170,0.07); border-bottom: 1px solid rgba(0,212,170,0.2);">
+          <div class="project-card__emoji">🛡️</div>
+          <div class="project-card__meta">
+            <div class="project-card__num" style="color: #00d4aa;">Flagship Project 02 &nbsp;·&nbsp; Live on Netlify</div>
+            <div class="project-card__title" style="color: #f0f9ff; font-family: var(--ff-serif); font-size: 1.25rem;">PhishShield — AI-Powered Phishing URL Detector</div>
+            <div class="project-card__company" style="color: #67e8d4;">Pakistan CERT (PKCERT) — National Cybersecurity Submission</div>
+          </div>
+        </div>
+        <div class="project-card__body">
+          <div class="project-card__story" style="background: rgba(0,212,170,0.06); border-left-color: #00d4aa; color: #67e8d4;">Built for the PKCERT Technology Internship selection board — demonstrates real-time URL threat intelligence using 18+ AI-driven detection signals, designed to protect Pakistani citizens from phishing and social engineering attacks.</div>
+          <p class="project-card__desc" style="color: #94a3b8;">A state-of-the-art browser-based cybersecurity threat detection engine. Evaluates URLs using 18+ structural, lexical, and domain-level threat indicators — including IP-based host detection, brand impersonation scoring, suspicious keyword flags, URL entropy analysis, and TLD risk classification. Features a live animated SVG risk-score gauge, a bulk URL scanner for up to 10 simultaneous checks, a real-time simulated threat intelligence feed with attack type classification, and a fully animated particle canvas background. Built entirely in vanilla HTML/CSS/JS, deployed live on Netlify — sub-0.5s scan time, no server required.</p>
+          <div class="tags-row">
+            <span class="tag accent" style="background: rgba(0,212,170,0.12); border-color: #00d4aa; color: #67e8d4;">18+ AI Detection Signals</span>
+            <span class="tag accent" style="background: rgba(0,212,170,0.12); border-color: #00d4aa; color: #67e8d4;">SVG Risk Gauge</span>
+            <span class="tag accent" style="background: rgba(0,212,170,0.12); border-color: #00d4aa; color: #67e8d4;">Bulk URL Scanner</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">Live Threat Feed</span>
+            <span class="tag green" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); color: #a7f3d0;">Netlify · Vanilla JS</span>
+          </div>
+        </div>
+        <div class="project-card__footer" style="border-top: 1px solid rgba(0,212,170,0.2);">
+          <div class="project-card__actions">
+            <a href="https://gregarious-elf-40417f.netlify.app/" target="_blank" rel="noopener" class="project-card__btn primary" style="background: linear-gradient(135deg, #00a884 0%, #0ea5e9 100%); border: 1px solid rgba(255,255,255,0.15); color: #fff; box-shadow: 0 0 18px rgba(0,212,170,0.4);">🛡️ Launch PhishShield ↗</a>
+          </div>
+          <span class="tag" style="background: rgba(0,212,170,0.1); color: #67e8d4; border-color: rgba(0,212,170,0.3);">Cybersecurity / PKCERT</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CTA -->
+    <div style="text-align:center;margin-top:3.5rem" class="reveal">
+      <p style="color:var(--clr-muted);font-size:0.875rem;margin-bottom:1.25rem">All projects are live and free to explore. Want to collaborate or hire me?</p>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+        <a href="https://share.streamlit.io/user/lokeshsoni653-del" target="_blank" rel="noopener" class="btn btn-primary">
+          🚀 View All on Streamlit
+        </a>
+        <a href="contact.html" class="btn btn-outline">✉️ Get In Touch</a>
+        <a href="https://github.com/lokeshsoni653-del" target="_blank" rel="noopener" class="btn btn-outline">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__inner">
+      <div class="footer__logo">Lokesh<span>.</span></div>
+      <nav class="footer__links">
+        <a href="index.html" class="footer__link">Home</a>
+        <a href="experience.html" class="footer__link">Experience</a>
+        <a href="certifications.html" class="footer__link">Certifications</a>
+        <a href="contact.html" class="footer__link">Contact</a>
+      </nav>
+      <p class="footer__copy">© 2026 Lokesh Kumar.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav=document.getElementById('main-nav');
+  window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>20));
+  document.getElementById('hamburger').addEventListener('click',()=>document.getElementById('mobile-menu').classList.toggle('open'));
+
+  // Filter
+  const btns  = document.querySelectorAll('.filter-btn');
+  const cards = document.querySelectorAll('.project-card');
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.filter;
+      let visible = 0;
+      cards.forEach(c => {
+        const cats = c.dataset.category || '';
+        const show = (f === 'all' || cats.includes(f));
+        c.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+    });
+  });
+
+  const observer=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('visible');observer.unobserve(x.target)}}),{threshold:0.08});
+  document.querySelectorAll('.reveal').forEach(r=>observer.observe(r));
+</script>
+</body>
+</html>

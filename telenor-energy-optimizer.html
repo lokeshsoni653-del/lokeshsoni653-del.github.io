@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TELENOR TELECOM SITE ENERGY & SOLAR OPTIMIZER HUD</title>
+  
+  <!-- Modern Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet"/>
+  
+  <!-- Leaflet GIS Map Assets -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <!-- Analytics Charting Asset -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Cybernetic Telenor HUD Style Sheet -->
+  <style>
+    :root {
+      --clr-bg-black: #020408;
+      --clr-bg-navy: #050a14;
+      --clr-hud-card: rgba(8, 14, 28, 0.85);
+      --clr-border-red: rgba(220, 38, 38, 0.35);
+      --clr-red: #dc2626;
+      --clr-red-bright: #ef4444;
+      --clr-red-dim: #991b1b;
+      --clr-neon-cyan: #06b6d4;
+      --clr-neon-green: #10b981;
+      --clr-text-white: #fcfbf9;
+      --clr-text-muted: #94a3b8;
+      
+      --font-mono: 'Share Tech Mono', monospace;
+      --font-hud: 'Orbitron', sans-serif;
+      --font-sans: 'Inter', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--clr-bg-black);
+      background-image: 
+        radial-gradient(ellipse at 50% 10%, rgba(20, 10, 10, 0.8) 0%, var(--clr-bg-black) 85%),
+        linear-gradient(rgba(220, 38, 38, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(220, 38, 38, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 25px 25px, 25px 25px;
+      color: var(--clr-text-white);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-bottom: 3rem;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: var(--clr-bg-black); }
+    ::-webkit-scrollbar-thumb { background: var(--clr-red-dim); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--clr-red-bright); }
+
+    .container-fluid {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    /* =========================================================================
+       GLOBAL HUD HEADER
+       ========================================================================= */
+    .hud-header {
+      background: rgba(5, 10, 20, 0.95);
+      border: 1px solid var(--clr-border-red);
+      border-radius: 6px;
+      padding: 1.25rem 2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(220, 38, 38, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hud-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--clr-red), transparent);
+    }
+    .hud-header__identity {
+      display: flex;
+      flex-direction: column;
+    }
+    .hud-header__title {
+      font-family: var(--font-hud);
+      font-weight: 900;
+      font-size: 1.6rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--clr-text-white);
+      text-shadow: 0 0 10px rgba(220, 38, 38, 0.35);
+    }
+    .hud-header__subtitle {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      color: var(--clr-red-bright);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .hud-header__metrics {
+      display: flex;
+      gap: 2.5rem;
+      align-items: center;
+    }
+    .hud-header__stat {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+    .hud-header__stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--clr-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .hud-header__stat-value {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: var(--clr-neon-cyan);
+    }
+    .hud-header__stat-value.pulse {
+      animation: pulseAlert 2.5s infinite;
+    }
+
+    /* Sound Switcher Controls */
+    .hud-header__sound {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border-left: 1px solid rgba(220, 38, 38, 0.3);
+      padding-left: 1.5rem;
+    }
+    .hud-header__sound-btn {
+      font-family: var(--font-hud);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border: 1px solid var(--clr-red-dim);
+      padding: 0.35rem 0.75rem;
+      border-radius: 4px;
+      color: var(--clr-red-bright);
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .hud-header__sound-btn.active {
+      background: rgba(220, 38, 38, 0.25);
+      border-color: var(--clr-red-bright);
+      color: var(--clr-text-white);
+      box-shadow: 0 0 10px rgba(220, 38, 38, 0.2);
+    }
+    .hud-header__sound-btn:hover {
+      border-color: var(--clr-red-bright);
+      color: var(--clr-text-white);
+    }
+
+    @keyframes pulseAlert {
+      0%, 100% { opacity: 1; color: var(--clr-neon-cyan); }
+      50% { opacity: 0.5; color: var(--clr-red-bright); }
+    }
+
+    /* =========================================================================
+       HUD PANELS GRID
+       ========================================================================= */
+    .hud-grid {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    .hud-panel {
+      background: var(--clr-hud-card);
+      border: 1px solid var(--clr-border-red);
+      border-radius: 6px;
+      padding: 1.5rem;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.7), inset 0 0 15px rgba(220, 38, 38, 0.03);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+    }
+    .hud-panel::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 4px; height: 12px;
+      background: var(--clr-red);
+    }
+    .hud-panel::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; width: 12px; height: 4px;
+      background: var(--clr-red);
+    }
+
+    .hud-panel__title {
+      font-family: var(--font-hud);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--clr-red-bright);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid rgba(220, 38, 38, 0.2);
+      padding-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* =========================================================================
+       FORM CONTROL STYLING
+       ========================================================================= */
+    .hud-group {
+      margin-bottom: 1.25rem;
+    }
+    .hud-label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--clr-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.4rem;
+    }
+    .hud-select {
+      width: 100%;
+      background: #050b16;
+      border: 1px solid var(--clr-border-red);
+      border-radius: 4px;
+      color: var(--clr-text-white);
+      padding: 0.5rem;
+      font-size: 0.85rem;
+      font-family: var(--font-sans);
+      outline: none;
+      transition: all 0.2s;
+    }
+    .hud-select:focus {
+      border-color: var(--clr-red-bright);
+      box-shadow: 0 0 10px rgba(220, 38, 38, 0.25);
+    }
+    
+    .hud-slider-wrap {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .hud-slider {
+      flex: 1;
+      accent-color: var(--clr-red);
+      cursor: pointer;
+    }
+    .hud-slider-value {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--clr-text-white);
+      width: 55px;
+      text-align: right;
+    }
+
+    /* Toggle Switches / Checkboxes */
+    .hud-switch-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.6rem;
+      margin-top: 0.5rem;
+    }
+    .hud-switch-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: rgba(5, 11, 22, 0.6);
+      border: 1px solid rgba(220, 38, 38, 0.15);
+      border-radius: 4px;
+      padding: 0.5rem 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .hud-switch-item:hover {
+      border-color: rgba(220, 38, 38, 0.4);
+      background: rgba(220, 38, 38, 0.05);
+    }
+    .hud-switch-item input {
+      accent-color: var(--clr-red);
+      cursor: pointer;
+    }
+    .hud-switch-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--clr-text-white);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Segmented Controls */
+    .hud-segmented {
+      display: flex;
+      background: rgba(5, 11, 22, 0.8);
+      border: 1px solid var(--clr-border-red);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 0.75rem;
+    }
+    .hud-segmented-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--clr-text-muted);
+      font-family: var(--font-hud);
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 0.5rem 0.25rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .hud-segmented-btn:not(:last-child) {
+      border-right: 1px solid var(--clr-border-red);
+    }
+    .hud-segmented-btn.active {
+      background: var(--clr-red-dim);
+      color: var(--clr-text-white);
+      font-weight: 900;
+    }
+    .hud-segmented-btn:hover:not(.active) {
+      color: var(--clr-text-white);
+      background: rgba(220, 38, 38, 0.1);
+    }
+
+    /* Telemetry data box */
+    .packing-details {
+      background: rgba(5, 11, 22, 0.7);
+      border: 1px solid rgba(220, 38, 38, 0.2);
+      border-radius: 4px;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .packing-row {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--clr-text-muted);
+      margin-bottom: 0.4rem;
+    }
+    .packing-row span:last-child {
+      color: var(--clr-text-white);
+      font-weight: bold;
+    }
+
+    /* HUD Progress Bar */
+    .hud-progress-bg {
+      background: #050b16;
+      border: 1px solid rgba(220, 38, 38, 0.25);
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 0.5rem;
+    }
+    .hud-progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.3s;
+      background-color: var(--clr-neon-green);
+    }
+
+    /* Trigger Simulation Button */
+    .hud-btn-execute {
+      width: 100%;
+      background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
+      color: var(--clr-text-white);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      padding: 0.85rem;
+      font-family: var(--font-hud);
+      font-size: 0.85rem;
+      font-weight: bold;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      box-shadow: 0 0 15px rgba(220, 38, 38, 0.3);
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 0.5rem;
+    }
+    .hud-btn-execute:hover {
+      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+      box-shadow: 0 0 25px rgba(220, 38, 38, 0.6);
+      transform: translateY(-1px);
+    }
+    .hud-btn-execute:active {
+      transform: translateY(1px);
+    }
+
+    /* =========================================================================
+       RIGHT COMMAND PANELS
+       ========================================================================= */
+    .hud-main-center {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Leaflet map container */
+    .hud-map-panel {
+      padding: 0;
+      border-radius: 6px;
+      position: relative;
+    }
+    #gis-operational-map {
+      height: 380px;
+      width: 100%;
+      background: #03060c;
+      border-radius: 5px;
+    }
+    .hud-map-label {
+      position: absolute;
+      top: 15px; left: 15px;
+      background: rgba(3, 6, 12, 0.85);
+      border: 1px solid var(--clr-border-red);
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--clr-red-bright);
+      z-index: 1000;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    /* Telemetry row grid */
+    .telemetry-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+    .telemetry-box {
+      background: rgba(5, 10, 20, 0.85);
+      border: 1px solid rgba(220, 38, 38, 0.25);
+      border-radius: 4px;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+    .telemetry-box__val {
+      font-family: var(--font-hud);
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    .telemetry-box__val.cyan { color: var(--clr-neon-cyan); text-shadow: 0 0 8px rgba(6, 182, 212, 0.35); }
+    .telemetry-box__val.red { color: var(--clr-red-bright); text-shadow: 0 0 8px rgba(239, 68, 68, 0.35); }
+    .telemetry-box__val.green { color: var(--clr-neon-green); text-shadow: 0 0 8px rgba(16, 185, 129, 0.35); }
+    .telemetry-box__val.white { color: var(--clr-text-white); }
+
+    .telemetry-box__lbl {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--clr-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Leaflet overrides for dark red theme */
+    .leaflet-bar {
+      border: 1px solid var(--clr-border-red) !important;
+      background: rgba(5, 10, 20, 0.9) !important;
+    }
+    .leaflet-bar a {
+      background-color: transparent !important;
+      color: var(--clr-red-bright) !important;
+      border-bottom: 1px solid var(--clr-border-red) !important;
+    }
+    .leaflet-bar a:hover {
+      color: var(--clr-text-white) !important;
+      background-color: rgba(220, 38, 38, 0.15) !important;
+    }
+    .leaflet-popup-content-wrapper {
+      background: rgba(5, 10, 20, 0.95) !important;
+      border: 1px solid var(--clr-red) !important;
+      color: var(--clr-text-white) !important;
+      border-radius: 4px !important;
+      font-family: var(--font-sans) !important;
+    }
+    .leaflet-popup-tip {
+      background: var(--clr-red-dim) !important;
+    }
+
+    /* Graphics and Charting */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+    }
+    .chart-container {
+      position: relative;
+      height: 240px;
+      width: 100%;
+    }
+
+    /* Monospaced Command Log Terminal */
+    .terminal-panel {
+      background: #010204;
+      border: 1px solid var(--clr-border-red);
+      border-radius: 6px;
+      padding: 1rem;
+      position: relative;
+    }
+    .terminal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(220, 38, 38, 0.2);
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .terminal-title {
+      font-family: var(--font-hud);
+      font-size: 0.72rem;
+      color: var(--clr-red-bright);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .terminal-blink-dot {
+      width: 6px;
+      height: 6px;
+      background-color: var(--clr-neon-green);
+      border-radius: 50%;
+      animation: terminalPulse 1.2s infinite;
+    }
+    .terminal-controls {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .terminal-circle {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--clr-red-dim);
+    }
+    .terminal-circle:first-child { background: var(--clr-red-bright); }
+    .terminal-circle:nth-child(2) { background: #b91c1c; }
+    .terminal-circle:nth-child(3) { background: var(--clr-neon-green); }
+
+    .terminal-window {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--clr-text-white);
+      height: 150px;
+      overflow-y: auto;
+      line-height: 1.5;
+      padding-right: 0.5rem;
+      scroll-behavior: smooth;
+    }
+    .terminal-line {
+      margin-bottom: 0.35rem;
+      white-space: pre-wrap;
+    }
+    .terminal-line.info { color: #94a3b8; }
+    .terminal-line.success { color: var(--clr-neon-green); }
+    .terminal-line.warning { color: #f59e0b; }
+    .terminal-line.danger { color: var(--clr-red-bright); }
+    .terminal-line.critical { color: #a78bfa; font-weight: bold; }
+
+    @keyframes terminalPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* =========================================================================
+       ACADEMIC BRIEFING
+       ========================================================================= */
+    .brief-panel {
+      margin-top: 1.5rem;
+    }
+    .brief-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+      margin-top: 1rem;
+    }
+    .brief-sec {
+      margin-bottom: 1.5rem;
+    }
+    .brief-sec h4 {
+      font-family: var(--font-hud);
+      font-size: 0.85rem;
+      color: var(--clr-red-bright);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+      border-left: 2px solid var(--clr-red);
+      padding-left: 0.5rem;
+    }
+    .brief-sec p {
+      font-size: 0.85rem;
+      color: var(--clr-text-muted);
+      line-height: 1.6;
+      text-align: justify;
+      margin-bottom: 1rem;
+    }
+    .brief-highlight {
+      background: rgba(220, 38, 38, 0.03);
+      border: 1px dashed rgba(220, 38, 38, 0.25);
+      border-radius: 4px;
+      padding: 1rem;
+      font-size: 0.82rem;
+      color: var(--clr-text-white);
+      line-height: 1.5;
+    }
+
+    /* Scanning line overlays */
+    .hud-crt-scanline {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+      background-size: 100% 4px, 6px 100%;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.12;
+    }
+
+    @media (max-width: 1200px) {
+      .hud-grid { grid-template-columns: 1fr; }
+      .charts-grid { grid-template-columns: 1fr; }
+      .brief-columns { grid-template-columns: 1fr; gap: 1.5rem; }
+    }
+    @media (max-width: 768px) {
+      .hud-header { flex-direction: column; gap: 1.25rem; text-align: center; padding: 1.25rem 1rem; }
+      .hud-header__metrics { flex-direction: column; gap: 0.85rem; width: 100%; align-items: center; }
+      .hud-header__stat { align-items: center; }
+      .hud-header__sound { border-left: none; padding-left: 0; width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Retro Cyber Scanline overlay -->
+  <div class="hud-crt-scanline"></div>
+
+  <div class="container-fluid">
+
+    <!-- GLOBAL HUD HEADER -->
+    <header class="hud-header">
+      <div class="hud-header__identity">
+        <h1 class="hud-header__title">Telecom Energy Command</h1>
+        <div class="hud-header__subtitle">Telenor Northern Sector Energy & Solar Optimizer HUD • Ver 5.1</div>
+      </div>
+      <div class="hud-header__metrics">
+        <div class="hud-header__stat">
+          <span class="hud-header__stat-label">Power Nodes Monitored</span>
+          <span class="hud-header__stat-value" id="hud-nodes-count">3 ACTIVE SECTORS</span>
+        </div>
+        <div class="hud-header__stat">
+          <span class="hud-header__stat-label">Power Grid Status</span>
+          <span class="hud-header__stat-value pulse" id="hud-grid-status">STABLE // ONLINE</span>
+        </div>
+        <div class="hud-header__stat">
+          <span class="hud-header__stat-label">Local Coordinates Range</span>
+          <span class="hud-header__stat-value">33.7294° N, 73.0931° E</span>
+        </div>
+        <div class="hud-header__sound">
+          <button class="hud-header__sound-btn" id="hum-btn">🔊 Core Hum</button>
+          <button class="hud-header__sound-btn" id="radar-btn">📡 Scan Ping</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- CORE INTERFACE GRID -->
+    <main class="hud-grid">
+
+      <!-- LEFT COLUMN: SENSITIVITY CONFIGURATION -->
+      <section class="hud-panel" style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <div class="hud-panel__title">
+          <span>🕹️ Energy Optimization Matrix</span>
+        </div>
+
+        <!-- 1. Telecom Tower Node Selector -->
+        <div class="hud-group">
+          <label class="hud-label" for="site-select">Active Telecom Site Node</label>
+          <select class="hud-select" id="site-select">
+            <option value="margalla" selected>Margalla High-Altitude FOB (Sector 1)</option>
+            <option value="i9">I-9 Industrial Sector Hub (Sector 2)</option>
+            <option value="f6">F-6 Residential Urban Site (Sector 3)</option>
+          </select>
+        </div>
+
+        <!-- 2. Operational Demand Configuration -->
+        <div class="hud-panel__title" style="margin-top: 0.5rem; font-size: 0.82rem; margin-bottom: 0.75rem;">
+          <span>⚡ Tower Configuration &amp; Load</span>
+        </div>
+
+        <div class="hud-group">
+          <label class="hud-label" for="traffic-slider">Active Transceiver Carriers (Traffic Load)</label>
+          <div class="hud-slider-wrap">
+            <input type="range" class="hud-slider" id="traffic-slider" min="1" max="12" value="4" step="1"/>
+            <span class="hud-slider-value" id="traffic-val">4 trx</span>
+          </div>
+        </div>
+
+        <div class="hud-group">
+          <label class="hud-label" for="temp-slider">Outdoor Temperature (°C)</label>
+          <div class="hud-slider-wrap">
+            <input type="range" class="hud-slider" id="temp-slider" min="5" max="48" value="28"/>
+            <span class="hud-slider-value" id="temp-val">28°C</span>
+          </div>
+        </div>
+
+        <!-- 3. Deployed Power Assets -->
+        <div class="hud-panel__title" style="margin-top: 0.5rem; font-size: 0.82rem; margin-bottom: 0.75rem;">
+          <span>☀️ Deployed Hybrid Power Assets</span>
+        </div>
+
+        <div class="hud-group">
+          <label class="hud-label" for="solar-slider">Installed Solar PV Capacity (kWp)</label>
+          <div class="hud-slider-wrap">
+            <input type="range" class="hud-slider" id="solar-slider" min="0" max="45" value="15" step="1"/>
+            <span class="hud-slider-value" id="solar-val">15 kWp</span>
+          </div>
+        </div>
+
+        <div class="hud-group">
+          <label class="hud-label" for="battery-slider">Backup Battery Storage (kWh)</label>
+          <div class="hud-slider-wrap">
+            <input type="range" class="hud-slider" id="battery-slider" min="10" max="150" value="60" step="5"/>
+            <span class="hud-slider-value" id="battery-val">60 kWh</span>
+          </div>
+        </div>
+
+        <!-- 4. Environmental Context -->
+        <div class="hud-group">
+          <label class="hud-label" for="weather-select">Active Weather Profile</label>
+          <select class="hud-select" id="weather-select">
+            <option value="sunny" selected>Sunny &amp; Clear (Peak Insolation)</option>
+            <option value="overcast">Overcast &amp; Cloudy (50% Irradiance)</option>
+            <option value="rainy">Rainy / Monsoon Storms (15% Irradiance)</option>
+          </select>
+        </div>
+
+        <!-- Dynamic Load Summary Sheet -->
+        <div class="packing-details">
+          <p style="font-family: var(--font-mono); font-size:0.75rem; color:var(--clr-red-bright); font-weight:bold; margin-bottom: 0.5rem;">REAL-TIME SITE LOAD SHEET</p>
+          <div class="packing-row">
+            <span>Base Tower Load:</span>
+            <span id="sheet-base-load">2.50 kW</span>
+          </div>
+          <div class="packing-row">
+            <span>Active HVAC Cooling:</span>
+            <span id="sheet-hvac-load">1.20 kW</span>
+          </div>
+          <div class="packing-row">
+            <span>Total Continuous Demand:</span>
+            <span id="sheet-total-load" style="color:var(--clr-neon-cyan);">3.70 kW</span>
+          </div>
+          <div class="packing-row">
+            <span>Peak Solar PV Output:</span>
+            <span id="sheet-solar-output" style="color:var(--clr-neon-green);">11.25 kW</span>
+          </div>
+        </div>
+
+        <!-- Progress status -->
+        <div>
+          <p style="font-family:var(--font-mono); font-size:0.65rem; color:var(--clr-text-muted); text-transform:uppercase;">Simulation Model Synchronization</p>
+          <div class="hud-progress-bg">
+            <div class="hud-progress-fill" id="model-progress"></div>
+          </div>
+        </div>
+
+        <!-- Execute Button -->
+        <button class="hud-btn-execute" id="sim-btn">⚡ Run Optimization Wargame</button>
+      </section>
+
+      <!-- RIGHT SECTION: MAP, TELEMETRY & CHARTS -->
+      <section class="hud-main-center">
+
+        <!-- 1. Leaflet Operational GIS Map -->
+        <div class="hud-panel hud-map-panel">
+          <div class="hud-map-label">Tactical GIS Layout Sector Area</div>
+          <div id="gis-operational-map"></div>
+        </div>
+
+        <!-- 2. Real-time Telemetry Dashboard -->
+        <div class="telemetry-row">
+          <div class="telemetry-box">
+            <div class="telemetry-box__val cyan" id="telem-opex">PKR 450/hr</div>
+            <div class="telemetry-box__lbl">Estimated Site OPEX</div>
+          </div>
+          <div class="telemetry-box">
+            <div class="telemetry-box__val red" id="telem-diesel">1.25 L/hr</div>
+            <div class="telemetry-box__lbl">Diesel Fuel Burn</div>
+          </div>
+          <div class="telemetry-box">
+            <div class="telemetry-box__val green" id="telem-solar-share">82%</div>
+            <div class="telemetry-box__lbl">Renewable Energy Mix</div>
+          </div>
+          <div class="telemetry-box">
+            <div class="telemetry-box__val white" id="telem-co2">2.4 kg/hr</div>
+            <div class="telemetry-box__lbl">CO2 Emissions Rate</div>
+          </div>
+        </div>
+
+        <!-- 3. Analytical Charts Grid -->
+        <div class="hud-panel">
+          <div class="hud-panel__title">
+            <span>📊 Pro-Forma 24-Hour Battery state & load curves</span>
+          </div>
+          <div class="charts-grid">
+            <div class="chart-container">
+              <canvas id="energy-chart"></canvas>
+            </div>
+            <div class="chart-container" style="display:flex; flex-direction:column; justify-content:center; gap:0.5rem; background:rgba(5,11,22,0.6); padding:1rem; border-radius:4px; border:1px solid rgba(220,38,38,0.15);">
+              <p style="font-family:var(--font-hud); font-size:0.75rem; color:var(--clr-red-bright); text-transform:uppercase; letter-spacing:1px; text-align:center;">Site Sensitivity Matrix</p>
+              
+              <div style="border-top:1px dashed rgba(220,38,38,0.2); padding-top:0.4rem;">
+                <p style="font-family:var(--font-mono); font-size:0.58rem; color:var(--clr-text-muted); text-transform:uppercase;">Daily OPEX Savings</p>
+                <p style="font-family:var(--font-hud); font-size:1.1rem; color:var(--clr-neon-green);" id="matrix-savings">PKR 18,240</p>
+              </div>
+
+              <div style="border-top:1px dashed rgba(220,38,38,0.2); padding-top:0.4rem;">
+                <p style="font-family:var(--font-mono); font-size:0.58rem; color:var(--clr-text-muted); text-transform:uppercase;">DG Run Hours Avoided</p>
+                <p style="font-family:var(--font-hud); font-size:1.1rem; color:var(--clr-neon-cyan);" id="matrix-dg-hours">9.5 Hrs / day</p>
+              </div>
+
+              <div style="border-top:1px dashed rgba(220,38,38,0.2); padding-top:0.4rem;">
+                <p style="font-family:var(--font-mono); font-size:0.58rem; color:var(--clr-text-muted); text-transform:uppercase;">Solar Battery Payback</p>
+                <p style="font-family:var(--font-hud); font-size:1.1rem; color:var(--clr-text-white);" id="matrix-payback">2.4 Years</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Interactive Command Log Terminal -->
+        <div class="terminal-panel">
+          <div class="terminal-header">
+            <div class="terminal-title">
+              <span class="terminal-blink-dot"></span>
+              <span>Operations Command Log Feed</span>
+            </div>
+            <div class="terminal-controls">
+              <div class="terminal-circle"></div>
+              <div class="terminal-circle"></div>
+              <div class="terminal-circle"></div>
+            </div>
+          </div>
+          <div class="terminal-window" id="terminal-win">
+            <!-- Populated via Javascript -->
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <!-- ACADEMIC ENERGY BRIEFING SECTION -->
+    <footer class="hud-panel brief-panel">
+      <div class="hud-panel__title" style="margin-bottom:0.5rem;">
+        <span>📚 Telenor northern sector energy strategy briefing</span>
+      </div>
+      <div class="brief-columns">
+        <div class="brief-sec">
+          <h4>DC-Powered Solar &amp; Hybrid HVAC Architecture</h4>
+          <p>
+            Traditional telecom sites suffer high conversion losses converting DC battery power to AC for air conditioning, then rectifying AC grid power back to DC for transceivers. By deploying native **DC-powered variable-capacity air conditioners**, Telenor avoids up to 18% inverter conversion losses. Combining this with high-efficiency solar PV arrays allows Margalla and urban towers to run completely off-grid during daylight hours.
+          </p>
+          <div class="brief-highlight">
+            <strong>Key Planning Strategy (DC Direct Coupling):</strong><br/>
+            Solar panels feed energy directly into the DC common bus bar, charging Lithium-Ion battery banks and running transceivers directly. The smart generator only fires as a final safety trigger when battery SoC drops below critical thresholds.
+          </div>
+        </div>
+        <div class="brief-sec">
+          <h4>OPEX Sensitivities &amp; World Bank SDG Alignment</h4>
+          <p>
+            Telenor's network cost model is highly sensitive to remote site diesel delivery tariffs. Incorporating solar sizing and battery storage calculations into a unified data optimization model allows planning teams to design custom regional power designs. Right-sizing battery storage from 40kWh to 80kWh in cloudy high-altitude sectors avoids thermal runaway risks and significantly drops diesel generator maintenance costs.
+          </p>
+          <p>
+            This energy planning methodology supports **SDG 7 (Affordable &amp; Clean Energy)** and **SDG 13 (Climate Action)**. Proving these sensitivities through interactive data-driven models demonstrates advanced engineering operations research and strategic cost management.
+          </p>
+        </div>
+      </div>
+      <div style="border-top: 1px solid rgba(220,38,38,0.25); padding-top: 1rem; text-align: center; font-family: var(--font-hud); font-size: 0.72rem; color: var(--clr-text-muted); margin-top: 1rem;">
+        DESIGNED FOR TELENOR PAKISTAN TECHNOLOGY FELLOWSHIP RECRUITMENT BY LOKESH KUMAR (BS SOFTWARE ENGINEERING, SAU TANDO JAM)
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Audio elements & Real-time mathematical simulation logic -->
+  <script>
+    // =========================================================================
+    // 1. TACTICAL WEB AUDIO API SYNTHESIS
+    // =========================================================================
+    let audioCtx = null;
+    let humOscillator = null;
+    let humGain = null;
+    let humEnabled = false;
+
+    function initAudio() {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    // A low telecom line hum
+    function toggleHum() {
+      if (!audioCtx) initAudio();
+
+      if (!humEnabled) {
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        
+        humOscillator = audioCtx.createOscillator();
+        humGain = audioCtx.createGain();
+
+        // 50Hz electrical hum with saw wave harmonics
+        humOscillator.type = 'sawtooth';
+        
+        const trxVal = parseInt(document.getElementById('traffic-slider').value);
+        humOscillator.frequency.setValueAtTime(50 + (trxVal * 8), audioCtx.currentTime);
+
+        // Low-pass filter to make it deep and less abrasive
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(120, audioCtx.currentTime);
+
+        humGain.gain.setValueAtTime(0.04, audioCtx.currentTime); // Very quiet ambient hum
+
+        humOscillator.connect(filter);
+        filter.connect(humGain);
+        humGain.connect(audioCtx.destination);
+
+        humOscillator.start();
+        humEnabled = true;
+        document.getElementById('hum-btn').classList.add('active');
+        addLog("AUDIO: Telecom ambient core hum SYNTHESIZED [50Hz - 120Hz Lowpass] // ACTIVE", "success");
+      } else {
+        humOscillator.stop();
+        humOscillator.disconnect();
+        humGain.disconnect();
+        humEnabled = false;
+        document.getElementById('hum-btn').classList.remove('active');
+        addLog("AUDIO: Telecom ambient hum MUTED // STANDBY", "info");
+      }
+    }
+
+    // High frequency radar sweep sonar ping
+    function playRadarPing() {
+      if (!audioCtx) initAudio();
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      const osc = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, audioCtx.currentTime); // 880Hz pitch
+      osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 1.2); // Decay frequency
+
+      gainNode.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2); // Decay volume
+
+      osc.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + 1.3);
+      addLog("TELEMETRY: Broadcast operational GIS sector scan ping sent.", "warning");
+    }
+
+    document.getElementById('hum-btn').addEventListener('click', toggleHum);
+    document.getElementById('radar-btn').addEventListener('click', playRadarPing);
+
+    // =========================================================================
+    // 2. TERMINAL CMD LOG SYSTEM
+    // =========================================================================
+    const terminalWin = document.getElementById('terminal-win');
+
+    function addLog(msg, type = "info") {
+      const timeStr = new Date().toISOString().slice(11, 19) + "." + Math.floor(Math.random() * 90 + 10);
+      const line = document.createElement('div');
+      line.className = `terminal-line ${type}`;
+      line.innerHTML = `<span style="color:#dc2626;">[${timeStr}]</span> ${msg}`;
+      terminalWin.appendChild(line);
+      terminalWin.scrollTop = terminalWin.scrollHeight;
+    }
+
+    // Initialize with boot logs
+    addLog("TELENOR NETWORK COMMAND HUD v5.1 INITIALIZING...", "critical");
+    addLog("SYSTEM: Synchronized connection with Islamabad main core established.", "success");
+    addLog("GIS: Loaded Pakistan Northern Sector GIS map layer (Leaflet).", "info");
+    addLog("SIM: 24-Hour Solar insolation profile matching Margalla, I-9 & F-6 nodes LOADED.", "success");
+    addLog("STANDBY: Adjust slider matrix controls to test power sensitivities.", "warning");
+
+    // =========================================================================
+    // 3. LEAFLET GEOSPATIAL MAP SETUP
+    // =========================================================================
+    // Islamabad center
+    const map = L.map('gis-operational-map', {
+      zoomControl: true,
+      scrollWheelZoom: false
+    }).setView([33.71, 73.07], 12);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; CartoDB'
+    }).addTo(map);
+
+    // Define Site Coordinates & Details
+    const sites = {
+      margalla: {
+        name: "Margalla FOB Sector Site",
+        coords: [33.7438, 73.0210],
+        elevation: "1,120m (High Wind Sector)",
+        type: "Alpine High-Altitude Tower",
+        solar: 25,
+        battery: 100,
+        tempScale: 0.8, // Cooler at high altitude
+        baseLoad: 2.1,
+        desc: "Requires hybrid solar backup due to high operational diesel delivery tariffs on mountain passes."
+      },
+      i9: {
+        name: "I-9 Industrial Core Hub",
+        coords: [33.6582, 73.0754],
+        elevation: "510m (Industrial Sector)",
+        type: "Macro High-Traffic Site",
+        solar: 12,
+        battery: 40,
+        tempScale: 1.05, // Slightly warmer industrial zone
+        baseLoad: 3.8,
+        desc: "High traffic growth hub running 12 transceivers. Prone to industrial power grid fluctuations."
+      },
+      f6: {
+        name: "F-6 Residential Sector Node",
+        coords: [33.7294, 73.0782],
+        elevation: "530m (Residential Zone)",
+        type: "Micro Urban Green Site",
+        solar: 18,
+        battery: 80,
+        tempScale: 1.0,
+        baseLoad: 1.8,
+        desc: "Low visual and noise footprint. Subject to tight municipal battery/diesel operation restrictions."
+      }
+    };
+
+    // Render nodes with Leaflet Circles
+    const markers = {};
+    for (let key in sites) {
+      const site = sites[key];
+      const color = key === 'margalla' ? '#ef4444' : (key === 'i9' ? '#06b6d4' : '#10b981');
+      
+      const marker = L.circle(site.coords, {
+        color: color,
+        fillColor: color,
+        fillOpacity: 0.25,
+        radius: 400
+      }).addTo(map);
+
+      marker.bindPopup(`
+        <strong style="color:${color}; font-family:var(--font-hud);">${site.name}</strong><br/>
+        <b>Type:</b> ${site.type}<br/>
+        <b>Elevation:</b> ${site.elevation}<br/>
+        <b>Desc:</b> ${site.desc}
+      `);
+
+      markers[key] = marker;
+    }
+
+    // Handle dropdown site selection fly-to
+    document.getElementById('site-select').addEventListener('change', function(e) {
+      const key = e.target.value;
+      const site = sites[key];
+      map.flyTo(site.coords, 13);
+      
+      // Update sliders matching this site's presets to reflect realistic defaults
+      document.getElementById('solar-slider').value = site.solar;
+      document.getElementById('solar-val').innerText = site.solar + " kWp";
+      document.getElementById('battery-slider').value = site.battery;
+      document.getElementById('battery-val').innerText = site.battery + " kWh";
+      
+      addLog(`GIS: Recalibrating coordinates. Focus flown to ${site.name} Sector Node.`, "info");
+      playRadarPing();
+      runSimulation();
+    });
+
+    // =========================================================================
+    // 4. REAL-TIME MATHEMATICAL SOLAR & BATTERY SIMULATION MODEL
+    // =========================================================================
+    let energyChart = null;
+
+    function runSimulation() {
+      const siteKey = document.getElementById('site-select').value;
+      const site = sites[siteKey];
+
+      const trxVal = parseInt(document.getElementById('traffic-slider').value);
+      const tempVal = parseInt(document.getElementById('temp-slider').value);
+      const solarVal = parseInt(document.getElementById('solar-slider').value);
+      const batteryVal = parseInt(document.getElementById('battery-slider').value);
+      const weatherVal = document.getElementById('weather-select').value;
+
+      // Update UI labels
+      document.getElementById('traffic-val').innerText = trxVal + " trx";
+      document.getElementById('temp-val').innerText = tempVal + "°C";
+      document.getElementById('solar-val').innerText = solarVal + " kWp";
+      document.getElementById('battery-val').innerText = batteryVal + " kWh";
+
+      // Modulate oscillator frequency dynamically with load change
+      if (humEnabled && humOscillator) {
+        humOscillator.frequency.setValueAtTime(50 + (trxVal * 8), audioCtx.currentTime);
+      }
+
+      // Mathematical Power Model
+      // Transceivers consume ~0.4kW per active carrier
+      const transceiversLoad = trxVal * 0.45;
+      // AC cooling load scales up when outdoor temperature is above 25°C
+      const coolingLoad = Math.max(0.1, (tempVal - 24) * 0.12) * site.tempScale;
+      
+      const baseLoad = site.baseLoad + transceiversLoad;
+      const totalLoad = baseLoad + coolingLoad;
+
+      // Solar Generation Profile
+      // Weather factor
+      const weatherFactor = weatherVal === 'sunny' ? 1.0 : (weatherVal === 'overcast' ? 0.45 : 0.15);
+      // Temp derating factor: solar panel efficiency drops by 0.4% per degree above 25°C panel temp
+      const cellTemp = tempVal + (weatherFactor * 20); // Estimation of panel temperature
+      const tempDerating = Math.max(0.7, 1 - Math.max(0, cellTemp - 25) * 0.004);
+      
+      const peakSolar = solarVal * 0.85 * weatherFactor * tempDerating;
+
+      // Update Summary UI elements
+      document.getElementById('sheet-base-load').innerText = baseLoad.toFixed(2) + " kW";
+      document.getElementById('sheet-hvac-load').innerText = coolingLoad.toFixed(2) + " kW";
+      document.getElementById('sheet-total-load').innerText = totalLoad.toFixed(2) + " kW";
+      document.getElementById('sheet-solar-output').innerText = peakSolar.toFixed(2) + " kW";
+
+      // Pro-forma 24 Hour load and battery SoC simulation
+      const hours = Array.from({length: 24}, (_, i) => i);
+      const loadProfile = [];
+      const solarProfile = [];
+      const batterySoC = [];
+
+      let currentSoC = 80.0; // Starts at 80% capacity
+      let totalDieselConsumed = 0;
+      let totalCO2Emitted = 0;
+      let renewableMixCount = 0;
+      let generatorHoursCount = 0;
+
+      for (let h = 0; h < 24; h++) {
+        // Daily load has a slight bump during active evening mobile traffic hours (17:00 - 22:00)
+        const trafficFactor = (h >= 17 && h <= 22) ? 1.25 : ((h >= 1 && h <= 6) ? 0.75 : 1.0);
+        const hourlyLoad = totalLoad * trafficFactor;
+        loadProfile.push(hourlyLoad);
+
+        // Standard bell-shaped solar irradiance curve (peaking at 12:00)
+        let solarRad = 0;
+        if (h >= 6 && h <= 18) {
+          solarRad = Math.sin(Math.PI * (h - 6) / 12);
+        }
+        const hourlySolar = peakSolar * solarRad;
+        solarProfile.push(hourlySolar);
+
+        // Power balance calculation
+        const netPower = hourlySolar - hourlyLoad;
+        
+        if (netPower > 0) {
+          // Charging battery with solar surplus
+          const maxCharge = batteryVal * 0.25; // 0.25C max charging rate
+          const chargeEnergy = Math.min(netPower, maxCharge);
+          currentSoC = Math.min(100.0, currentSoC + (chargeEnergy / batteryVal) * 100);
+          renewableMixCount += hourlyLoad; // Fully powered by renewable solar
+        } else {
+          // Deficit: Discharging battery
+          const deficit = Math.abs(netPower);
+          const maxDischarge = batteryVal * 0.5; // 0.5C max discharge rate
+          const dischargeEnergy = Math.min(deficit, maxDischarge);
+
+          if (currentSoC > 15.0) { // Keep 15% reserve limit
+            const socDrop = (dischargeEnergy / batteryVal) * 100;
+            currentSoC = Math.max(15.0, currentSoC - socDrop);
+            
+            // Re-calculate how much of the load was successfully supplied by the battery
+            const suppliedByBattery = (socDrop / 100) * batteryVal;
+            renewableMixCount += suppliedByBattery;
+          } else {
+            // Battery empty (at reserve limit). Trigger Diesel Generator!
+            generatorHoursCount++;
+            const dieselUsed = 0.85 + (deficit * 0.28); // 0.85L baseline + 0.28L/kW load
+            totalDieselConsumed += dieselUsed;
+            totalCO2Emitted += dieselUsed * 2.68; // 2.68kg CO2 per liter diesel
+          }
+        }
+        batterySoC.push(currentSoC);
+      }
+
+      // Update real-time Telemetry box displays
+      const avgOpex = (totalDieselConsumed * 275) / 24; // Average daily cost assuming PKR 275/L diesel
+      const avgDiesel = totalDieselConsumed / 24;
+      const solarPercentage = Math.min(100, Math.round((renewableMixCount / loadProfile.reduce((a, b) => a + b, 0)) * 100));
+      const avgCO2 = totalCO2Emitted / 24;
+
+      document.getElementById('telem-opex').innerText = "PKR " + Math.round(avgOpex) + "/hr";
+      document.getElementById('telem-diesel').innerText = avgDiesel.toFixed(2) + " L/hr";
+      document.getElementById('telem-solar-share').innerText = solarPercentage + "%";
+      document.getElementById('telem-co2').innerText = avgCO2.toFixed(2) + " kg/hr";
+
+      // Color coding telemetry values depending on performance
+      const opexVal = document.getElementById('telem-opex');
+      const shareVal = document.getElementById('telem-solar-share');
+      
+      if (solarPercentage > 75) {
+        shareVal.className = "telemetry-box__val green";
+        opexVal.className = "telemetry-box__val green";
+      } else if (solarPercentage > 45) {
+        shareVal.className = "telemetry-box__val cyan";
+        opexVal.className = "telemetry-box__val cyan";
+      } else {
+        shareVal.className = "telemetry-box__val red";
+        opexVal.className = "telemetry-box__val red";
+      }
+
+      // Pro-Forma planning matrix calculations (comparison with default non-solar site baseline)
+      const baselineDiesel = loadProfile.reduce((a, b) => a + b, 0) * 0.35; // baseline liters consumed without solar
+      const baselineDailyOpex = baselineDiesel * 275;
+      
+      const actualDailyOpex = totalDieselConsumed * 275;
+      const dailySavings = Math.max(0, baselineDailyOpex - actualDailyOpex);
+
+      document.getElementById('matrix-savings').innerText = "PKR " + Math.round(dailySavings).toLocaleString() + " / day";
+      document.getElementById('matrix-dg-hours').innerText = (24 - generatorHoursCount).toFixed(1) + " Hrs avoided";
+      
+      // Payback period estimation in years: cost of solar setup / annual savings
+      const capitalCost = (solarVal * 135000) + (batteryVal * 65000); // Solar setup PKR 135k/kWp + Battery 65k/kWh
+      const annualSavings = dailySavings * 365;
+      const payback = annualSavings > 0 ? (capitalCost / annualSavings) : 9.9;
+      
+      document.getElementById('matrix-payback').innerText = payback > 9 ? "N/A" : payback.toFixed(1) + " Years";
+
+      // Synchronize Chart.js display
+      updateChart(hours, loadProfile, solarProfile, batterySoC);
+    }
+
+    // =========================================================================
+    // 5. CHART.JS COORDINATION
+    // =========================================================================
+    function updateChart(hours, load, solar, soc) {
+      const ctx = document.getElementById('energy-chart').getContext('2d');
+      
+      if (energyChart) {
+        energyChart.destroy();
+      }
+
+      energyChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: hours.map(h => `${h.toString().padStart(2, '0')}:00`),
+          datasets: [
+            {
+              label: 'Battery State of Charge (SoC %)',
+              data: soc,
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.05)',
+              borderWidth: 2.5,
+              yAxisID: 'ySoC',
+              tension: 0.3,
+              fill: true
+            },
+            {
+              label: 'Total Power Demand (kW)',
+              data: load,
+              borderColor: '#ef4444',
+              borderDash: [5, 5],
+              borderWidth: 2,
+              yAxisID: 'yPower',
+              tension: 0.1
+            },
+            {
+              label: 'Real-time Solar Generation (kW)',
+              data: solar,
+              borderColor: '#f59e0b',
+              backgroundColor: 'rgba(245, 158, 11, 0.1)',
+              borderWidth: 2,
+              yAxisID: 'yPower',
+              tension: 0.4,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: {
+                color: '#94a3b8',
+                font: { family: 'Inter', size: 9 }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(220, 38, 38, 0.05)' },
+              ticks: { color: '#94a3b8', font: { family: 'Share Tech Mono' } }
+            },
+            yPower: {
+              position: 'left',
+              grid: { color: 'rgba(220, 38, 38, 0.05)' },
+              ticks: { color: '#94a3b8', font: { family: 'Share Tech Mono' } },
+              title: { display: true, text: 'Power (kW)', color: '#94a3b8' }
+            },
+            ySoC: {
+              position: 'right',
+              grid: { drawOnChartArea: false },
+              min: 0,
+              max: 100,
+              ticks: { color: '#10b981', font: { family: 'Share Tech Mono' } },
+              title: { display: true, text: 'SoC (%)', color: '#10b981' }
+            }
+          }
+        }
+      });
+    }
+
+    // =========================================================================
+    // 6. EVENT INTERACTION COORDINATION
+    // =========================================================================
+    const sliders = ['traffic-slider', 'temp-slider', 'solar-slider', 'battery-slider'];
+    sliders.forEach(id => {
+      document.getElementById(id).addEventListener('input', function() {
+        runSimulation();
+        document.getElementById('model-progress').style.width = "100%";
+        document.getElementById('model-progress').style.backgroundColor = "#10b981";
+      });
+    });
+
+    document.getElementById('weather-select').addEventListener('change', function(e) {
+      addLog(`ENV: Solar irradiance weather context switched to [${e.target.value.toUpperCase()}].`, "warning");
+      runSimulation();
+    });
+
+    // Run Optimization Wargame Button
+    document.getElementById('sim-btn').addEventListener('click', function() {
+      playRadarPing();
+      
+      let progress = 0;
+      const bar = document.getElementById('model-progress');
+      bar.style.backgroundColor = "#dc2626";
+      
+      addLog("COMMAND: Commencing Telenor Telecom Site 100-run Monte Carlo Optimization Wargame...", "critical");
+      
+      const interval = setInterval(() => {
+        progress += 20;
+        bar.style.width = progress + "%";
+        
+        if (progress === 40) {
+          addLog("SIM: Sweeping solar load profiles under temperature cloud profiles...", "info");
+        } else if (progress === 80) {
+          addLog("SIM: Simulating battery cycle degradation and cost avoidance ratios...", "info");
+        }
+        
+        if (progress >= 100) {
+          clearInterval(interval);
+          bar.style.backgroundColor = "#10b981";
+          
+          addLog("OPTIMIZATION SUCCESSFUL: Solar Coupled DC Bus optimized.", "success");
+          addLog(`RESULT: Deployed solar design achieves daily OPEX savings and avoids critical generator runs.`, "success");
+          runSimulation();
+        }
+      }, 100);
+    });
+
+    // Initial run
+    runSimulation();
+    document.getElementById('model-progress').style.width = "100%";
+  </script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Testimonials — Lokesh Kumar</title>
+  <meta name="description" content="What professors and supervisors say about Lokesh Kumar — recommendations and testimonials."/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .testimonials-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.75rem; }
+    .big-testimonial {
+      background: var(--clr-surface); border: 1px solid var(--clr-border);
+      border-radius: var(--radius-xl); padding: 2.5rem;
+      grid-column: 1 / -1;
+      position: relative; overflow: hidden;
+      transition: all 0.3s var(--ease-out);
+    }
+    .big-testimonial:hover { box-shadow: var(--shadow-md); border-color: rgba(37,99,235,0.2); }
+    .big-testimonial__quote {
+      font-family: var(--ff-serif); font-size: 7rem; line-height: 1;
+      color: var(--clr-border); position: absolute; top: 1rem; right: 2rem;
+      pointer-events: none;
+    }
+    .big-testimonial__text { font-size: 1.05rem; line-height: 1.8; color: var(--clr-muted); margin-bottom: 2rem; max-width: 700px; position: relative; z-index: 1; }
+    .big-testimonial__author { display: flex; align-items: center; gap: 1.25rem; }
+    .big-testimonial__avatar {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--clr-accent-lt); display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; font-weight: 700; color: var(--clr-accent); flex-shrink: 0;
+    }
+    .big-testimonial__name { font-weight: 700; font-size: 1rem; }
+    .big-testimonial__role { font-size: 0.825rem; color: var(--clr-muted); }
+    .big-testimonial__org  { font-size: 0.8rem; color: var(--clr-accent); font-weight: 600; margin-top: 0.1rem; }
+
+    .trait-card {
+      background: var(--clr-surface); border: 1px solid var(--clr-border);
+      border-radius: var(--radius-lg); padding: 1.75rem;
+      display: flex; flex-direction: column; gap: 1rem;
+      transition: all 0.3s var(--ease-out);
+    }
+    .trait-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: rgba(37,99,235,0.2); }
+    .trait-card__icon { font-size: 2rem; }
+    .trait-card__title { font-weight: 700; font-size: 1rem; }
+    .trait-card__desc { font-size: 0.875rem; color: var(--clr-muted); line-height: 1.65; flex: 1; }
+    .trait-card__source { font-size: 0.75rem; color: var(--clr-accent); font-weight: 600; border-top: 1px solid var(--clr-border); padding-top: 0.75rem; }
+
+    .cta-section {
+      background: var(--clr-text); color: #fff;
+      border-radius: var(--radius-xl); padding: 3rem; text-align: center; margin-top: 3rem;
+    }
+    .cta-section h2 { font-family: var(--ff-serif); font-size: 2rem; margin-bottom: 0.75rem; }
+    .cta-section p { opacity: 0.75; max-width: 480px; margin: 0 auto 2rem; font-size: 0.9rem; line-height: 1.7; }
+    .cta-section .btn-primary { background: var(--clr-accent); }
+    .cta-section .btn-outline { border-color: rgba(255,255,255,0.3); color: #fff; }
+    .cta-section .btn-outline:hover { border-color: #fff; background: rgba(255,255,255,0.1); }
+
+    @media(max-width:700px){ .testimonials-grid{grid-template-columns:1fr;} .big-testimonial{grid-column:auto;} }
+  </style>
+</head>
+<body>
+<nav class="nav" id="main-nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">Lokesh<span>.</span></a>
+    <div class="nav__links">
+      <a href="index.html"          class="nav__link">Home</a>
+      <a href="about.html"          class="nav__link">About</a>
+      <a href="skills.html"         class="nav__link">Skills</a>
+      <a href="projects.html"       class="nav__link">Projects</a>
+      <a href="experience.html"     class="nav__link">Experience</a>
+      <a href="education.html"      class="nav__link">Education</a>
+      <a href="certifications.html" class="nav__link">Certs</a>
+      <a href="testimonials.html"   class="nav__link active">Testimonials</a>
+    </div>
+    <a href="contact.html" class="nav__cta">Hire Me →</a>
+    <button class="nav__hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+  <div class="nav__mobile" id="mobile-menu">
+    <a href="index.html" class="nav__link">Home</a>
+    <a href="about.html" class="nav__link">About</a>
+    <a href="skills.html" class="nav__link">Skills</a>
+    <a href="projects.html" class="nav__link">Projects</a>
+    <a href="experience.html" class="nav__link">Experience</a>
+    <a href="education.html" class="nav__link">Education</a>
+    <a href="certifications.html" class="nav__link">Certifications</a>
+    <a href="testimonials.html" class="nav__link active">Testimonials</a>
+    <a href="contact.html" class="nav__cta btn btn-primary">Hire Me →</a>
+  </div>
+</nav>
+
+<header class="page-header">
+  <p class="label page-header__label">What Others Say</p>
+  <h1 class="h1 page-header__title">Testimonials</h1>
+  <p class="page-header__sub">Recommendations from professors and supervisors who have seen my work up close.</p>
+</header>
+
+<section class="section">
+  <div class="container">
+
+    <div class="testimonials-grid">
+
+      <!-- Big testimonial from ITC Director -->
+      <div class="big-testimonial reveal">
+        <div class="big-testimonial__quote">"</div>
+        <p class="big-testimonial__text">
+          I am writing to enthusiastically recommend Lokesh Kumar, a third-year BS Software Engineering student at Sindh Agriculture University Tando Jam, for your internship program. I have had the pleasure of knowing Lokesh through their coursework and active involvement within our Institute of Information Technology Centre (ITC).
+          <br><br>
+          Lokesh has consistently demonstrated a <strong>strong grasp of software engineering principles</strong> and a highly dedicated approach to their studies. They possess a solid foundation in programming, problem-solving, and data structures, and are clearly eager to apply their knowledge in a practical setting.
+          <br><br>
+          I am confident that Lokesh would be a <strong>valuable asset to your team</strong> and a strong contributor to any internship program.
+        </p>
+        <div class="big-testimonial__author">
+          <div class="big-testimonial__avatar">🎓</div>
+          <div>
+            <div class="big-testimonial__name">Prof. Dr. Mir Sajjad Hussain Talpur</div>
+            <div class="big-testimonial__role">Director, Institute of Information Technology Centre (ITC)</div>
+            <div class="big-testimonial__org">Sindh Agriculture University, Tando Jam</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trait cards derived from what's been said -->
+      <div class="trait-card reveal">
+        <div class="trait-card__icon">🔬</div>
+        <div class="trait-card__title">Strong Technical Foundation</div>
+        <p class="trait-card__desc">"Possesses a solid foundation in programming, problem-solving, and data structures" — demonstrating depth in core CS concepts that goes beyond surface-level understanding.</p>
+        <div class="trait-card__source">— Prof. Dr. Mir Sajjad Hussain Talpur, ITC Director, SAU Tando Jam</div>
+      </div>
+
+      <div class="trait-card reveal delay-1">
+        <div class="trait-card__icon">🎯</div>
+        <div class="trait-card__title">Highly Dedicated</div>
+        <p class="trait-card__desc">"Consistently demonstrated a highly dedicated approach to their studies" — showing the kind of commitment that translates directly into real-world project delivery and professional excellence.</p>
+        <div class="trait-card__source">— Prof. Dr. Mir Sajjad Hussain Talpur, ITC Director, SAU Tando Jam</div>
+      </div>
+
+      <div class="trait-card reveal">
+        <div class="trait-card__icon">⚡</div>
+        <div class="trait-card__title">Performance Exceeds Expectations</div>
+        <p class="trait-card__desc">"His performance exceeded the expectations and was able to complete the internship project successfully in time." — demonstrating the ability to deliver under pressure with a self-motivated attitude.</p>
+        <div class="trait-card__source">— Shahzaib Khan, Founder, Interns Pakistan</div>
+      </div>
+
+      <div class="trait-card reveal delay-1">
+        <div class="trait-card__icon">🌱</div>
+        <div class="trait-card__title">Eager to Apply Knowledge</div>
+        <p class="trait-card__desc">"Clearly eager to apply their knowledge in a practical setting" — a hallmark of engineers who bridge the gap between academic learning and real-world impact effectively.</p>
+        <div class="trait-card__source">— Prof. Dr. Mir Sajjad Hussain Talpur, ITC Director, SAU Tando Jam</div>
+      </div>
+
+      <!-- Interns Pakistan testimonial -->
+      <div class="big-testimonial reveal" style="background:linear-gradient(135deg,#f0fdf4,#fff);border-color:#BBF7D0">
+        <div class="big-testimonial__quote" style="color:#BBF7D0">"</div>
+        <p class="big-testimonial__text">
+          Lokesh Kumar has successfully completed the <strong>Interns Program</strong> at Interns Pakistan (Career Accelerator Internship Program). During the period of the internship, the candidate was exposed to challenges related to HTML/CSS/JS/PHP/WordPress.
+          <br><br>
+          With a <strong>self-motivated attitude to learning new things</strong>, his performance exceeded the expectations and he was able to complete the internship project successfully in time.
+          <br><br>
+          Wishing him all the very best in his future endeavors.
+        </p>
+        <div class="big-testimonial__author">
+          <div class="big-testimonial__avatar" style="background:#F0FDF4;color:#15803D">🏢</div>
+          <div>
+            <div class="big-testimonial__name">Shahzaib Khan</div>
+            <div class="big-testimonial__role">Founder</div>
+            <div class="big-testimonial__org" style="color:#16A34A">Interns Pakistan — Career Accelerator Internship Program</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-section reveal">
+      <h2>Want to work with Lokesh?</h2>
+      <p>I'm currently open to internships, contract work, and full-time opportunities in data engineering, AI applications, and Python-based web systems.</p>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+        <a href="contact.html" class="btn btn-primary">Get In Touch →</a>
+        <a href="https://www.linkedin.com/in/lokesh-kumar-76060722a" target="_blank" class="btn btn-outline">LinkedIn Profile</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__inner">
+      <div class="footer__logo">Lokesh<span>.</span></div>
+      <nav class="footer__links">
+        <a href="index.html" class="footer__link">Home</a>
+        <a href="projects.html" class="footer__link">Projects</a>
+        <a href="contact.html" class="footer__link">Contact</a>
+      </nav>
+      <p class="footer__copy">© 2026 Lokesh Kumar.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav=document.getElementById('main-nav');
+  window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>20));
+  document.getElementById('hamburger').addEventListener('click',()=>document.getElementById('mobile-menu').classList.toggle('open'));
+  const observer=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('visible');observer.unobserve(x.target)}}),{threshold:0.1});
+  document.querySelectorAll('.reveal').forEach(r=>observer.observe(r));
+</script>
+</body>
+</html>

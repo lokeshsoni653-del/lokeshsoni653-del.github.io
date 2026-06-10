@@ -1,0 +1,2017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TACTICAL OPERATIONAL COMMAND HUD — AIMH v5.0</title>
+  
+  <!-- Modern Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet"/>
+  
+  <!-- Leaflet GIS Map Assets -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <!-- Analytics Charting Asset -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Cybernetic Military HUD Style Sheet -->
+  <style>
+    :root {
+      --clr-bg-black: #03060c;
+      --clr-bg-navy: #070e1b;
+      --clr-hud-card: rgba(10, 18, 36, 0.85);
+      --clr-border-gold: rgba(133, 117, 78, 0.4);
+      --clr-gold: #c9a84c;
+      --clr-gold-bright: #f0ce71;
+      --clr-gold-dim: #85754e;
+      --clr-neon-cyan: #06b6d4;
+      --clr-neon-green: #10b981;
+      --clr-neon-red: #f43f5e;
+      --clr-text-white: #fcfbf9;
+      --clr-text-muted: #9f9b90;
+      
+      --font-mono: 'Share Tech Mono', monospace;
+      --font-hud: 'Orbitron', sans-serif;
+      --font-sans: 'Inter', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--clr-bg-black);
+      background-image: 
+        radial-gradient(ellipse at 50% 10%, rgba(10, 20, 42, 0.8) 0%, var(--clr-bg-black) 85%),
+        linear-gradient(rgba(133, 117, 78, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(133, 117, 78, 0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 25px 25px, 25px 25px;
+      color: var(--clr-text-white);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-bottom: 3rem;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: var(--clr-bg-black); }
+    ::-webkit-scrollbar-thumb { background: var(--clr-gold-dim); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--clr-gold-bright); }
+
+    .container-fluid {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    /* =========================================================================
+       GLOBAL HUD HEADER
+       ========================================================================= */
+    .hud-header {
+      background: rgba(7, 14, 27, 0.95);
+      border: 1px solid var(--clr-border-gold);
+      border-radius: 6px;
+      padding: 1.25rem 2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(133, 117, 78, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hud-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--clr-gold), transparent);
+    }
+    .hud-header__identity {
+      display: flex;
+      flex-direction: column;
+    }
+    .hud-header__title {
+      font-family: var(--font-hud);
+      font-weight: 900;
+      font-size: 1.6rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--clr-text-white);
+      text-shadow: 0 0 10px rgba(201, 168, 76, 0.35);
+    }
+    .hud-header__subtitle {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      color: var(--clr-gold-bright);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .hud-header__metrics {
+      display: flex;
+      gap: 2.5rem;
+      align-items: center;
+    }
+    .hud-header__stat {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+    .hud-header__stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--clr-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .hud-header__stat-value {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: var(--clr-neon-cyan);
+    }
+    .hud-header__stat-value.pulse {
+      animation: pulseAlert 2.5s infinite;
+    }
+
+    /* Sound Switcher Controls */
+    .hud-header__sound {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border-left: 1px solid rgba(133, 117, 78, 0.3);
+      padding-left: 1.5rem;
+    }
+    .hud-header__sound-btn {
+      font-family: var(--font-hud);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border: 1px solid var(--clr-gold-dim);
+      padding: 0.35rem 0.75rem;
+      border-radius: 4px;
+      color: var(--clr-gold);
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .hud-header__sound-btn.active {
+      background: rgba(133, 117, 78, 0.25);
+      border-color: var(--clr-gold-bright);
+      color: var(--clr-gold-bright);
+      box-shadow: 0 0 10px rgba(133, 117, 78, 0.2);
+    }
+    .hud-header__sound-btn:hover {
+      border-color: var(--clr-gold-bright);
+      color: var(--clr-text-white);
+    }
+
+    @keyframes pulseAlert {
+      0%, 100% { opacity: 1; color: var(--clr-neon-cyan); }
+      50% { opacity: 0.5; color: var(--clr-gold-bright); }
+    }
+
+    /* =========================================================================
+       HUD PANELS GRID
+       ========================================================================= */
+    .hud-grid {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    .hud-panel {
+      background: var(--clr-hud-card);
+      border: 1px solid var(--clr-border-gold);
+      border-radius: 6px;
+      padding: 1.5rem;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.7), inset 0 0 15px rgba(133, 117, 78, 0.03);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+    }
+    .hud-panel::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 4px; height: 12px;
+      background: var(--clr-gold);
+    }
+    .hud-panel::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; width: 12px; height: 4px;
+      background: var(--clr-gold);
+    }
+
+    .hud-panel__title {
+      font-family: var(--font-hud);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--clr-gold-bright);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid rgba(133, 117, 78, 0.2);
+      padding-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* =========================================================================
+       FORM CONTROL STYLING
+       ========================================================================= */
+    .hud-group {
+      margin-bottom: 1.25rem;
+    }
+    .hud-label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--clr-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.4rem;
+    }
+    .hud-select {
+      width: 100%;
+      background: #050b16;
+      border: 1px solid var(--clr-border-gold);
+      border-radius: 4px;
+      color: var(--clr-text-white);
+      padding: 0.5rem;
+      font-size: 0.85rem;
+      font-family: var(--font-sans);
+      outline: none;
+      transition: all 0.2s;
+    }
+    .hud-select:focus {
+      border-color: var(--clr-gold-bright);
+      box-shadow: 0 0 10px rgba(133, 117, 78, 0.25);
+    }
+    
+    .hud-slider-wrap {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .hud-slider {
+      flex: 1;
+      accent-color: var(--clr-gold);
+      cursor: pointer;
+    }
+    .hud-slider-value {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--clr-text-white);
+      width: 50px;
+      text-align: right;
+    }
+
+    /* Protection Grid Checklist */
+    .protection-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.6rem;
+      margin-top: 0.5rem;
+    }
+    .protection-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: rgba(5, 11, 22, 0.6);
+      border: 1px solid rgba(133, 117, 78, 0.15);
+      border-radius: 4px;
+      padding: 0.5rem 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .protection-item:hover {
+      border-color: rgba(133, 117, 78, 0.4);
+      background: rgba(133, 117, 78, 0.05);
+    }
+    .protection-item input {
+      accent-color: var(--clr-gold);
+      cursor: pointer;
+    }
+    .protection-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--clr-text-white);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Segmented Controls for Tactics */
+    .hud-segmented {
+      display: flex;
+      background: rgba(5, 11, 22, 0.8);
+      border: 1px solid var(--clr-border-gold);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 0.75rem;
+    }
+    .hud-segmented-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--clr-text-muted);
+      font-family: var(--font-hud);
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 0.5rem 0.25rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .hud-segmented-btn:not(:last-child) {
+      border-right: 1px solid var(--clr-border-gold);
+    }
+    .hud-segmented-btn.active {
+      background: var(--clr-gold-dim);
+      color: var(--clr-bg-black);
+      font-weight: 900;
+    }
+    .hud-segmented-btn:hover:not(.active) {
+      color: var(--clr-text-white);
+      background: rgba(133, 117, 78, 0.1);
+    }
+
+    /* Packing list numbers */
+    .packing-details {
+      background: rgba(5, 11, 22, 0.7);
+      border: 1px solid rgba(133, 117, 78, 0.2);
+      border-radius: 4px;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .packing-row {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--clr-text-muted);
+      margin-bottom: 0.4rem;
+    }
+    .packing-row span:last-child {
+      color: var(--clr-text-white);
+      font-weight: bold;
+    }
+
+    /* HUD Progress Bar */
+    .hud-progress-bg {
+      background: #050b16;
+      border: 1px solid rgba(133, 117, 78, 0.25);
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 0.5rem;
+    }
+    .hud-progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.3s var(--clr-neon-green);
+    }
+
+    /* Trigger Simulation Button */
+    .hud-btn-execute {
+      width: 100%;
+      background: linear-gradient(135deg, #85754e 0%, #63532c 100%);
+      color: var(--clr-text-white);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      padding: 0.85rem;
+      font-family: var(--font-hud);
+      font-size: 0.85rem;
+      font-weight: bold;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      box-shadow: 0 0 15px rgba(133, 117, 78, 0.3);
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 0.5rem;
+    }
+    .hud-btn-execute:hover {
+      background: linear-gradient(135deg, #a89566 0%, #85754e 100%);
+      box-shadow: 0 0 25px rgba(133, 117, 78, 0.6);
+      transform: translateY(-1px);
+    }
+    .hud-btn-execute:active {
+      transform: translateY(1px);
+    }
+
+    /* =========================================================================
+       RIGHT COMMAND PANELS
+       ========================================================================= */
+    .hud-main-center {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Leaflet custom wargaming map container */
+    .hud-map-panel {
+      padding: 0;
+      border-radius: 6px;
+      position: relative;
+    }
+    #gis-operational-map {
+      height: 400px;
+      width: 100%;
+      background: #03060c;
+      border-radius: 5px;
+    }
+    /* Map overlays custom grid layout */
+    .hud-map-label {
+      position: absolute;
+      top: 15px; left: 15px;
+      background: rgba(3, 6, 12, 0.85);
+      border: 1px solid var(--clr-border-gold);
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--clr-gold-bright);
+      z-index: 1000;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    /* Telemetry row grid */
+    .telemetry-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    .telemetry-box {
+      background: rgba(5, 11, 22, 0.85);
+      border: 1px solid rgba(133, 117, 78, 0.25);
+      border-radius: 4px;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+    .telemetry-box__val {
+      font-family: var(--font-hud);
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    .telemetry-box__val.cyan { color: var(--clr-neon-cyan); text-shadow: 0 0 8px rgba(6, 182, 212, 0.35); }
+    .telemetry-box__val.gold { color: var(--clr-gold); text-shadow: 0 0 8px rgba(201, 168, 76, 0.35); }
+    .telemetry-box__val.green { color: var(--clr-neon-green); text-shadow: 0 0 8px rgba(16, 185, 129, 0.35); }
+    .telemetry-box__val.red { color: var(--clr-neon-red); text-shadow: 0 0 8px rgba(244, 63, 94, 0.35); }
+
+    .telemetry-box__lbl {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--clr-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Map Leaflet styling overrides for cyber look */
+    .leaflet-bar {
+      border: 1px solid var(--clr-border-gold) !important;
+      background: rgba(7, 14, 27, 0.9) !important;
+    }
+    .leaflet-bar a {
+      background-color: transparent !important;
+      color: var(--clr-gold) !important;
+      border-bottom: 1px solid var(--clr-border-gold) !important;
+      transition: all 0.2s;
+    }
+    .leaflet-bar a:hover {
+      color: var(--clr-gold-bright) !important;
+      background-color: rgba(133, 117, 78, 0.15) !important;
+    }
+    .leaflet-popup-content-wrapper {
+      background: rgba(7, 14, 27, 0.95) !important;
+      border: 1px solid var(--clr-gold) !important;
+      color: var(--clr-text-white) !important;
+      border-radius: 4px !important;
+      font-family: var(--font-sans) !important;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.6) !important;
+    }
+    .leaflet-popup-tip {
+      background: var(--clr-gold-dim) !important;
+    }
+
+    /* Graphics and Charting Panel Grid */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    .chart-container {
+      position: relative;
+      height: 240px;
+      width: 100%;
+    }
+
+    /* Monospaced Command Log Terminal */
+    .terminal-panel {
+      background: #020408;
+      border: 1px solid var(--clr-border-gold);
+      border-radius: 6px;
+      padding: 1rem;
+      position: relative;
+    }
+    .terminal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(133, 117, 78, 0.2);
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .terminal-title {
+      font-family: var(--font-hud);
+      font-size: 0.72rem;
+      color: var(--clr-gold-bright);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .terminal-blink-dot {
+      width: 6px;
+      height: 6px;
+      background-color: var(--clr-neon-green);
+      border-radius: 50%;
+      animation: terminalPulse 1.2s infinite;
+    }
+    .terminal-controls {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .terminal-circle {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--clr-gold-dim);
+    }
+    .terminal-circle:first-child { background: var(--clr-neon-red); }
+    .terminal-circle:nth-child(2) { background: var(--clr-gold); }
+    .terminal-circle:nth-child(3) { background: var(--clr-neon-green); }
+
+    .terminal-window {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--clr-text-white);
+      height: 180px;
+      overflow-y: auto;
+      line-height: 1.5;
+      padding-right: 0.5rem;
+      scroll-behavior: smooth;
+    }
+    .terminal-line {
+      margin-bottom: 0.35rem;
+      white-space: pre-wrap;
+    }
+    .terminal-line.info { color: #9f9b90; }
+    .terminal-line.success { color: var(--clr-neon-green); }
+    .terminal-line.warning { color: var(--clr-gold); }
+    .terminal-line.danger { color: var(--clr-neon-red); }
+    .terminal-line.critical { color: #a78bfa; font-weight: bold; }
+
+    @keyframes terminalPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* =========================================================================
+       ACADEMIC DEFENSE BRIEFING (BOTTOM PANEL)
+       ========================================================================= */
+    .brief-panel {
+      margin-top: 1.5rem;
+    }
+    .brief-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+      margin-top: 1rem;
+    }
+    .brief-sec {
+      margin-bottom: 1.5rem;
+    }
+    .brief-sec h4 {
+      font-family: var(--font-hud);
+      font-size: 0.85rem;
+      color: var(--clr-gold);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+      border-left: 2px solid var(--clr-gold);
+      padding-left: 0.5rem;
+    }
+    .brief-sec p {
+      font-size: 0.85rem;
+      color: var(--clr-text-muted);
+      line-height: 1.6;
+      text-align: justify;
+      margin-bottom: 1rem;
+    }
+    .brief-highlight {
+      background: rgba(133, 117, 78, 0.05);
+      border: 1px dashed rgba(133, 117, 78, 0.25);
+      border-radius: 4px;
+      padding: 1rem;
+      font-size: 0.82rem;
+      color: var(--clr-text-white);
+      line-height: 1.5;
+    }
+    @keyframes threatFlash {
+      0%, 100% { border-color: var(--clr-border-gold); box-shadow: 0 0 20px rgba(0,0,0,0.7); }
+      50% { border-color: var(--clr-neon-red); box-shadow: 0 0 35px rgba(244, 63, 94, 0.45), inset 0 0 20px rgba(244, 63, 94, 0.2); }
+    }
+    .hud-panel.threat-flash-active {
+      animation: threatFlash 0.4s infinite;
+    }
+    
+    /* Responsive HUD overrides */
+    @media (max-width: 1200px) {
+      .hud-grid {
+        grid-template-columns: 1fr;
+      }
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+      .brief-columns {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hud-header {
+        flex-direction: column;
+        gap: 1.25rem;
+        text-align: center;
+        padding: 1.25rem 1rem;
+      }
+      .hud-header__metrics {
+        flex-direction: column;
+        gap: 0.85rem;
+        width: 100%;
+        align-items: center;
+      }
+      .hud-header__stat {
+        align-items: center;
+      }
+      .hud-header__sound {
+        border-left: none;
+        padding-left: 0;
+        margin-top: 0.25rem;
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .telemetry-row {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+      .hud-btn-execute {
+        padding: 0.75rem;
+        font-size: 0.8rem;
+      }
+      #gis-operational-map {
+        height: 300px;
+      }
+      .hud-segmented-btn {
+        font-size: 0.55rem;
+        padding: 0.4rem 0.1rem;
+      }
+    }
+
+    /* High-tech HUD scanning line effect overlay */
+    .hud-crt-scanline {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      background-size: 100% 4px, 6px 100%;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.15;
+    }
+    .hud-crt-flicker {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(133, 117, 78, 0.015);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 9998;
+      animation: crtFlicker 0.15s infinite;
+    }
+    @keyframes crtFlicker {
+      0% { opacity: 0.1; }
+      50% { opacity: 0.2; }
+      100% { opacity: 0.05; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Retro Military CRT Monitor Visual Elements -->
+  <div class="hud-crt-scanline"></div>
+
+  <div class="container-fluid">
+
+    <!-- GLOBAL HUD HEADER -->
+    <header class="hud-header">
+      <div class="hud-header__identity">
+        <h1 class="hud-header__title">Operational Command Center</h1>
+        <div class="hud-header__subtitle">AIMH Geospatial Logistics HUD • Security Grade Alpha</div>
+      </div>
+      <div class="hud-header__metrics">
+        <div class="hud-header__stat">
+          <span class="hud-header__stat-label">System Node Status</span>
+          <span class="hud-header__stat-value pulse">ONLINE // SECURE</span>
+        </div>
+        <div class="hud-header__stat">
+          <span class="hud-header__stat-label">Synchronized Clock</span>
+          <span class="hud-header__stat-value" id="hud-clock">00:00:00:00 GMT</span>
+        </div>
+        <div class="hud-header__stat">
+          <span class="hud-header__stat-label">Grid Coordinates Scan</span>
+          <span class="hud-header__stat-value" id="hud-coords">35.2975° N, 75.6333° E</span>
+        </div>
+        <div class="hud-header__sound" style="display: flex; flex-direction: column; gap: 0.5rem; border-left: 1px solid rgba(133, 117, 78, 0.3); padding-left: 1.5rem; align-items: stretch;">
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="hud-header__sound-btn" id="drone-switch">🔊 Drone Ambient</button>
+            <button class="hud-header__sound-btn" id="radar-beep-btn">📡 Ping Radar</button>
+          </div>
+          <div id="hum-modulator-wrap" style="display: none; align-items: center; gap: 0.5rem; margin-top: 0.25rem; justify-content: space-between;">
+            <span style="font-family: var(--font-mono); font-size: 0.58rem; color: var(--clr-gold); text-transform: uppercase;">Pitch Modulation</span>
+            <input type="range" class="hud-slider" id="hum-pitch-slider" min="40" max="110" value="55" style="width: 70px; height: 3px; accent-color: var(--clr-gold); cursor: pointer;"/>
+            <span id="hum-pitch-val" style="font-family: var(--font-mono); font-size: 0.58rem; color: var(--clr-text-white); width: 35px; text-align: right;">55Hz</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- CORE INTERFACE GRID -->
+    <main class="hud-grid">
+
+      <!-- LEFT COLUMN: SIM CONFIGURATION PANEL -->
+      <section class="hud-panel" style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <div class="hud-panel__title">
+          <span>🕹️ Tactical Simulation Matrix</span>
+        </div>
+
+        <!-- 1. Combat Scenario Selector -->
+        <div class="hud-group">
+          <label class="hud-label" for="scenario-select">Combat Theater Sector</label>
+          <select class="hud-select" id="scenario-select">
+            <!-- Populated via Javascript -->
+          </select>
+        </div>
+
+        <!-- 2. Fleet Configuration -->
+        <div class="hud-panel__title" style="margin-top: 0.5rem; font-size: 0.82rem; margin-bottom: 0.75rem;">
+          <span>🚛 Provision Logistics Convoy</span>
+        </div>
+
+        <div class="hud-group">
+          <label class="hud-label" for="vehicle-select">Transport Platform</label>
+          <select class="hud-select" id="vehicle-select">
+            <option value="Heavy Logistics Vehicle (HLV)">Heavy Logistics Vehicle (HLV)</option>
+            <option value="4x4 Utility Truck" selected>4x4 Utility Truck</option>
+            <option value="Tracked APC Carrier">Tracked APC Carrier</option>
+            <option value="High-Altitude Pack Animal">High-Altitude Pack Animal</option>
+          </select>
+        </div>
+
+        <div class="hud-group">
+          <label class="hud-label">Fleet Convoy Size (Units)</label>
+          <div class="hud-slider-wrap">
+            <input type="range" class="hud-slider" id="fleet-size-slider" min="5" max="100" value="25"/>
+            <span class="hud-slider-value" id="fleet-size-val">25</span>
+          </div>
+        </div>
+
+        <div class="hud-group">
+          <label class="hud-label">Payload per Vehicle (Tons)</label>
+          <div class="hud-slider-wrap">
+            <input type="range" class="hud-slider" id="payload-slider" min="1.0" max="15.0" step="0.5" value="4.5"/>
+            <span class="hud-slider-value" id="payload-val">4.5 T</span>
+          </div>
+        </div>
+
+        <!-- 3. Force Protection Controls -->
+        <div class="hud-panel__title" style="margin-top: 0.5rem; font-size: 0.82rem; margin-bottom: 0.75rem;">
+          <span>🛡️ Force Protection Elements</span>
+        </div>
+        <div class="hud-group">
+          <div class="protection-grid">
+            <label class="protection-item">
+              <input type="checkbox" id="protect-escorts" checked/>
+              <span class="protection-label">Deploy Armed Escort Units</span>
+            </label>
+            <label class="protection-item">
+              <input type="checkbox" id="protect-mines"/>
+              <span class="protection-label">Deploy Anti-Mine Engineers</span>
+            </label>
+            <label class="protection-item">
+              <input type="checkbox" id="protect-air"/>
+              <span class="protection-label">Secure Tactical Air Support</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 4. Tactical Variables -->
+        <div class="hud-panel__title" style="margin-top: 0.5rem; font-size: 0.82rem; margin-bottom: 0.75rem;">
+          <span>⚡ Operations Command Variables</span>
+        </div>
+
+        <div class="hud-group">
+          <label class="hud-label">Combat Posture</label>
+          <div class="hud-segmented" id="posture-control">
+            <button class="hud-segmented-btn active" data-val="Standard Recon Cover">Standard</button>
+            <button class="hud-segmented-btn" data-val="Stealth Movement">Stealth</button>
+            <button class="hud-segmented-btn" data-val="Aggressive Breakthrough">Breakthrough</button>
+          </div>
+        </div>
+
+        <div class="hud-group">
+          <label class="hud-label">Tactical Formation</label>
+          <div class="hud-segmented" id="formation-control">
+            <button class="hud-segmented-btn active" data-val="Column Formation (Max Speed)">Column</button>
+            <button class="hud-segmented-btn" data-val="Vee Formation (Balanced Defense)">Vee</button>
+            <button class="hud-segmented-btn" data-val="Line Formation (Wide Coverage)">Line</button>
+          </div>
+        </div>
+
+        <div class="hud-group">
+          <label class="hud-label" for="weather-select">Tactical Weather Profile</label>
+          <select class="hud-select" id="weather-select">
+            <option value="Clear & Dry" selected>Clear & Dry</option>
+            <option value="Heavy Snow / Alpine Winter">Heavy Snow / Alpine Winter</option>
+            <option value="Severe Heat & Sandstorms">Severe Heat & Sandstorms</option>
+            <option value="Monsoon / Landslides">Monsoon / Landslides</option>
+            <option value="High-Altitude Blizzard">High-Altitude Blizzard</option>
+          </select>
+        </div>
+
+        <div class="hud-group" style="margin-bottom: 0.75rem;">
+          <label class="hud-label" for="threat-select">Ambush Threat Level</label>
+          <select class="hud-select" id="threat-select">
+            <option value="LOW">LOW (6% Base Ambush Risk)</option>
+            <option value="MEDIUM" selected>MEDIUM (20% Base Ambush Risk)</option>
+            <option value="HIGH">HIGH (55% Base Ambush Risk)</option>
+            <option value="CRITICAL">CRITICAL (88% Base Ambush Risk)</option>
+          </select>
+        </div>
+
+        <!-- 5. Cargo Packing sheet -->
+        <div class="packing-details">
+          <div class="packing-row">
+            <span>convoy Total Cargo Load</span>
+            <span id="pack-total-cap">112.5 Tons</span>
+          </div>
+          <div class="hud-group" style="margin-bottom: 0.5rem;">
+            <label class="hud-label">Reserves Allocation (Fuel / Ammo / Food)</label>
+            <div class="hud-slider-wrap">
+              <input type="range" class="hud-slider" id="cargo-load-slider" min="20" max="100" value="65"/>
+              <span class="hud-slider-value" id="cargo-load-val">65%</span>
+            </div>
+          </div>
+          <div class="packing-row" style="margin-bottom: 0;">
+            <span>Resource Cargo Utilisation</span>
+            <span id="pack-util-pct">65.0%</span>
+          </div>
+          <div class="hud-progress-bg">
+            <div class="hud-progress-fill" id="pack-progress" style="width: 65%; background-color: var(--clr-neon-green);"></div>
+          </div>
+        </div>
+
+        <!-- BUTTON EXECUTOR -->
+        <button class="hud-btn-execute" id="execute-sim-btn">⚡ Run Wargame Simulation</button>
+
+      </section>
+
+      <!-- RIGHT MAIN COMMAND CENTER VIEWER -->
+      <section class="hud-main-center">
+
+        <!-- PANEL I: LEAFLET GIS BATTLE-THEATER MAP -->
+        <div class="hud-panel hud-map-panel">
+          <div class="hud-map-label" id="map-theater-label">Active Sector: skardu - minimarg pass</div>
+          <div id="gis-operational-map"></div>
+        </div>
+
+        <!-- PANEL II: TELEMETRY DISPLAY BOXES -->
+        <div class="telemetry-row">
+          <div class="telemetry-box">
+            <div class="telemetry-box__val cyan" id="telemetry-success">--</div>
+            <div class="telemetry-box__lbl">Convoy Success Rate</div>
+          </div>
+          <div class="telemetry-box">
+            <div class="telemetry-box__val gold" id="telemetry-yield">--</div>
+            <div class="telemetry-box__lbl">Logistics Supply Yield</div>
+          </div>
+          <div class="telemetry-box">
+            <div class="telemetry-box__val green" id="telemetry-duration">--</div>
+            <div class="telemetry-box__lbl">Simulated Avg Transit ETA</div>
+          </div>
+        </div>
+
+        <!-- PANEL III: DYNAMIC TELEMETRY CHARTS AND ELEVATION PASS PROFILE -->
+        <div class="hud-panel">
+          <div class="hud-panel__title">
+            <span>📊 Operational Telemetry &amp; Route Profile Climb</span>
+          </div>
+          <div class="charts-grid">
+            <div class="chart-container">
+              <canvas id="telemetry-charts-yield"></canvas>
+            </div>
+            <div class="chart-container">
+              <canvas id="telemetry-charts-elevation"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL IV: MONOSPACED COMMAND TERMINAL -->
+        <div class="terminal-panel">
+          <header class="terminal-header">
+            <div class="terminal-title">
+              <span class="terminal-blink-dot"></span>
+              <span>Tactical Operations Log Console</span>
+            </div>
+            <div class="terminal-controls">
+              <div class="terminal-circle"></div>
+              <div class="terminal-circle"></div>
+              <div class="terminal-circle"></div>
+            </div>
+          </header>
+          <div class="terminal-window" id="terminal-log-window">
+            <div class="terminal-line warning">[SYSTEM STANDBY] Command Center online. Provision convoy parameters in the sidebar, and execute the Monte Carlo simulation to evaluate active sector logistics thresholds.</div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- ACADEMIC BRIEFING PANEL (BOTTOM SECTION) -->
+    <footer class="hud-panel brief-panel">
+      <div class="hud-panel__title" style="margin-bottom: 0.5rem;">
+        <span>📚 Digital Humanities &amp; Defense Data Analytics Research Brief</span>
+      </div>
+      <div style="font-family: var(--font-hud); font-size: 0.72rem; color: var(--clr-gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 1.25rem; display: flex; flex-wrap: wrap; gap: 0.5rem 1rem;">
+        <span>Author: <a href="https://lokeshsoni653-del.github.io/lokesh-kumar-portfolio-website/lokesh-portfolio/index.html" target="_blank" style="color: var(--clr-neon-cyan); text-decoration: none; border-bottom: 1px dashed var(--clr-neon-cyan); transition: all 0.2s;">Lokesh Kumar</a></span>
+        <span>• Sindh Agriculture University, Tando Jam</span>
+        <span>• AIMH Quantitative Research Track</span>
+        <span>• <a href="resume-aimh.html" target="_blank" style="color: var(--clr-neon-cyan); text-decoration: none; border-bottom: 1px dashed var(--clr-neon-cyan); transition: all 0.2s;">Interactive CV</a></span>
+        <span>• <a href="cover-letter-aimh.html" target="_blank" style="color: var(--clr-neon-cyan); text-decoration: none; border-bottom: 1px dashed var(--clr-neon-cyan); transition: all 0.2s;">Motivation Letter</a></span>
+      </div>
+      
+      <div class="brief-columns">
+        <div>
+          <div class="brief-sec">
+            <h4>Research Methodology: Computational History</h4>
+            <p>
+              Traditional military history assessment relies heavily on qualitative textual reviews of command archives. By modeling historical terrain elevations, logistics platforms, and localized weather factors mathematically, this wargaming simulation bridges quantitative software engineering with tactical social science studies. The logistics engine employs the Haversine equation to model accurate geographical arc distances between theater nodes, adjusting movement velocities and operational fuel burn coefficients dynamically based on real physical properties.
+            </p>
+          </div>
+          <div class="brief-sec">
+            <h4>High-Altitude Hypoxia &amp; Carburator Air-Thinning</h4>
+            <p>
+              In mountainous operations (such as the Karakoram Corridor or Operation Zojila), high altitudes induce severe engine de-rating. Internal combustion engine efficiency falls dramatically above 2,500 meters due to carburetor air thinning. This engine models this drop-off dynamically, mapping severe elevation rises (up to 4,693 meters along the Khunjerab Pass) to logistics speed penalties and fuel consumption surges.
+            </p>
+          </div>
+        </div>
+        
+        <div>
+          <div class="brief-sec">
+            <h4>Monte Carlo Probability Analysis</h4>
+            <p>
+              Unlike deterministic logistics calculators, military theaters are defined by uncertainty. We run a 100-run Monte Carlo wargame simulation that models ambient hazards (snow blizzards, landslides, dehydrating heat waves) and high-probability tactical ambushes. The simulation executes dynamically, incorporating deployed defense components (Armed Escort teams, Mine-Sweeping Engineers, and Air Cover support vectors) and combat posture speed multipliers to determine mathematical probability bounds.
+            </p>
+          </div>
+          <div class="brief-highlight">
+            <strong>Strategic Focus: Operation Zojila Tank Breakthrough (1948)</strong><br/>
+            In the winter of 1948, the Pakistan Army achieved a historic tactical feat by deploying light Stuart tanks at Zojila Pass (11,578 ft), completely stunning entrenched alpine defense coordinates. This simulator models the extreme logistics winding coefficients (1.62 winding index), steep elevation profiles, and high-altitude mechanical constraints that defined the structural operational framework of that legendary high-altitude tank operational transit.
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- CORE JAVASCRIPT WARGAMING LOGIC -->
+  <script>
+    // =========================================================================
+    // I. SCENARIOS DATABASE
+    // =========================================================================
+    const SCENARIOS = {
+      "zojila": {
+        "id": "zojila",
+        "name": "🎖️ Operation Zojila (Kashmir - 1948)",
+        "title": "Passage of the Tanks — Zojila Pass Breakthrough",
+        "intro": "The historic strategic deployment of light tanks by the Pakistan Army at an extreme altitude of 11,578 feet, breaking through heavily entrenched positions over the Himalayan ridge. Critical focus: high-altitude alpine logistics, narrow tracks, and extreme weather constraints.",
+        "nodes": {
+          "Skardu Base Command": {"lat": 35.2975, "lon": 75.6333, "type": "HQ", "desc": "Sector Logistics Command Center."},
+          "Chillum Checkpost": {"lat": 35.0833, "lon": 75.1167, "type": "Checkpost", "desc": "High altitude valley security transit checkpoint."},
+          "FOB Minimarg": {"lat": 34.7878, "lon": 75.1436, "type": "FOB", "desc": "Forward alpine logistical assembly area at the base of the pass."},
+          "Zojila Pass FDL": {"lat": 34.2831, "lon": 75.4686, "type": "FDL", "desc": "Critical mountain bottleneck. High ambush threat."}
+        },
+        "path_coords": [
+          [35.2975, 75.6333],
+          [35.15, 75.40],
+          [35.0833, 75.1167],
+          [34.90, 75.05],
+          [34.7878, 75.1436],
+          [34.55, 75.25],
+          [34.2831, 75.4686]
+        ],
+        "road_winding": 1.62,
+        "base_elev": 2200.0,
+        "peak_elev": 3530.0,
+        "hazard_radius": 15000,
+        "hazard_center": [34.7878, 75.1436],
+        "hazard_desc": "Avalanche / Snow Drift Zone"
+      },
+      "thar": {
+        "id": "thar",
+        "name": "🏜️ Thar Desert Campaign (Chhor Sector)",
+        "title": "Operation Sandwind — Water & Fuel Pipelines",
+        "intro": "Long-range supply operations across shifting sand dunes, requiring absolute tracking of water distribution, fuel expenditure, and wheel traction modeling. Critical focus: dehydration risk and mobility in sand-dunes.",
+        "nodes": {
+          "Chhor Logistics Base": {"lat": 25.5134, "lon": 69.7573, "type": "HQ", "desc": "Strategic railhead and main desert logistics depot."},
+          "Water Depot (Khipro)": {"lat": 25.8286, "lon": 69.7831, "type": "Checkpost", "desc": "Primary bore-well water distribution depot."},
+          "FOB Umerkot": {"lat": 25.3614, "lon": 69.7381, "type": "FOB", "desc": "Forward combat command base monitoring sand tracks."},
+          "Thar Border Outpost": {"lat": 25.8000, "lon": 70.3500, "type": "FDL", "desc": "Deep desert border patrol observation outpost."}
+        },
+        "path_coords": [
+          [25.5134, 69.7573],
+          [25.65, 69.85],
+          [25.8286, 69.7831],
+          [25.60, 70.00],
+          [25.3614, 69.7381],
+          [25.55, 70.15],
+          [25.8000, 70.3500]
+        ],
+        "road_winding": 1.32,
+        "base_elev": 50.0,
+        "peak_elev": 190.0,
+        "hazard_radius": 22000,
+        "hazard_center": [25.60, 70.00],
+        "hazard_desc": "High Heat Dehydration Zone"
+      },
+      "karakoram": {
+        "id": "karakoram",
+        "name": "🗻 Karakoram Highway Strategic Corridor",
+        "title": "Operation Khunjerab — High-Altitude Corridor",
+        "intro": "The world's highest paved international border crossing at 15,397 feet. Modeling structural corridor connectivity, rockfall hazards, and extreme vehicle transmission climbs. Critical focus: landslide closures and road winding multipliers.",
+        "nodes": {
+          "Rawalpindi Command HQ": {"lat": 33.5973, "lon": 73.0479, "type": "HQ", "desc": "General Logistics Command Headquarters."},
+          "Abbottabad Base": {"lat": 34.1688, "lon": 73.2215, "type": "Checkpost", "desc": "Intermediate logistical staging base."},
+          "Chilas Logistics Node": {"lat": 35.4216, "lon": 74.0950, "type": "FOB", "desc": "Logistics hub monitoring Indus River gorge terrain."},
+          "Khunjerab Border Post": {"lat": 36.8486, "lon": 75.4292, "type": "FDL", "desc": "High altitude alpine international border crossing."}
+        },
+        "path_coords": [
+          [33.5973, 73.0479],
+          [33.90, 73.15],
+          [34.1688, 73.2215],
+          [34.80, 73.50],
+          [35.4216, 74.0950],
+          [36.10, 74.30],
+          [36.8486, 75.4292]
+        ],
+        "road_winding": 1.85,
+        "base_elev": 500.0,
+        "peak_elev": 4693.0,
+        "hazard_radius": 28000,
+        "hazard_center": [35.4216, 74.0950],
+        "hazard_desc": "Critical Landslide Gorge Zone"
+      }
+    };
+
+    // Transport platform profiles matching core_engine.py
+    const PLATFORMS = {
+      "Heavy Logistics Vehicle (HLV)": {"speed": 25.0, "fuel_rate": 0.45, "slope_max": 14.0},
+      "4x4 Utility Truck": {"speed": 40.0, "fuel_rate": 0.25, "slope_max": 20.0},
+      "Tracked APC Carrier": {"speed": 18.0, "fuel_rate": 0.65, "slope_max": 25.0},
+      "High-Altitude Pack Animal": {"speed": 5.0, "fuel_rate": 0.02, "slope_max": 30.0}
+    };
+
+    // =========================================================================
+    // II. DYNAMIC DUAL AUDIO SYNTHESIZER
+    // =========================================================================
+    let audioCtx = null;
+    let droneOsc = null;
+    let droneGain = null;
+    let droneFilter = null;
+    let isDroneActive = false;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    // Mathematical generation of deep military drone hum
+    function toggleDroneHum() {
+      initAudio();
+      
+      const btn = document.getElementById("drone-switch");
+
+      if (isDroneActive) {
+        // Stop Drone safely
+        if (droneOsc) {
+          droneOsc.stop();
+          droneOsc.disconnect();
+          droneOsc = null;
+        }
+        if (droneGain) {
+          droneGain.disconnect();
+          droneGain = null;
+        }
+        isDroneActive = false;
+        btn.classList.remove("active");
+        btn.innerHTML = "🔊 Drone Ambient";
+        document.getElementById("hum-modulator-wrap").style.display = "none";
+        writeTerminalLog("[COM-DEVICES] Operational background low-frequency hum generator: DEACTIVATED.", "info");
+      } else {
+        // Start Drone Osculation
+        droneOsc = audioCtx.createOscillator();
+        droneFilter = audioCtx.createBiquadFilter();
+        droneGain = audioCtx.createGain();
+
+        // Military sub-base hum characteristics
+        droneOsc.type = "sawtooth";
+        // Sync with pitch slider initial value
+        const initialPitch = parseFloat(document.getElementById("hum-pitch-slider").value);
+        droneOsc.frequency.value = initialPitch; 
+
+        // Filter high-frequencies to create warm mechanical vibrations
+        droneFilter.type = "lowpass";
+        droneFilter.frequency.value = 140.0;
+        droneFilter.Q.value = 5.0;
+
+        // Modulate gain value for realistic engine rumble
+        droneGain.gain.setValueAtTime(0.0, audioCtx.currentTime);
+        droneGain.gain.linearRampToValueAtTime(0.12, audioCtx.currentTime + 1.5);
+
+        // Connect channels
+        droneOsc.connect(droneFilter);
+        droneFilter.connect(droneGain);
+        droneGain.connect(audioCtx.destination);
+
+        droneOsc.start();
+        isDroneActive = true;
+        btn.classList.add("active");
+        btn.innerHTML = "🔇 Mute Drone";
+        document.getElementById("hum-modulator-wrap").style.display = "flex";
+        writeTerminalLog("[COM-DEVICES] Operational background low-frequency hum generator: ONLINE. Synthesizer frequency bounds established (" + initialPitch + "Hz SAW + 140Hz LOWPASS).", "success");
+      }
+    }
+
+    // High fidelity feedback click
+    function playAudioClick(freq = 600, duration = 0.04, type = "sine") {
+      if (!audioCtx) return;
+      
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = type;
+        osc.frequency.value = freq;
+
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {
+        console.log("Audio feedback click bypass");
+      }
+    }
+
+    // Dynamic sweep alert beep
+    function playRadarSweep() {
+      initAudio();
+      
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.4);
+
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.45);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.45);
+        writeTerminalLog("[GIS-RADAR] Echo ping emitted. Active tracking sweep verified.", "info");
+      } catch (e) {
+        console.log("Radar beep sound bypass");
+      }
+    }
+
+    // Synthesized military dual alarm hazard warning klaxon
+    function playWarningAlarm() {
+      initAudio();
+      if (!audioCtx) return;
+      try {
+        const osc1 = audioCtx.createOscillator();
+        const gain1 = audioCtx.createGain();
+        osc1.type = "sawtooth";
+        osc1.frequency.setValueAtTime(880, audioCtx.currentTime);
+        osc1.frequency.linearRampToValueAtTime(440, audioCtx.currentTime + 0.15);
+        gain1.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain1.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.15);
+        osc1.connect(gain1);
+        gain1.connect(audioCtx.destination);
+        osc1.start();
+        osc1.stop(audioCtx.currentTime + 0.15);
+
+        setTimeout(() => {
+          const osc2 = audioCtx.createOscillator();
+          const gain2 = audioCtx.createGain();
+          osc2.type = "sawtooth";
+          osc2.frequency.setValueAtTime(880, audioCtx.currentTime);
+          osc2.frequency.linearRampToValueAtTime(440, audioCtx.currentTime + 0.15);
+          gain2.gain.setValueAtTime(0.08, audioCtx.currentTime);
+          gain2.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.15);
+          osc2.connect(gain2);
+          gain2.connect(audioCtx.destination);
+          osc2.start();
+          osc2.stop(audioCtx.currentTime + 0.15);
+        }, 180);
+      } catch (e) {}
+    }
+
+    // Flashes the log console card with a glowing red cyber threat alert
+    function triggerPanelFlash() {
+      const panel = document.getElementById("terminal-log-window").parentNode;
+      panel.classList.add("threat-flash-active");
+      setTimeout(() => {
+        panel.classList.remove("threat-flash-active");
+      }, 1200);
+    }
+
+    // =========================================================================
+    // III. GIS GEOSPATIAL MAP CONTROLLER (LEAFLET)
+    // =========================================================================
+    let map = null;
+    let pathPolyline = null;
+    let hazardCircle = null;
+    let markersList = [];
+
+    function initGISMap() {
+      // Map configuration centered on Skardu initially
+      map = L.map('gis-operational-map', {
+        zoomControl: true,
+        attributionControl: false
+      }).setView([35.2975, 75.6333], 8);
+
+      // Add CartoDB Dark Matter tile layer to represent professional dark command screen
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 18
+      }).addTo(map);
+    }
+
+    function updateGISTheater(scenarioKey) {
+      const scenario = SCENARIOS[scenarioKey];
+      if (!scenario) return;
+
+      // 1. Clear previous layers
+      if (pathPolyline) map.removeLayer(pathPolyline);
+      if (hazardCircle) map.removeLayer(hazardCircle);
+      markersList.forEach(m => map.removeLayer(m));
+      markersList = [];
+
+      // 2. Set new geographical center view
+      const lats = Object.values(scenario.nodes).map(n => n.lat);
+      const lons = Object.values(scenario.nodes).map(n => n.lon);
+      const centerLat = lats.reduce((a, b) => a + b, 0) / lats.length;
+      const centerLon = lons.reduce((a, b) => a + b, 0) / lons.length;
+      map.setView([centerLat, centerLon], scenario.id === "karakoram" ? 7 : 8);
+
+      // 3. Draw glowing supply artery line
+      pathPolyline = L.polyline(scenario.path_coords, {
+        color: '#c9a84c',
+        weight: 4,
+        opacity: 0.85,
+        dashArray: '8, 8',
+        lineCap: 'round',
+        lineJoin: 'round'
+      }).addTo(map);
+
+      // 4. Draw high hazard border perimeter
+      hazardCircle = L.circle(scenario.hazard_center, {
+        radius: scenario.hazard_radius,
+        color: '#f43f5e',
+        fillColor: '#f43f5e',
+        fillOpacity: 0.12,
+        weight: 1.5,
+        dashArray: '3, 6'
+      }).addTo(map);
+      hazardCircle.bindTooltip(`HIGH HAZARD ZONE: ${scenario.hazard_desc}`, { sticky: true });
+
+      // 5. Draw vector point nodes with high-end tooltips
+      Object.entries(scenario.nodes).forEach(([name, details]) => {
+        let nodeColor = '#3b82f6'; // HQ/Base Blue
+        if (details.type === "FDL") nodeColor = '#f43f5e'; // FDL Red
+        if (details.type === "FOB") nodeColor = '#10b981'; // FOB Green
+        if (details.type === "Checkpost") nodeColor = '#c9a84c'; // Checkpost Amber
+
+        const nodeHtml = `<div style="background: ${nodeColor}; width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid #fff; box-shadow: 0 0 8px ${nodeColor};"></div>`;
+        const customIcon = L.divIcon({
+          html: nodeHtml,
+          className: 'custom-leaflet-marker',
+          iconSize: [10, 10],
+          iconAnchor: [5, 5]
+        });
+
+        const marker = L.marker([details.lat, details.lon], { icon: customIcon })
+          .addTo(map)
+          .bindPopup(`<b>${name}</b><br><span style="font-size:0.75rem;color:#9f9b90;">${details.desc}</span>`);
+        
+        marker.on('mouseover', function(e) {
+          this.openPopup();
+          playAudioClick(800, 0.02);
+          document.getElementById("hud-coords").innerHTML = `${details.lat.toFixed(4)}° N, ${details.lon.toFixed(4)}° E`;
+        });
+
+        markersList.push(marker);
+      });
+
+      // Update HUD Labels
+      document.getElementById("map-theater-label").innerHTML = `Active Sector: ${scenario.name}`;
+      document.getElementById("hud-coords").innerHTML = `${centerLat.toFixed(4)}° N, ${centerLon.toFixed(4)}° E`;
+      writeTerminalLog(`[GIS-MAP] Switched command map grid overlay to sector: ${scenario.name.toUpperCase()}`, "success");
+    }
+
+    // =========================================================================
+    // IV. ANALYTICS CHARTS ENGINE (CHART.JS)
+    // =========================================================================
+    let yieldChartInstance = null;
+    let elevChartInstance = null;
+
+    function initTelemetryCharts() {
+      // 1. Monte Carlo Attrition/Yield Radar Chart
+      const ctxYield = document.getElementById('telemetry-charts-yield').getContext('2d');
+      yieldChartInstance = new Chart(ctxYield, {
+        type: 'radar',
+        data: {
+          labels: ['Mission Success', 'Supply Yield', 'Escort Matrix Protect', 'Fuel Range Capacity', 'Ammunition Security'],
+          datasets: [{
+            label: 'Tactical Capabilities Factors (%)',
+            data: [0, 0, 0, 0, 0],
+            backgroundColor: 'rgba(201, 168, 76, 0.15)',
+            borderColor: '#c9a84c',
+            borderWidth: 2,
+            pointBackgroundColor: '#f0ce71',
+            pointBorderColor: '#fff',
+            pointRadius: 3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: {
+                color: '#9f9b90',
+                font: { family: 'Share Tech Mono', size: 10 }
+              }
+            }
+          },
+          scales: {
+            r: {
+              grid: { color: 'rgba(133, 117, 78, 0.2)' },
+              angleLines: { color: 'rgba(133, 117, 78, 0.2)' },
+              pointLabels: {
+                color: '#9f9b90',
+                font: { family: 'Share Tech Mono', size: 9 }
+              },
+              ticks: {
+                display: false,
+                max: 100,
+                min: 0,
+                stepSize: 20
+              }
+            }
+          }
+        }
+      });
+
+      // 2. Elevation pass profile area climb
+      const ctxElev = document.getElementById('telemetry-charts-elevation').getContext('2d');
+      elevChartInstance = new Chart(ctxElev, {
+        type: 'line',
+        data: {
+          labels: Array.from({length: 20}, (_, i) => `${Math.round(i * 10)} km`),
+          datasets: [{
+            label: 'Route Elevation Climb (Meters)',
+            data: [],
+            backgroundColor: 'rgba(6, 182, 212, 0.08)',
+            borderColor: '#06b6d4',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.3,
+            pointRadius: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: {
+                color: '#9f9b90',
+                font: { family: 'Share Tech Mono', size: 10 }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(133, 117, 78, 0.1)' },
+              ticks: { color: '#9f9b90', font: { family: 'Share Tech Mono', size: 8 } }
+            },
+            y: {
+              grid: { color: 'rgba(133, 117, 78, 0.1)' },
+              ticks: { color: '#9f9b90', font: { family: 'Share Tech Mono', size: 8 } }
+            }
+          }
+        }
+      });
+    }
+
+    function updateElevationChart(scenarioKey) {
+      const scenario = SCENARIOS[scenarioKey];
+      if (!scenario) return;
+
+      const steps = 15;
+      const elevData = [];
+      const labels = [];
+      const totalDist = calculateTotalDistance(scenario.path_coords) * scenario.road_winding;
+
+      const base = scenario.base_elev;
+      const peak = scenario.peak_elev;
+
+      for (let i = 0; i <= steps; i++) {
+        const prog = i / steps;
+        // Parabolic mountain pass elevation climb model
+        let h = base + (peak - base) * (3 * Math.pow(prog, 2) - 2 * Math.pow(prog, 3));
+        // Add realistic terrain micro-variations
+        h += (Math.sin(prog * 10) * 120);
+        h = Math.min(h, peak);
+        h = Math.max(h, base);
+
+        elevData.push(Math.round(h));
+        labels.push(`${Math.round(prog * totalDist)} km`);
+      }
+
+      elevChartInstance.data.labels = labels;
+      elevChartInstance.data.datasets[0].data = elevData;
+      elevChartInstance.update();
+    }
+
+    function updateYieldRadarChart(successPct, yieldPct, escortsActive, fuelCapOk, ammoOk) {
+      yieldChartInstance.data.datasets[0].data = [
+        successPct,
+        yieldPct,
+        escortsActive ? 95 : 20,
+        fuelCapOk,
+        ammoOk
+      ];
+      yieldChartInstance.update();
+    }
+
+    // Helper: Haversine distance calculator
+    function calculateTotalDistance(coords) {
+      let dist = 0;
+      for (let i = 0; i < coords.length - 1; i++) {
+        const lat1 = coords[i][0];
+        const lon1 = coords[i][1];
+        const lat2 = coords[i+1][0];
+        const lon2 = coords[i+1][1];
+        
+        const R = 6371; // km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        dist += R * c;
+      }
+      return dist;
+    }
+
+    // =========================================================================
+    // V. SCENARIO & FORM CONTROLLER MATRIX INTERACTIVITY
+    // =========================================================================
+    function setupFormListeners() {
+      // Scenario Changer
+      const scenSelect = document.getElementById("scenario-select");
+      scenSelect.addEventListener("change", function(e) {
+        playAudioClick(700, 0.03);
+        const key = e.target.value;
+        updateGISTheater(key);
+        updateElevationChart(key);
+        calculateTelemetryKPIs();
+      });
+
+      // Platform Changer
+      const vehicleSelect = document.getElementById("vehicle-select");
+      vehicleSelect.addEventListener("change", function() {
+        playAudioClick(700, 0.03);
+        calculateTelemetryKPIs();
+      });
+
+      // Convoy size slider
+      const fleetSlider = document.getElementById("fleet-size-slider");
+      fleetSlider.addEventListener("input", function(e) {
+        document.getElementById("fleet-size-val").innerHTML = e.target.value;
+        calculateTelemetryKPIs();
+      });
+
+      // Payload slider
+      const payloadSlider = document.getElementById("payload-slider");
+      payloadSlider.addEventListener("input", function(e) {
+        document.getElementById("payload-val").innerHTML = `${e.target.value} T`;
+        calculateTelemetryKPIs();
+      });
+
+      // Cargo resources capacity slider
+      const cargoSlider = document.getElementById("cargo-load-slider");
+      cargoSlider.addEventListener("input", function(e) {
+        const val = e.target.value;
+        document.getElementById("cargo-load-val").innerHTML = `${val}%`;
+        
+        const capBar = document.getElementById("pack-progress");
+        const capPct = document.getElementById("pack-util-pct");
+        
+        capBar.style.width = `${val}%`;
+        capPct.innerHTML = `${parseFloat(val).toFixed(1)}%`;
+
+        if (val > 85) {
+          capBar.style.backgroundColor = 'var(--clr-neon-red)';
+        } else if (val > 65) {
+          capBar.style.backgroundColor = 'var(--clr-gold)';
+        } else {
+          capBar.style.backgroundColor = 'var(--clr-neon-green)';
+        }
+        playAudioClick(400 + val * 4, 0.02);
+      });
+
+      // Segmented control triggers
+      setupSegmentedControl("posture-control");
+      setupSegmentedControl("formation-control");
+
+      // Checkboxes triggers
+      const checks = ["protect-escorts", "protect-mines", "protect-air"];
+      checks.forEach(id => {
+        document.getElementById(id).addEventListener("change", function() {
+          playAudioClick(850, 0.02);
+          calculateTelemetryKPIs();
+        });
+      });
+
+      // Ambient weather changer
+      document.getElementById("weather-select").addEventListener("change", function() {
+        playAudioClick(650, 0.03);
+        calculateTelemetryKPIs();
+      });
+
+      // Sound and Radar triggers
+      document.getElementById("drone-switch").addEventListener("click", toggleDroneHum);
+      document.getElementById("radar-beep-btn").addEventListener("click", playRadarSweep);
+
+      // Synthesizer pitch modulator slider event binding
+      document.getElementById("hum-pitch-slider").addEventListener("input", function(e) {
+        const val = e.target.value;
+        document.getElementById("hum-pitch-val").innerHTML = `${val}Hz`;
+        if (droneOsc && isDroneActive) {
+          droneOsc.frequency.setValueAtTime(parseFloat(val), audioCtx.currentTime);
+        }
+      });
+      
+      // Simulation click listener binding
+      document.getElementById("execute-sim-btn").addEventListener("click", runMonteCarloSimulator);
+
+      // Trigger Leaflet dimensions recalculation on window resize for flawless GIS map responsiveness
+      window.addEventListener("resize", function() {
+        if (map) {
+          map.invalidateSize();
+        }
+      });
+    }
+
+    function setupSegmentedControl(groupId) {
+      const container = document.getElementById(groupId);
+      const btns = container.querySelectorAll(".hud-segmented-btn");
+      btns.forEach(btn => {
+        btn.addEventListener("click", function() {
+          btns.forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          playAudioClick(900, 0.03);
+          calculateTelemetryKPIs();
+        });
+      });
+    }
+
+    function getSegmentedVal(groupId) {
+      const container = document.getElementById(groupId);
+      const activeBtn = container.querySelector(".hud-segmented-btn.active");
+      return activeBtn ? activeBtn.getAttribute("data-val") : "";
+    }
+
+    // Instant operational calculations based on UI configurations
+    function calculateTelemetryKPIs() {
+      const scenarioKey = document.getElementById("scenario-select").value;
+      const scenario = SCENARIOS[scenarioKey];
+      if (!scenario) return;
+
+      const vehicleType = document.getElementById("vehicle-select").value;
+      const fleetSize = parseInt(document.getElementById("fleet-size-slider").value);
+      const payloadPerVeh = parseFloat(document.getElementById("payload-slider").value);
+      
+      const weather = document.getElementById("weather-select").value;
+      const formation = getSegmentedVal("formation-control");
+      const posture = getSegmentedVal("posture-control");
+
+      // Platform metrics calculation
+      const profile = PLATFORMS[vehicleType] || PLATFORMS["4x4 Utility Truck"];
+      const baseSpeed = profile.speed;
+      const baseFuelRate = profile.fuel_rate;
+
+      // Adjust speed penalty
+      const weatherMultipliers = {
+        "Clear & Dry": 1.0,
+        "Heavy Snow / Alpine Winter": 0.45,
+        "Severe Heat & Sandstorms": 0.65,
+        "Monsoon / Landslides": 0.50,
+        "High-Altitude Blizzard": 0.25
+      };
+      let speedMult = weatherMultipliers[weather] || 1.0;
+
+      const formationMultipliers = {
+        "Column Formation (Max Speed)": 1.15,
+        "Vee Formation (Balanced Defense)": 0.90,
+        "Line Formation (Wide Coverage)": 0.70
+      };
+      speedMult *= (formationMultipliers[formation] || 1.0);
+
+      // High-altitude carburetor fuel air thinning penalty (Operation Zojila / Karakoram Corridor)
+      if (scenario.peak_elev > 2500) {
+        const altPenalty = 1.0 - ((scenario.peak_elev - 2500) / 10000);
+        speedMult *= Math.max(0.5, altPenalty);
+      }
+
+      const calculatedSpeed = baseSpeed * speedMult;
+
+      // Distance calculations
+      const totalRawDist = calculateTotalDistance(scenario.path_coords);
+      const actualLineDist = totalRawDist * scenario.road_winding;
+
+      // Posture speed multiplier adjustment
+      const postureModifiers = {
+        "Aggressive Breakthrough": {"speed": 1.25},
+        "Stealth Movement": {"speed": 0.7},
+        "Standard Recon Cover": {"speed": 1.0}
+      };
+      const postureMod = postureModifiers[posture] || postureModifiers["Standard Recon Cover"];
+      
+      const finalETA = actualLineDist / (calculatedSpeed * postureMod.speed);
+      const totalPayloadVal = fleetSize * payloadPerVeh;
+
+      // Update dynamic HUD items
+      document.getElementById("pack-total-cap").innerHTML = `${totalPayloadVal.toFixed(1)} Tons`;
+      document.getElementById("telemetry-duration").innerHTML = `${finalETA.toFixed(1)} Hours`;
+      document.getElementById("telemetry-success").innerHTML = "STANDBY";
+      document.getElementById("telemetry-yield").innerHTML = "STANDBY";
+    }
+
+    // =========================================================================
+    // VI. ASYNCHRONOUS MONTE CARLO COMBAT SIMULATOR ENGINE (JS CORE)
+    // =========================================================================
+    let isSimulating = false;
+
+    function runMonteCarloSimulator() {
+      if (isSimulating) return;
+      isSimulating = true;
+
+      const executeBtn = document.getElementById("execute-sim-btn");
+      executeBtn.disabled = true;
+      executeBtn.innerHTML = "⚡ SIMULATING MISSION...";
+      
+      // Clear console terminal
+      const logWindow = document.getElementById("terminal-log-window");
+      logWindow.innerHTML = "";
+
+      writeTerminalLog("[SECURE INIT] Deactivating operational standby. Loading battle-theater variables...", "success");
+      playAudioClick(350, 0.15, "square");
+
+      // Extract form variables
+      const scenarioKey = document.getElementById("scenario-select").value;
+      const scenario = SCENARIOS[scenarioKey];
+      
+      const vehicleType = document.getElementById("vehicle-select").value;
+      const fleetSize = parseInt(document.getElementById("fleet-size-slider").value);
+      const payloadPerVeh = parseFloat(document.getElementById("payload-slider").value);
+      
+      const weather = document.getElementById("weather-select").value;
+      const threat = document.getElementById("threat-select").value;
+      const formation = getSegmentedVal("formation-control");
+      const posture = getSegmentedVal("posture-control");
+      
+      const escorts = document.getElementById("protect-escorts").checked;
+      const mineSweepers = document.getElementById("protect-mines").checked;
+      const airSupport = document.getElementById("protect-air").checked;
+      
+      const cargoLoadAlloc = parseInt(document.getElementById("cargo-load-slider").value);
+
+      // Total route properties
+      const rawDistance = calculateTotalDistance(scenario.path_coords);
+      const actualDistance = rawDistance * scenario.road_winding;
+
+      // Establish calculations parameters
+      const profile = PLATFORMS[vehicleType] || PLATFORMS["4x4 Utility Truck"];
+      const baseSpeed = profile.speed;
+      const baseFuelRate = profile.fuel_rate;
+
+      // Adjust speed penalty
+      const weatherMultipliers = {
+        "Clear & Dry": 1.0,
+        "Heavy Snow / Alpine Winter": 0.45,
+        "Severe Heat & Sandstorms": 0.65,
+        "Monsoon / Landslides": 0.50,
+        "High-Altitude Blizzard": 0.25
+      };
+      let speedMult = weatherMultipliers[weather] || 1.0;
+
+      const formationMultipliers = {
+        "Column Formation (Max Speed)": 1.15,
+        "Vee Formation (Balanced Defense)": 0.90,
+        "Line Formation (Wide Coverage)": 0.70
+      };
+      speedMult *= (formationMultipliers[formation] || 1.0);
+
+      // Carburetor thinning de-rating above 2500m
+      if (scenario.peak_elev > 2500) {
+        const altPenalty = 1.0 - ((scenario.peak_elev - 2500) / 10000);
+        speedMult *= Math.max(0.5, altPenalty);
+      }
+      const calculatedSpeed = baseSpeed * speedMult;
+
+      // Ambush threat base variables matching core_engine.py
+      const threatLevels = {"LOW": 0.06, "MEDIUM": 0.2, "HIGH": 0.55, "CRITICAL": 0.88};
+      const baseAmbushProb = threatLevels[threat] || 0.06;
+      
+      // High altitude alpine landslide risk
+      const alpineRisk = scenario.peak_elev > 3000 ? 0.25 : 0.05;
+
+      // Posture modifiers
+      const postureModifiers = {
+        "Aggressive Breakthrough": {"threat": 1.2, "speed": 1.25, "fuel": 1.3},
+        "Stealth Movement": {"threat": 0.45, "speed": 0.7, "fuel": 0.85},
+        "Standard Recon Cover": {"threat": 1.0, "speed": 1.0, "fuel": 1.0}
+      };
+      const postureMod = postureModifiers[posture] || postureModifiers["Standard Recon Cover"];
+
+      // Protection levels mitigators
+      let ambushProb = baseAmbushProb * postureMod.threat;
+      if (escorts) ambushProb *= 0.5;
+      if (airSupport) ambushProb *= 0.3;
+
+      let alpineFailProb = alpineRisk;
+      if (mineSweepers) alpineFailProb *= 0.6;
+
+      // Run 100 loops dynamically with beautiful pacing interval to make it look like a living command terminal
+      let run = 0;
+      let successRuns = 0;
+      let combatAborts = 0;
+      let alpineAborts = 0;
+      let fuelAborts = 0;
+      let ammoAborts = 0;
+      
+      let totalTonsDelivered = 0;
+      const maxCargoCapacity = fleetSize * payloadPerVeh;
+      
+      let sumDuration = 0;
+      let sumFuelUsed = 0;
+
+      const logLinesQueue = [];
+
+      // Initial parameters telemetry log
+      writeTerminalLog(`[WARGAME-PARAMS] Target Route: ${scenario.title}`, "info");
+      writeTerminalLog(`[WARGAME-PARAMS] Target Route Distance: ${actualDistance.toFixed(1)} km (Raw: ${rawDistance.toFixed(1)} km, Winding coefficient: ${scenario.road_winding.toFixed(2)})`, "info");
+      writeTerminalLog(`[WARGAME-PARAMS] Transport Platform: ${vehicleType} (${fleetSize} units). Total cargo cap: ${maxCargoCapacity.toFixed(1)} Tons`, "info");
+      writeTerminalLog(`[WARGAME-PARAMS] Threat: ${threat} | Posture: ${posture} | Formation: ${formation}`, "info");
+      writeTerminalLog(`[WARGAME-PARAMS] Protection: Escorts=${escorts}, MineSweepers=${mineSweepers}, AirSupport=${airSupport}`, "info");
+      writeTerminalLog(`[WARGAME-PARAMS] Deployed Defense Matrix: Calculated ambush probability bounds: ${(ambushProb*100).toFixed(1)}% (Base: ${(baseAmbushProb*100).toFixed(1)}%)`, "warning");
+
+      const simInterval = setInterval(function() {
+        run++;
+        
+        // 1. Roll for combat ambush
+        const randAmbush = Math.random();
+        if (randAmbush < ambushProb) {
+          // Roll escape probability
+          const randEscape = Math.random();
+          const escapeBarrier = escorts ? 0.85 : 0.25;
+          
+          if (randEscape > escapeBarrier) {
+            combatAborts++;
+            writeTerminalLog(`[RUN-${run}] ❌ AMBUSH CRITICAL FORCE BREAKTHROUGH: Enemy force successfully interdicted logistics artery. Convoy neutralized.`, "danger");
+            playWarningAlarm();
+            triggerPanelFlash();
+            nextStep();
+            return;
+          } else {
+            // Combat engagement consumes ammunition. Check ammunition reserves depletion
+            const randAmmoCheck = Math.random();
+            const ammoDepletedBarrier = escorts ? 0.10 : 0.35; // Escorts support ammo management
+            if (randAmmoCheck < ammoDepletedBarrier && cargoLoadAlloc < 50) {
+              ammoAborts++;
+              writeTerminalLog(`[RUN-${run}] ❌ AMBUSH ENGAGED - AMMUNITION DEPLETION: Convoy resisted initial ambush, but exhausted stock. Mission aborted.`, "danger");
+              playWarningAlarm();
+              triggerPanelFlash();
+              nextStep();
+              return;
+            }
+            writeTerminalLog(`[RUN-${run}] 🛡️ AMBUSH MATRIX SUCCESS: Ambush triggered near forward sector. Deployed escorts repulsed enemy force. Convoy sustained path.`, "warning");
+            playAudioClick(650, 0.04, "sine");
+          }
+        }
+
+        // 2. Roll for high altitude landslides or avalanches
+        const randAlpine = Math.random();
+        if (randAlpine < alpineFailProb) {
+          const randAlpinePass = Math.random();
+          if (randAlpinePass < 0.45) {
+            alpineAborts++;
+            writeTerminalLog(`[RUN-${run}] ❌ ALPINE STRUCTURAL OBSTRUCTION: Landslide / Blizzard blocked high passes. Route impassable. Transit aborted.`, "danger");
+            playWarningAlarm();
+            triggerPanelFlash();
+            nextStep();
+            return;
+          }
+          writeTerminalLog(`[RUN-${run}] ⚙️ CORRIDOR HAZARD SOLVED: Rockfall/Landslip detected. Engineers deployed immediately to clear blockages.`, "warning");
+        }
+
+        // 3. Simulate Fuel Depreciation Curve
+        // Base fuel capacity matches core_engine.py logic
+        const altitudeBurnMult = scenario.peak_elev > 3000 ? 1.25 : 1.0;
+        const fuelNeeded = actualDistance * baseFuelRate * postureMod.fuel * altitudeBurnMult;
+
+        // Out of fuel range checks
+        if (fuelNeeded > (cargoLoadAlloc * 1.5)) {
+          fuelAborts++;
+          writeTerminalLog(`[RUN-${run}] ❌ FUEL RANGE EXHAUSTION: High slope resistance drained fuel tanks completely. Vehicles stranded.`, "danger");
+          playWarningAlarm();
+          triggerPanelFlash();
+          nextStep();
+          return;
+        }
+
+        // Success run completion
+        successRuns++;
+        
+        // Dynamic simulated cargo yield
+        const cargoYieldMult = 0.9 + Math.random() * 0.1;
+        const deliveredTons = maxCargoCapacity * cargoYieldMult;
+        totalTonsDelivered += deliveredTons;
+
+        // Route friction delay multiplier
+        const routeDelay = 1.0 + Math.random() * 0.4;
+        const actualETA = (actualDistance / (calculatedSpeed * postureMod.speed)) * routeDelay;
+
+        sumDuration += actualETA;
+        sumFuelUsed += fuelNeeded;
+
+        writeTerminalLog(`[RUN-${run}] ✅ TRANSIT COMPLETED: Delivered ${deliveredTons.toFixed(1)} Tons cargo in ${actualETA.toFixed(1)} Hrs. Fuel Consumed: ${fuelNeeded.toFixed(1)}L per unit.`, "success");
+        playAudioClick(1200, 0.02, "sine");
+
+        nextStep();
+
+        function nextStep() {
+          // Check if sim finished
+          if (run >= 100) {
+            clearInterval(simInterval);
+            finishSimulation();
+          }
+        }
+      }, 12); // High speed animation pacing
+
+      function finishSimulation() {
+        isSimulating = false;
+        executeBtn.disabled = false;
+        executeBtn.innerHTML = "⚡ Run Wargame Simulation";
+
+        // Calculate aggregates
+        const successRate = successRuns;
+        const yieldRate = (totalTonsDelivered) / (maxCargoCapacity * 100) * 100;
+        const avgETA = successRuns > 0 ? (sumDuration / successRuns) : 0;
+
+        // Update dynamic boxes
+        document.getElementById("telemetry-success").innerHTML = `${successRate}%`;
+        document.getElementById("telemetry-yield").innerHTML = `${yieldRate.toFixed(1)}%`;
+        document.getElementById("telemetry-duration").innerHTML = successRuns > 0 ? `${avgETA.toFixed(1)} Hours` : "N/A";
+
+        // Print operational summary logs
+        writeTerminalLog(`\n=======================================================\n[WARGAME SUMMARY - BATTLE REPORT COMPILATION]`, "critical");
+        writeTerminalLog(`[SUMMARY] MISSION SUCCESS RATE: ${successRate}% | TOTAL DELIVERED CARGO: ${totalTonsDelivered.toFixed(1)} T`, "success");
+        writeTerminalLog(`[SUMMARY] AMBUSH ATTRITIONS: ${combatAborts} | HIGH-ALTITUDE RE-ROUTING CRASHES: ${alpineAborts}`, "danger");
+        writeTerminalLog(`[SUMMARY] FUEL EXHAUSTIONS: ${fuelAborts} | AMMUNITION DEPLETION SHUTDOWNS: ${ammoAborts}`, "danger");
+        writeTerminalLog(`[SUMMARY] AVERAGE COMPLETED ETA: ${avgETA.toFixed(1)} Hrs | AVERAGE FUEL CONSUMED: ${(sumFuelUsed/100).toFixed(1)} Liters per vehicle`, "info");
+        writeTerminalLog(`[SYSTEM ONLINE] Returned to tactical monitoring loop standby.`, "success");
+        
+        playRadarSweep();
+
+        // Update Yield Radar Chart
+        updateYieldRadarChart(
+          successRate,
+          yieldRate,
+          escorts,
+          fuelAborts === 0 ? 98 : 45,
+          ammoAborts === 0 ? 95 : 55
+        );
+      }
+    }
+
+    // Dynamic logging output
+    function writeTerminalLog(text, type = "info") {
+      const logWindow = document.getElementById("terminal-log-window");
+      const line = document.createElement("div");
+      line.className = `terminal-line ${type}`;
+      line.innerHTML = text;
+      logWindow.appendChild(line);
+      logWindow.scrollTop = logWindow.scrollHeight;
+    }
+
+    // =========================================================================
+    // VII. APPLICATION SYSTEM INITIALIZATION
+    // =========================================================================
+    window.addEventListener("DOMContentLoaded", function() {
+      // 1. Initialize Leaflet Map
+      initGISMap();
+
+      // 2. Populate Combat Theater Scenarios list
+      const scenSelect = document.getElementById("scenario-select");
+      Object.entries(SCENARIOS).forEach(([key, details]) => {
+        const opt = document.createElement("option");
+        opt.value = key;
+        opt.innerHTML = details.name;
+        scenSelect.appendChild(opt);
+      });
+
+      // 3. Initialize dynamic clock HUD
+      setInterval(updateHUDClock, 1000);
+
+      // 4. Initialize charts
+      initTelemetryCharts();
+
+      // 5. Load default scenario
+      const defaultScen = "zojila";
+      updateGISTheater(defaultScen);
+      updateElevationChart(defaultScen);
+      
+      // 6. Connect form interactivity
+      setupFormListeners();
+
+      // 7. Calculate initial telemetry metrics
+      calculateTelemetryKPIs();
+    });
+
+    // Real-time synchronization GMT clock
+    function updateHUDClock() {
+      const now = new Date();
+      const formatNumber = num => String(num).padStart(2, '0');
+      
+      const timeStr = `${formatNumber(now.getHours())}:${formatNumber(now.getMinutes())}:${formatNumber(now.getSeconds())}:${formatNumber(Math.floor(now.getMilliseconds()/10))} GMT`;
+      document.getElementById("hud-clock").innerHTML = timeStr;
+    }
+  </script>
+</body>
+</html>

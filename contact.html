@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact — Lokesh Kumar</title>
+  <meta name="description" content="Contact Lokesh Kumar — available for internships, freelance work, and full-time opportunities in data engineering and Python web applications."/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .contact-layout { display: grid; grid-template-columns: 1fr 1.4fr; gap: 4rem; align-items: start; }
+    .contact-info { position: sticky; top: calc(var(--nav-h) + 2rem); }
+
+    .contact-info__heading { font-family: var(--ff-serif); font-size: 2rem; line-height: 1.2; letter-spacing: -0.02em; margin-bottom: 1rem; }
+    .contact-info__sub { font-size: 0.9rem; color: var(--clr-muted); line-height: 1.7; margin-bottom: 2rem; }
+
+    .contact-item {
+      display: flex; align-items: flex-start; gap: 1rem;
+      padding: 1.1rem; border-radius: var(--radius-md);
+      border: 1px solid var(--clr-border); margin-bottom: 0.85rem;
+      background: var(--clr-surface); transition: all 0.2s;
+    }
+    .contact-item:hover { border-color: var(--clr-accent); background: var(--clr-accent-lt); }
+    .contact-item__icon {
+      width: 40px; height: 40px; border-radius: var(--radius-sm);
+      background: var(--clr-tag-bg); display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .contact-item__label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--clr-muted); }
+    .contact-item__value { font-size: 0.9rem; font-weight: 500; color: var(--clr-text); }
+    .contact-item__value a:hover { color: var(--clr-accent); }
+
+    .avail-card {
+      background: linear-gradient(135deg, var(--clr-accent), #818cf8);
+      border-radius: var(--radius-lg); padding: 1.5rem; color: #fff; margin-top: 1.5rem;
+    }
+    .avail-card__title { font-weight: 700; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem; }
+    .avail-card__dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; animation: pulse 2s infinite; }
+    .avail-card__desc { font-size: 0.825rem; opacity: 0.9; line-height: 1.6; }
+
+    /* Form */
+    .form-card {
+      background: var(--clr-surface); border: 1px solid var(--clr-border);
+      border-radius: var(--radius-xl); padding: 2.5rem;
+    }
+    .form-card__title { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.35rem; }
+    .form-card__sub { font-size: 0.875rem; color: var(--clr-muted); margin-bottom: 2rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+
+    .form-success {
+      display: none; text-align: center; padding: 2rem;
+      border: 1.5px solid #BBF7D0; border-radius: var(--radius-md);
+      background: #F0FDF4; color: #15803D; margin-top: 1rem;
+    }
+    .form-success__icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    .form-success__title { font-weight: 700; margin-bottom: 0.25rem; }
+
+    .interests-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 2rem; }
+    .interest-item {
+      display: flex; align-items: center; gap: 0.6rem;
+      font-size: 0.8rem; background: var(--clr-tag-bg);
+      border: 1px solid var(--clr-border); border-radius: var(--radius-sm);
+      padding: 0.5rem 0.75rem;
+    }
+
+    @media(max-width:800px){ .contact-layout{grid-template-columns:1fr;} .contact-info{position:static;} .form-row{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+<nav class="nav" id="main-nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">Lokesh<span>.</span></a>
+    <div class="nav__links">
+      <a href="index.html"          class="nav__link">Home</a>
+      <a href="about.html"          class="nav__link">About</a>
+      <a href="skills.html"         class="nav__link">Skills</a>
+      <a href="projects.html"       class="nav__link">Projects</a>
+      <a href="experience.html"     class="nav__link">Experience</a>
+      <a href="education.html"      class="nav__link">Education</a>
+      <a href="certifications.html" class="nav__link">Certs</a>
+      <a href="testimonials.html"   class="nav__link">Testimonials</a>
+    </div>
+    <a href="contact.html" class="nav__cta active">Contact</a>
+    <button class="nav__hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+  <div class="nav__mobile" id="mobile-menu">
+    <a href="index.html" class="nav__link">Home</a>
+    <a href="about.html" class="nav__link">About</a>
+    <a href="skills.html" class="nav__link">Skills</a>
+    <a href="projects.html" class="nav__link">Projects</a>
+    <a href="experience.html" class="nav__link">Experience</a>
+    <a href="education.html" class="nav__link">Education</a>
+    <a href="certifications.html" class="nav__link">Certifications</a>
+    <a href="testimonials.html" class="nav__link">Testimonials</a>
+    <a href="contact.html" class="nav__cta btn btn-primary">Contact</a>
+  </div>
+</nav>
+
+<header class="page-header">
+  <p class="label page-header__label">Let's Connect</p>
+  <h1 class="h1 page-header__title">Get In Touch</h1>
+  <p class="page-header__sub">Whether it's a project, internship, collaboration, or just a chat — I'd love to hear from you.</p>
+</header>
+
+<section class="section">
+  <div class="container">
+    <div class="contact-layout">
+
+      <!-- LEFT: Info -->
+      <div class="contact-info">
+        <div class="reveal">
+          <h2 class="contact-info__heading">Let's build something<br><em>meaningful</em> together.</h2>
+          <p class="contact-info__sub">I'm actively seeking internships and opportunities in data engineering, AI, and Python application development. If my work resonates with you — let's talk!</p>
+        </div>
+
+        <div class="contact-item reveal">
+          <div class="contact-item__icon">📧</div>
+          <div>
+            <div class="contact-item__label">Email</div>
+            <div class="contact-item__value"><a href="mailto:lokeshsoni653@gmail.com">lokeshsoni653@gmail.com</a></div>
+          </div>
+        </div>
+        <div class="contact-item reveal delay-1">
+          <div class="contact-item__icon">📱</div>
+          <div>
+            <div class="contact-item__label">Phone / WhatsApp</div>
+            <div class="contact-item__value">0303-3021048</div>
+          </div>
+        </div>
+        <div class="contact-item reveal delay-2">
+          <div class="contact-item__icon">📍</div>
+          <div>
+            <div class="contact-item__label">Location</div>
+            <div class="contact-item__value">Hyderabad / Tando Jam / Mithi, Sindh, Pakistan</div>
+          </div>
+        </div>
+        <div class="contact-item reveal delay-3">
+          <div class="contact-item__icon">💼</div>
+          <div>
+            <div class="contact-item__label">LinkedIn</div>
+            <div class="contact-item__value"><a href="https://www.linkedin.com/in/lokesh-kumar-76060722a" target="_blank" rel="noopener">lokesh-kumar-76060722a</a></div>
+          </div>
+        </div>
+        <div class="contact-item reveal delay-4">
+          <div class="contact-item__icon">🐙</div>
+          <div>
+            <div class="contact-item__label">GitHub</div>
+            <div class="contact-item__value"><a href="https://github.com/lokeshsoni653-del" target="_blank" rel="noopener">lokeshsoni653-del</a></div>
+          </div>
+        </div>
+        <div class="contact-item reveal delay-5">
+          <div class="contact-item__icon">🚀</div>
+          <div>
+            <div class="contact-item__label">Streamlit Projects</div>
+            <div class="contact-item__value"><a href="https://share.streamlit.io/user/lokeshsoni653-del" target="_blank" rel="noopener">share.streamlit.io/user/lokeshsoni653-del</a></div>
+          </div>
+        </div>
+
+        <div class="avail-card reveal">
+          <div class="avail-card__title">
+            <span class="avail-card__dot"></span>
+            Currently Available
+          </div>
+          <p class="avail-card__desc">Open to internships, freelance projects, and full-time positions starting from mid-2026. Response time: typically within 24 hours.</p>
+        </div>
+
+        <div class="reveal" style="margin-top:2rem">
+          <p class="label" style="margin-bottom:0.75rem">Interested in working on</p>
+          <div class="interests-grid">
+            <div class="interest-item">🔗 Supply Chain Apps</div>
+            <div class="interest-item">🗺️ Geospatial Systems</div>
+            <div class="interest-item">🤖 AI / NLP Projects</div>
+            <div class="interest-item">📊 Data Pipelines</div>
+            <div class="interest-item">🚀 Streamlit Apps</div>
+            <div class="interest-item">🌐 Web Development</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Form -->
+      <div class="form-card reveal">
+        <div class="form-card__title">Send a Message</div>
+        <p class="form-card__sub">Fill in the form and I'll get back to you as soon as possible.</p>
+        <form id="contact-form" novalidate>
+          <!-- Web3Forms hidden fields — delivers form data to lokeshsoni653@gmail.com -->
+          <input type="hidden" name="access_key" value="988758ee-a406-4fe4-b759-04f1107f3e8e"/>
+          <!-- ⬆ Replace YOUR_WEB3FORMS_KEY with the key from web3forms.com (free, 1 min setup) -->
+          <input type="hidden" name="subject" value="[Portfolio Contact] New Message from Website"/>
+          <input type="hidden" name="from_name" value="Portfolio Contact Form"/>
+          <input type="checkbox" name="botcheck" style="display:none"/>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name" class="form-label">Full Name *</label>
+              <input type="text" id="name" name="name" class="form-input" placeholder="Your name" required/>
+            </div>
+            <div class="form-group">
+              <label for="email" class="form-label">Email *</label>
+              <input type="email" id="email" name="email" class="form-input" placeholder="your@email.com" required/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="contact-subject" class="form-label">Subject</label>
+            <input type="text" id="contact-subject" name="subject_line" class="form-input" placeholder="What's this about?"/>
+          </div>
+          <div class="form-group">
+            <label for="opportunity" class="form-label">Opportunity Type</label>
+            <select id="opportunity" name="opportunity" class="form-input">
+              <option value="">Select type...</option>
+              <option>Internship Offer</option>
+              <option>Freelance Project</option>
+              <option>Full-time Position</option>
+              <option>Collaboration</option>
+              <option>General Inquiry</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="message" class="form-label">Message *</label>
+            <textarea id="message" name="message" class="form-textarea" placeholder="Tell me about the opportunity or what you have in mind..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:0.85rem" id="submit-btn">
+            Send Message
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+          </button>
+        </form>
+
+        <div class="form-success" id="form-success">
+          <div class="form-success__icon">✅</div>
+          <div class="form-success__title">Message Sent!</div>
+          <div style="font-size:0.875rem">Thanks for reaching out! I'll get back to you within 24 hours at <strong>lokeshsoni653@gmail.com</strong>.</div>
+        </div>
+
+        <div class="divider"></div>
+        <div style="text-align:center">
+          <p class="small muted" style="margin-bottom:1rem">Or reach me directly via</p>
+          <div class="social-links" style="justify-content:center">
+            <a href="mailto:lokeshsoni653@gmail.com" class="social-link" title="Email" style="width:48px;height:48px">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </a>
+            <a href="https://www.linkedin.com/in/lokesh-kumar-76060722a" target="_blank" rel="noopener" class="social-link" title="LinkedIn" style="width:48px;height:48px">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </a>
+            <a href="https://github.com/lokeshsoni653-del" target="_blank" rel="noopener" class="social-link" title="GitHub" style="width:48px;height:48px">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__inner">
+      <div class="footer__logo">Lokesh<span>.</span></div>
+      <nav class="footer__links">
+        <a href="index.html"          class="footer__link">Home</a>
+        <a href="about.html"          class="footer__link">About</a>
+        <a href="skills.html"         class="footer__link">Skills</a>
+        <a href="projects.html"       class="footer__link">Projects</a>
+        <a href="experience.html"     class="footer__link">Experience</a>
+        <a href="education.html"      class="footer__link">Education</a>
+        <a href="certifications.html" class="footer__link">Certifications</a>
+        <a href="testimonials.html"   class="footer__link">Testimonials</a>
+      </nav>
+      <p class="footer__copy">© 2026 Lokesh Kumar · Hyderabad, Sindh, Pakistan</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Web3Forms integration — sends every submission to lokeshsoni653@gmail.com -->
+<script>
+  const nav=document.getElementById('main-nav');
+  window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>20));
+  document.getElementById('hamburger').addEventListener('click',()=>document.getElementById('mobile-menu').classList.toggle('open'));
+
+  const form    = document.getElementById('contact-form');
+  const btn     = document.getElementById('submit-btn');
+  const success = document.getElementById('form-success');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML = '⏳ Sending...';
+    btn.disabled = true;
+
+    try {
+      const formData = new FormData(form);
+      // Append subject line from the custom subject input
+      const subjectLine = document.getElementById('contact-subject').value.trim();
+      if (subjectLine) formData.set('subject', '[Portfolio] ' + subjectLine);
+
+      const res  = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        form.style.display = 'none';
+        success.style.display = 'block';
+      } else {
+        throw new Error(data.message || 'Submission error');
+      }
+    } catch (err) {
+      btn.innerHTML = originalHTML;
+      btn.disabled  = false;
+      alert('❌ Could not send. Please email me directly at lokeshsoni653@gmail.com\n\nError: ' + err.message);
+    }
+  });
+
+  const observer=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('visible');observer.unobserve(x.target)}}),{threshold:0.1});
+  document.querySelectorAll('.reveal').forEach(r=>observer.observe(r));
+</script>
+</body>
+</html>

@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PSTD TalentLoom — Digital Learning & Training Analytics Platform</title>
+<meta name="description" content="An interactive talent development operations dashboard demonstrating Training Needs Analysis, classroom scheduling, ROI tracking, and e-learning module delivery for PSTD Pakistan."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy-950: #020617;
+    --navy-900: #0f172a;
+    --navy-800: #1e293b;
+    --navy-700: #334155;
+    --navy-600: #475569;
+    --navy-500: #64748b;
+    --navy-400: #94a3b8;
+    --navy-300: #cbd5e1;
+    --gold-600: #d97706;
+    --gold-500: #f59e0b;
+    --gold-400: #fbbf24;
+    --gold-300: #fcd34d;
+    --gold-100: #fef3c7;
+    --orange-500: #f97316;
+    --green-500: #22c55e;
+    --green-400: #4ade80;
+    --red-500: #ef4444;
+    --blue-500: #3b82f6;
+    --purple-500: #a855f7;
+    --cyan-400: #22d3ee;
+    --glass: rgba(30,41,59,0.7);
+    --glass-border: rgba(245,158,11,0.18);
+    --glass-hover: rgba(245,158,11,0.08);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --shadow: 0 4px 32px rgba(0,0,0,0.4);
+    --shadow-gold: 0 0 24px rgba(245,158,11,0.15);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--navy-950);
+    color: var(--navy-300);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── ANIMATED BACKGROUND ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 40% at 10% 0%, rgba(245,158,11,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 90% 100%, rgba(249,115,22,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 60% at 50% 50%, rgba(15,23,42,0.98) 0%, transparent 100%);
+    pointer-events: none;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(2,6,23,0.92);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 0 32px;
+    height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .topbar-brand {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .topbar-logo {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--gold-500), var(--orange-500));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 17px; color: var(--navy-950);
+    letter-spacing: -0.5px;
+    box-shadow: 0 0 18px rgba(245,158,11,0.4);
+  }
+  .topbar-title { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
+  .topbar-title span { color: var(--gold-400); }
+  .topbar-meta { font-size: 12px; color: var(--navy-500); }
+  .topbar-right { display: flex; align-items: center; gap: 16px; }
+  .topbar-badge {
+    padding: 5px 14px; border-radius: 20px;
+    background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3);
+    color: var(--gold-400); font-size: 12px; font-weight: 600;
+    animation: pulse-badge 2s ease-in-out infinite;
+  }
+  @keyframes pulse-badge {
+    0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.3); }
+    50% { box-shadow: 0 0 0 5px rgba(245,158,11,0); }
+  }
+  .topbar-author { font-size: 12px; color: var(--navy-500); }
+  .topbar-author b { color: var(--gold-400); }
+
+  /* ── LAYOUT ── */
+  .page-wrap { position: relative; z-index: 1; }
+  .hero {
+    text-align: center;
+    padding: 60px 32px 40px;
+    max-width: 900px; margin: 0 auto;
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 18px; border-radius: 20px;
+    background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25);
+    color: var(--gold-400); font-size: 13px; font-weight: 600;
+    margin-bottom: 20px;
+  }
+  .hero-tag span { width: 7px; height: 7px; border-radius: 50%; background: var(--gold-400); animation: blink 1.5s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .hero h1 {
+    font-size: clamp(32px,5vw,54px); font-weight: 900; color: #fff;
+    letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 16px;
+  }
+  .hero h1 em { font-style: normal; color: var(--gold-400); }
+  .hero p { font-size: 17px; color: var(--navy-400); max-width: 650px; margin: 0 auto; line-height: 1.7; }
+
+  /* ── KPI ROW ── */
+  .kpi-row {
+    display: grid; grid-template-columns: repeat(4,1fr); gap: 16px;
+    max-width: 1400px; margin: 0 auto 40px; padding: 0 32px;
+  }
+  .kpi-card {
+    background: var(--glass); border: 1px solid var(--glass-border);
+    border-radius: var(--radius); padding: 22px 24px;
+    backdrop-filter: blur(12px);
+    transition: transform 0.25s, box-shadow 0.25s;
+    position: relative; overflow: hidden;
+  }
+  .kpi-card::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(245,158,11,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .kpi-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-gold); }
+  .kpi-icon {
+    font-size: 24px; margin-bottom: 10px;
+    filter: drop-shadow(0 0 8px rgba(245,158,11,0.5));
+  }
+  .kpi-value { font-size: 30px; font-weight: 900; color: #fff; letter-spacing: -1px; }
+  .kpi-label { font-size: 13px; color: var(--navy-500); margin-top: 4px; }
+  .kpi-delta {
+    font-size: 12px; font-weight: 600; margin-top: 6px;
+    color: var(--green-400);
+  }
+  .kpi-delta.neg { color: var(--red-500); }
+
+  /* ── MAIN GRID ── */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 24px;
+    max-width: 1400px; margin: 0 auto; padding: 0 32px 60px;
+  }
+  .col-left { display: flex; flex-direction: column; gap: 24px; }
+  .col-right { display: flex; flex-direction: column; gap: 24px; }
+
+  .card {
+    background: var(--glass); border: 1px solid var(--glass-border);
+    border-radius: var(--radius); padding: 28px;
+    backdrop-filter: blur(12px);
+    transition: box-shadow 0.25s;
+  }
+  .card:hover { box-shadow: var(--shadow-gold); }
+  .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-size: 16px; font-weight: 700; color: #fff;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .card-title .icon { font-size: 18px; }
+  .card-subtitle { font-size: 12px; color: var(--navy-500); margin-top: 2px; }
+  .card-badge {
+    padding: 4px 12px; border-radius: 12px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+  }
+  .badge-gold { background: rgba(245,158,11,0.15); color: var(--gold-400); border: 1px solid rgba(245,158,11,0.3); }
+  .badge-green { background: rgba(34,197,94,0.1); color: var(--green-400); border: 1px solid rgba(34,197,94,0.2); }
+  .badge-blue { background: rgba(59,130,246,0.1); color: #93c5fd; border: 1px solid rgba(59,130,246,0.2); }
+  .badge-purple { background: rgba(168,85,247,0.1); color: #c4b5fd; border: 1px solid rgba(168,85,247,0.2); }
+
+  /* ── MODULE 1: TNA ENGINE ── */
+  .tna-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-group label { font-size: 12px; font-weight: 600; color: var(--navy-400); text-transform: uppercase; letter-spacing: 0.7px; }
+  .form-group select, .form-group input {
+    background: rgba(15,23,42,0.8); border: 1px solid var(--navy-700);
+    color: var(--navy-200, #e2e8f0); border-radius: var(--radius-sm); padding: 10px 14px;
+    font-size: 14px; font-family: 'Inter', sans-serif;
+    cursor: pointer; transition: border 0.2s;
+    outline: none;
+  }
+  .form-group select:focus, .form-group input:focus { border-color: var(--gold-500); }
+  .form-group select option { background: var(--navy-900); }
+  .tna-btn {
+    grid-column: 1/-1; margin-top: 4px;
+    padding: 13px 28px; border: none; border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, var(--gold-500), var(--orange-500));
+    color: var(--navy-950); font-weight: 800; font-size: 15px;
+    cursor: pointer; transition: all 0.2s; letter-spacing: -0.2px;
+    box-shadow: 0 4px 20px rgba(245,158,11,0.35);
+  }
+  .tna-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(245,158,11,0.5); }
+  .tna-results { margin-top: 20px; }
+  .tna-result-card {
+    background: rgba(15,23,42,0.6); border: 1px solid var(--navy-700);
+    border-radius: var(--radius-sm); padding: 16px 20px; margin-bottom: 12px;
+    display: flex; align-items: flex-start; gap: 16px;
+    animation: slideIn 0.4s ease forwards;
+    opacity: 0; transform: translateY(10px);
+  }
+  @keyframes slideIn { to { opacity: 1; transform: translateY(0); } }
+  .tna-result-card:nth-child(1) { animation-delay: 0s; }
+  .tna-result-card:nth-child(2) { animation-delay: 0.1s; }
+  .tna-result-card:nth-child(3) { animation-delay: 0.2s; }
+  .tna-course-num {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--gold-500), var(--orange-500));
+    color: var(--navy-950); font-weight: 900; font-size: 13px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .tna-course-name { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .tna-course-meta { font-size: 12px; color: var(--navy-500); }
+  .tna-priority {
+    margin-left: auto; padding: 3px 10px; border-radius: 8px;
+    font-size: 11px; font-weight: 700;
+  }
+  .priority-high { background: rgba(239,68,68,0.15); color: #fca5a5; }
+  .priority-med { background: rgba(245,158,11,0.15); color: var(--gold-400); }
+  .priority-low { background: rgba(34,197,94,0.12); color: var(--green-400); }
+
+  /* ── MODULE 2: ROI CHARTS ── */
+  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .chart-wrap { position: relative; height: 180px; }
+
+  /* ── MODULE 3: SCHEDULE ── */
+  .schedule-grid {
+    display: grid; grid-template-columns: repeat(5,1fr); gap: 8px;
+    margin-top: 4px;
+  }
+  .schedule-day { font-size: 11px; font-weight: 700; color: var(--gold-400); text-align: center; padding: 6px 0; }
+  .schedule-slot {
+    border-radius: 8px; padding: 10px 8px; text-align: center;
+    font-size: 10.5px; font-weight: 600; cursor: pointer;
+    transition: all 0.2s; border: 1px solid transparent;
+    min-height: 58px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  }
+  .schedule-slot.occupied { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.25); color: var(--gold-300); }
+  .schedule-slot.available { background: rgba(34,197,94,0.06); border-color: rgba(34,197,94,0.15); color: var(--green-400); }
+  .schedule-slot.conflict { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.2); color: #fca5a5; }
+  .schedule-slot:hover { transform: scale(1.04); }
+  .schedule-slot .slot-room { font-size: 9px; color: var(--navy-500); font-weight: 500; }
+  .schedule-slot .slot-course { font-size: 10px; font-weight: 700; }
+  .schedule-legend { display: flex; gap: 16px; margin-top: 16px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--navy-500); }
+  .legend-dot { width: 9px; height: 9px; border-radius: 3px; }
+
+  /* ── MODULE 4: E-LEARNING QUIZ ── */
+  .quiz-progress-wrap { margin-bottom: 20px; }
+  .quiz-progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--navy-500); margin-bottom: 6px; }
+  .quiz-progress-bar { height: 8px; background: var(--navy-800); border-radius: 99px; overflow: hidden; }
+  .quiz-progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold-500), var(--orange-500)); border-radius: 99px; transition: width 0.5s ease; }
+  .quiz-question { font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 20px; line-height: 1.4; }
+  .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+  .quiz-option {
+    padding: 13px 18px; border-radius: var(--radius-sm);
+    background: rgba(15,23,42,0.7); border: 1.5px solid var(--navy-700);
+    color: var(--navy-300); font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s; text-align: left;
+  }
+  .quiz-option:hover { border-color: var(--gold-500); color: #fff; background: rgba(245,158,11,0.06); }
+  .quiz-option.correct { border-color: var(--green-500); background: rgba(34,197,94,0.08); color: var(--green-400); }
+  .quiz-option.wrong { border-color: var(--red-500); background: rgba(239,68,68,0.08); color: #fca5a5; }
+  .quiz-option.disabled { pointer-events: none; }
+  .quiz-feedback {
+    margin-top: 16px; padding: 12px 16px; border-radius: var(--radius-sm);
+    font-size: 14px; font-weight: 600; display: none;
+  }
+  .quiz-feedback.correct { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); color: var(--green-400); }
+  .quiz-feedback.wrong { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5; }
+  .quiz-nav { display: flex; justify-content: flex-end; margin-top: 20px; gap: 10px; }
+  .quiz-btn {
+    padding: 10px 22px; border-radius: var(--radius-sm); border: none;
+    font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+  }
+  .quiz-btn.primary {
+    background: linear-gradient(135deg, var(--gold-500), var(--orange-500));
+    color: var(--navy-950); box-shadow: 0 4px 16px rgba(245,158,11,0.3);
+  }
+  .quiz-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245,158,11,0.5); }
+  .quiz-btn:disabled { opacity: 0.4; pointer-events: none; }
+
+  /* ── CERT MODAL ── */
+  .cert-modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+  }
+  .cert-modal-overlay.open { display: flex; }
+  .cert-modal {
+    background: var(--navy-900); border: 1px solid var(--glass-border);
+    border-radius: 24px; padding: 48px; max-width: 560px; width: 90%;
+    text-align: center; position: relative;
+    box-shadow: 0 24px 80px rgba(245,158,11,0.2);
+    animation: certPop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  @keyframes certPop { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .cert-seal {
+    width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 24px;
+    background: linear-gradient(135deg, var(--gold-500), var(--orange-500));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 44px; box-shadow: 0 0 60px rgba(245,158,11,0.4);
+    animation: rotateSeal 4s linear infinite;
+  }
+  @keyframes rotateSeal { from { box-shadow: 0 0 40px rgba(245,158,11,0.3); } 50% { box-shadow: 0 0 80px rgba(245,158,11,0.6); } to { box-shadow: 0 0 40px rgba(245,158,11,0.3); } }
+  .cert-modal h2 { font-size: 26px; font-weight: 900; color: #fff; margin-bottom: 8px; }
+  .cert-modal p { color: var(--navy-400); font-size: 15px; margin-bottom: 24px; line-height: 1.6; }
+  .cert-name { color: var(--gold-400); font-weight: 700; font-size: 20px; margin: 8px 0; }
+  .cert-close {
+    padding: 12px 32px; border-radius: var(--radius-sm); border: none;
+    background: linear-gradient(135deg, var(--gold-500), var(--orange-500));
+    color: var(--navy-950); font-weight: 800; font-size: 15px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .cert-close:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245,158,11,0.5); }
+
+  /* ── FEEDBACK ANALYTICS SIDEBAR ── */
+  .metric-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .metric-label { font-size: 13px; color: var(--navy-400); min-width: 120px; }
+  .metric-bar-wrap { flex: 1; height: 8px; background: var(--navy-800); border-radius: 99px; overflow: hidden; }
+  .metric-bar { height: 100%; border-radius: 99px; transition: width 1s ease; }
+  .metric-value { font-size: 13px; font-weight: 700; color: #fff; min-width: 36px; text-align: right; }
+
+  /* ── COURSE CATALOG SIDEBAR ── */
+  .course-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px; border-radius: var(--radius-sm);
+    border: 1px solid var(--navy-800); margin-bottom: 10px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .course-item:hover { border-color: var(--gold-500); background: var(--glass-hover); }
+  .course-icon {
+    width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+  .course-name { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+  .course-meta { font-size: 11px; color: var(--navy-500); }
+  .course-seats {
+    margin-left: auto; text-align: right;
+    font-size: 11px; color: var(--navy-500);
+  }
+  .course-seats b { display: block; color: var(--gold-400); font-size: 14px; font-weight: 800; }
+
+  /* ── NPS SCORE ── */
+  .nps-dial { text-align: center; padding: 24px 0 8px; }
+  .nps-number { font-size: 64px; font-weight: 900; color: #fff; letter-spacing: -3px; line-height: 1; }
+  .nps-number span { font-size: 28px; color: var(--gold-400); }
+  .nps-label { font-size: 13px; color: var(--navy-500); margin-top: 4px; }
+
+  /* ── FOOTER STRIP ── */
+  .footer-strip {
+    position: relative; z-index: 1;
+    background: rgba(2,6,23,0.95);
+    border-top: 1px solid var(--glass-border);
+    padding: 16px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; color: var(--navy-600);
+  }
+  .footer-strip b { color: var(--gold-400); }
+
+  /* ── TOOLTIPS ── */
+  [data-tip] { position: relative; cursor: help; }
+  [data-tip]::after {
+    content: attr(data-tip);
+    position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+    background: var(--navy-800); color: var(--navy-300);
+    padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 500;
+    white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.2s;
+    border: 1px solid var(--navy-700); z-index: 50;
+  }
+  [data-tip]:hover::after { opacity: 1; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1100px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .col-right { display: grid; grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 700px) {
+    .kpi-row { grid-template-columns: 1fr 1fr; }
+    .tna-form { grid-template-columns: 1fr; }
+    .charts-grid { grid-template-columns: 1fr; }
+    .col-right { grid-template-columns: 1fr; }
+    .schedule-grid { grid-template-columns: repeat(3,1fr); }
+    .hero h1 { font-size: 28px; }
+    .topbar { padding: 0 16px; }
+    .main-grid { padding: 0 16px 40px; }
+    .kpi-row { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo">TL</div>
+    <div>
+      <div class="topbar-title">Talent<span>Loom</span></div>
+      <div class="topbar-meta">PSTD Digital Learning &amp; Development Platform</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-badge">⚡ Live Simulation</div>
+    <div class="topbar-author">Built by <b>Lokesh Kumar</b></div>
+  </div>
+</header>
+
+<div class="page-wrap">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-tag"><span></span> PSTD Accelerate — Internship Program 2026</div>
+    <h1>Talent Development<br/><em>Operations Intelligence</em></h1>
+    <p>An end-to-end digital training management platform — analyzing skill gaps, scheduling facilitators, tracking ROI, and delivering interactive e-learning modules for Pakistan's premier talent development organization.</p>
+  </section>
+
+  <!-- KPI ROW -->
+  <div class="kpi-row">
+    <div class="kpi-card" data-tip="Total employees currently enrolled across all PSTD programs">
+      <div class="kpi-icon">🎓</div>
+      <div class="kpi-value" id="kpi-enrolled">0</div>
+      <div class="kpi-label">Active Learners</div>
+      <div class="kpi-delta">↑ 18% this quarter</div>
+    </div>
+    <div class="kpi-card" data-tip="Weighted average score from post-training feedback forms">
+      <div class="kpi-icon">⭐</div>
+      <div class="kpi-value" id="kpi-csat">0.0</div>
+      <div class="kpi-label">Avg. Satisfaction Score</div>
+      <div class="kpi-delta">↑ 0.3 vs last cohort</div>
+    </div>
+    <div class="kpi-card" data-tip="Revenue generated per PKR spent on training programs">
+      <div class="kpi-icon">📈</div>
+      <div class="kpi-value" id="kpi-roi">0%</div>
+      <div class="kpi-label">Training ROI</div>
+      <div class="kpi-delta">↑ 12 pts vs last year</div>
+    </div>
+    <div class="kpi-card" data-tip="Percentage of learners who complete the full program">
+      <div class="kpi-icon">✅</div>
+      <div class="kpi-value" id="kpi-completion">0%</div>
+      <div class="kpi-label">Completion Rate</div>
+      <div class="kpi-delta neg">↓ 2% (needs improvement)</div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid">
+    <div class="col-left">
+
+      <!-- MODULE 1: TNA ENGINE -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title"><span class="icon">🔬</span> Training Needs Assessment Engine</div>
+            <div class="card-subtitle">AI-powered course recommendation based on skill gap analysis</div>
+          </div>
+          <span class="card-badge badge-gold">MODULE 1</span>
+        </div>
+        <div class="tna-form">
+          <div class="form-group">
+            <label>Department</label>
+            <select id="tna-dept">
+              <option>Human Resources</option>
+              <option>Business Development</option>
+              <option>Marketing</option>
+              <option>Digital Learning &amp; Development</option>
+              <option>Research &amp; Content</option>
+              <option>Conferences</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Primary Skill Gap</label>
+            <select id="tna-skill">
+              <option>Data Analytics &amp; Reporting</option>
+              <option>Generative AI &amp; LLMs</option>
+              <option>UI/UX &amp; Digital Design</option>
+              <option>Leadership &amp; Management</option>
+              <option>Finance &amp; Risk Management</option>
+              <option>Marketing &amp; Brand Strategy</option>
+              <option>Project Management</option>
+              <option>Supply Chain &amp; Operations</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Experience Level</label>
+            <select id="tna-level">
+              <option>Entry Level (0–2 yrs)</option>
+              <option>Mid Level (3–5 yrs)</option>
+              <option>Senior Level (6+ yrs)</option>
+              <option>Executive</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Urgency</label>
+            <select id="tna-urgency">
+              <option>High — Deploy in 4 weeks</option>
+              <option>Medium — Deploy in 2 months</option>
+              <option>Low — Plan for next quarter</option>
+            </select>
+          </div>
+          <button class="tna-btn" onclick="runTNA()">⚡ Generate TNA Report &amp; Course Recommendations</button>
+        </div>
+        <div class="tna-results" id="tna-results"></div>
+      </div>
+
+      <!-- MODULE 2: ROI CHARTS -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title"><span class="icon">📊</span> Training ROI &amp; Feedback Analytics</div>
+            <div class="card-subtitle">Post-program performance metrics — Cohort FY2026</div>
+          </div>
+          <span class="card-badge badge-blue">MODULE 2</span>
+        </div>
+        <div class="charts-grid">
+          <div>
+            <div style="font-size:12px;color:var(--navy-500);margin-bottom:10px;font-weight:600;">Monthly Enrollment Trend</div>
+            <div class="chart-wrap"><canvas id="chart-enroll"></canvas></div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--navy-500);margin-bottom:10px;font-weight:600;">Skill Uplift by Course Category</div>
+            <div class="chart-wrap"><canvas id="chart-uplift"></canvas></div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--navy-500);margin-bottom:10px;font-weight:600;">Learner Satisfaction (NPS)</div>
+            <div class="chart-wrap"><canvas id="chart-nps"></canvas></div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--navy-500);margin-bottom:10px;font-weight:600;">Training Cost vs. ROI Benefit</div>
+            <div class="chart-wrap"><canvas id="chart-roi"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULE 3: CLASSROOM SCHEDULE -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title"><span class="icon">🗓️</span> Facility &amp; Facilitator Scheduler</div>
+            <div class="card-subtitle">DHA Phase V Campus — Conference Hall, Syndicate Rooms, Auditorium</div>
+          </div>
+          <span class="card-badge badge-purple">MODULE 3</span>
+        </div>
+        <div class="schedule-grid" id="schedule-grid">
+          <!-- Filled by JS -->
+        </div>
+        <div class="schedule-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(245,158,11,0.4)"></div> Occupied</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(34,197,94,0.4)"></div> Available</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(239,68,68,0.4)"></div> Conflict</div>
+        </div>
+      </div>
+
+    </div><!-- /col-left -->
+
+    <div class="col-right">
+
+      <!-- MODULE 4: E-LEARNING QUIZ -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title"><span class="icon">🎮</span> Digital Course Module</div>
+            <div class="card-subtitle">SCORM-style interactive e-learning demo</div>
+          </div>
+          <span class="card-badge badge-green">MODULE 4</span>
+        </div>
+        <div class="quiz-progress-wrap">
+          <div class="quiz-progress-label">
+            <span id="quiz-step-label">Question 1 of 5</span>
+            <span id="quiz-score-label">Score: 0</span>
+          </div>
+          <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quiz-progress-fill" style="width:20%"></div></div>
+        </div>
+        <div id="quiz-container"></div>
+        <div class="quiz-nav">
+          <button class="quiz-btn primary" id="quiz-next-btn" onclick="quizNext()" disabled>Next →</button>
+        </div>
+      </div>
+
+      <!-- FEEDBACK METRICS -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><span class="icon">💬</span> Learner Feedback Breakdown</div>
+        </div>
+        <div id="feedback-metrics"></div>
+      </div>
+
+      <!-- COURSE CATALOG -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><span class="icon">📚</span> Course Catalog</div>
+          <span style="font-size:12px;color:var(--navy-500);">Live Seats</span>
+        </div>
+        <div id="course-catalog"></div>
+      </div>
+
+    </div><!-- /col-right -->
+  </div><!-- /main-grid -->
+</div><!-- /page-wrap -->
+
+<!-- CERT MODAL -->
+<div class="cert-modal-overlay" id="cert-modal">
+  <div class="cert-modal">
+    <div class="cert-seal">🏆</div>
+    <h2>Certificate of Completion</h2>
+    <p>This certifies that</p>
+    <div class="cert-name">Lokesh Kumar</div>
+    <p style="margin-top:4px;">has successfully completed the<br/><b style="color:#fff;">PSTD Digital Learning Fundamentals</b><br/>e-learning module with a score of <b id="cert-final-score" style="color:var(--gold-400);"></b></p>
+    <p style="margin-top:16px;font-size:12px;color:var(--navy-600);">Pakistan Society for Talent Development · <span id="cert-date"></span></p>
+    <button class="cert-close" onclick="closeCert()" style="margin-top:24px;">🎉 Restart Module</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer-strip">
+  <span>PSTD TalentLoom · Digital Learning &amp; Development Platform</span>
+  <span>Built by <b>Lokesh Kumar</b> · BS Software Engineering · Internship Program 2026 Demo</span>
+  <span>Pakistan Society for Talent Development · <b>pstd.com.pk</b></span>
+</footer>
+
+<script>
+/* ─────────────────────────── KPI COUNTER ─────────────────────────── */
+function animateCounter(id, target, suffix='', decimals=0, duration=1800) {
+  const el = document.getElementById(id);
+  let start = 0; const startTime = performance.now();
+  function step(now) {
+    const t = Math.min((now - startTime)/duration,1);
+    const ease = 1-Math.pow(1-t,3);
+    const val = start + (target - start)*ease;
+    el.textContent = decimals>0 ? val.toFixed(decimals)+suffix : Math.round(val)+suffix;
+    if(t<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+window.addEventListener('load',()=>{
+  animateCounter('kpi-enrolled',1247);
+  animateCounter('kpi-csat',4.7,'',1);
+  animateCounter('kpi-roi',143,'%');
+  animateCounter('kpi-completion',79,'%');
+});
+
+/* ─────────────────────────── TNA ENGINE ─────────────────────────── */
+const tnaDB = {
+  "Data Analytics & Reporting":   [{name:"Data Storytelling for Business",dur:"2 Days",mode:"In-Person",p:"High"},{name:"Power BI & Dashboard Design",dur:"3 Days",mode:"Hybrid",p:"High"},{name:"Excel Advanced Analytics",dur:"1 Day",mode:"Online",p:"Med"}],
+  "Generative AI & LLMs":         [{name:"Generative AI for Business Leaders",dur:"1 Day",mode:"In-Person",p:"High"},{name:"Prompt Engineering Practicum",dur:"2 Days",mode:"Online",p:"High"},{name:"AI Ethics & Governance",dur:"Half Day",mode:"Online",p:"Med"}],
+  "UI/UX & Digital Design":       [{name:"Human-Centered Design Thinking",dur:"2 Days",mode:"In-Person",p:"High"},{name:"Figma for Learning Designers",dur:"2 Days",mode:"Online",p:"High"},{name:"SCORM & LMS Authoring",dur:"3 Days",mode:"Hybrid",p:"Med"}],
+  "Leadership & Management":      [{name:"Strategic Leadership Masterclass",dur:"3 Days",mode:"In-Person",p:"High"},{name:"Ken Blanchard: Situational Leadership",dur:"2 Days",mode:"In-Person",p:"Med"},{name:"Coaching & Mentoring Fundamentals",dur:"1 Day",mode:"Online",p:"Low"}],
+  "Finance & Risk Management":    [{name:"Financial Modelling for Non-Finance Managers",dur:"2 Days",mode:"In-Person",p:"High"},{name:"Risk Assessment & Scenario Planning",dur:"1 Day",mode:"Hybrid",p:"Med"},{name:"Corporate Finance Essentials",dur:"3 Days",mode:"Online",p:"Low"}],
+  "Marketing & Brand Strategy":   [{name:"Digital Marketing Bootcamp",dur:"3 Days",mode:"Hybrid",p:"High"},{name:"Brand Building & Storytelling",dur:"2 Days",mode:"In-Person",p:"Med"},{name:"Marketing Analytics with Google Data Studio",dur:"1 Day",mode:"Online",p:"Low"}],
+  "Project Management":           [{name:"PMP Certification Prep",dur:"5 Days",mode:"In-Person",p:"High"},{name:"Agile & Scrum Master Fundamentals",dur:"2 Days",mode:"Hybrid",p:"High"},{name:"Risk & Stakeholder Management",dur:"1 Day",mode:"Online",p:"Med"}],
+  "Supply Chain & Operations":    [{name:"Logistics Optimization Masterclass",dur:"2 Days",mode:"In-Person",p:"High"},{name:"Supply Chain Analytics",dur:"3 Days",mode:"Hybrid",p:"Med"},{name:"Lean & Six Sigma Yellow Belt",dur:"2 Days",mode:"Online",p:"Low"}],
+};
+const priorityClass = { "High":"priority-high","Med":"priority-med","Low":"priority-low" };
+
+function runTNA() {
+  const skill = document.getElementById('tna-skill').value;
+  const dept  = document.getElementById('tna-dept').value;
+  const courses = tnaDB[skill] || tnaDB["Data Analytics & Reporting"];
+  const html = courses.map((c,i)=>`
+    <div class="tna-result-card">
+      <div class="tna-course-num">${i+1}</div>
+      <div style="flex:1">
+        <div class="tna-course-name">${c.name}</div>
+        <div class="tna-course-meta">⏱ ${c.dur} &nbsp;·&nbsp; 🏢 ${c.mode} &nbsp;·&nbsp; 🏢 Dept: ${dept}</div>
+      </div>
+      <div class="tna-priority ${priorityClass[c.p]}">⚑ ${c.p} Priority</div>
+    </div>
+  `).join('');
+  const results = document.getElementById('tna-results');
+  results.innerHTML = `<div style="font-size:13px;color:var(--navy-500);margin-bottom:12px;font-weight:600;">📋 Recommended Training Roadmap — ${skill}</div>` + html;
+}
+runTNA(); // default on load
+
+/* ─────────────────────────── CHARTS ─────────────────────────── */
+const chartDefaults = {
+  color: '#94a3b8',
+  plugins: { legend: { labels: { color:'#94a3b8', font:{size:11, family:'Inter'} } } },
+  scales: {
+    x:{ ticks:{color:'#64748b',font:{size:10}}, grid:{color:'rgba(255,255,255,0.04)'} },
+    y:{ ticks:{color:'#64748b',font:{size:10}}, grid:{color:'rgba(255,255,255,0.04)'} }
+  }
+};
+
+// Enrollment Trend
+new Chart(document.getElementById('chart-enroll').getContext('2d'),{
+  type:'line',
+  data:{
+    labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'],
+    datasets:[{
+      label:'Learners',
+      data:[820,895,960,1010,1080,1160,1210,1247],
+      borderColor:'#f59e0b',
+      backgroundColor:'rgba(245,158,11,0.07)',
+      pointBackgroundColor:'#f59e0b',
+      tension:0.4, fill:true, borderWidth:2.5
+    }]
+  },
+  options:{...chartDefaults, maintainAspectRatio:false, plugins:{legend:{display:false}}}
+});
+
+// Skill Uplift Radar
+new Chart(document.getElementById('chart-uplift').getContext('2d'),{
+  type:'radar',
+  data:{
+    labels:['Analytics','AI/Tech','Leadership','Soft Skills','Comms','Finance'],
+    datasets:[
+      {label:'Before',data:[42,28,55,60,50,38],borderColor:'rgba(100,116,139,0.6)',backgroundColor:'rgba(100,116,139,0.07)',pointRadius:3},
+      {label:'After', data:[78,74,82,85,79,68],borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,0.08)',pointRadius:3,pointBackgroundColor:'#f59e0b'}
+    ]
+  },
+  options:{
+    maintainAspectRatio:false,
+    scales:{r:{ticks:{display:false,backdropColor:'transparent'},grid:{color:'rgba(255,255,255,0.05)'},pointLabels:{color:'#94a3b8',font:{size:10}}}},
+    plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}}}}
+  }
+});
+
+// NPS Bar
+new Chart(document.getElementById('chart-nps').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['Detractors','Passives','Promoters'],
+    datasets:[{
+      data:[6,22,72],
+      backgroundColor:['rgba(239,68,68,0.6)','rgba(245,158,11,0.5)','rgba(34,197,94,0.6)'],
+      borderRadius:8, borderSkipped:false
+    }]
+  },
+  options:{...chartDefaults, maintainAspectRatio:false, plugins:{legend:{display:false}}}
+});
+
+// ROI Bar
+new Chart(document.getElementById('chart-roi').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['Q1 FY25','Q2 FY25','Q3 FY25','Q4 FY25','Q1 FY26','Q2 FY26'],
+    datasets:[
+      {label:'Cost (PKR L)',data:[12,14,11,16,13,15],backgroundColor:'rgba(100,116,139,0.4)',borderRadius:6},
+      {label:'ROI Benefit (PKR L)',data:[18,22,19,28,24,32],backgroundColor:'rgba(245,158,11,0.55)',borderRadius:6}
+    ]
+  },
+  options:{...chartDefaults, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}}}}}
+});
+
+/* ─────────────────────────── SCHEDULE ─────────────────────────── */
+const days = ['Mon','Tue','Wed','Thu','Fri'];
+const times = ['9am','11am','1pm','3pm'];
+const scheduleData = [
+  {d:'Mon',t:'9am',course:'Leadership',room:'Hall A',status:'occupied'},
+  {d:'Mon',t:'11am',course:'PMP Prep',room:'Syn. 1',status:'occupied'},
+  {d:'Mon',t:'1pm',course:'',room:'',status:'available'},
+  {d:'Mon',t:'3pm',course:'AI Bootcamp',room:'Hall B',status:'conflict'},
+  {d:'Tue',t:'9am',course:'SCORM Dev',room:'Lab',status:'occupied'},
+  {d:'Tue',t:'11am',course:'',room:'',status:'available'},
+  {d:'Tue',t:'1pm',course:'Brand Strat.',room:'Syn. 2',status:'occupied'},
+  {d:'Tue',t:'3pm',course:'',room:'',status:'available'},
+  {d:'Wed',t:'9am',course:'',room:'',status:'available'},
+  {d:'Wed',t:'11am',course:'Data Analytics',room:'Hall A',status:'occupied'},
+  {d:'Wed',t:'1pm',course:'',room:'',status:'available'},
+  {d:'Wed',t:'3pm',course:'Finance Mgmt',room:'Syn. 1',status:'occupied'},
+  {d:'Thu',t:'9am',course:'Agile/Scrum',room:'Lab',status:'occupied'},
+  {d:'Thu',t:'11am',course:'',room:'',status:'available'},
+  {d:'Thu',t:'1pm',course:'Comm. Skills',room:'Aud.',status:'occupied'},
+  {d:'Thu',t:'3pm',course:'',room:'',status:'available'},
+  {d:'Fri',t:'9am',course:'Design Think.',room:'Hall B',status:'occupied'},
+  {d:'Fri',t:'11am',course:'',room:'',status:'available'},
+  {d:'Fri',t:'1pm',course:'',room:'',status:'available'},
+  {d:'Fri',t:'3pm',course:'Grad Ceremony',room:'Aud.',status:'conflict'},
+];
+
+function buildSchedule() {
+  const g = document.getElementById('schedule-grid');
+  // header row
+  g.innerHTML = '<div></div>' + days.map(d=>`<div class="schedule-day">${d}</div>`).join('');
+  // time slots
+  times.forEach(t=>{
+    g.innerHTML += `<div style="display:flex;align-items:center;font-size:10px;color:var(--navy-600);font-weight:600;padding-right:4px;">${t}</div>`;
+    days.forEach(d=>{
+      const slot = scheduleData.find(s=>s.d===d && s.t===t);
+      if(!slot || slot.status==='available') {
+        g.innerHTML += `<div class="schedule-slot available"><div class="slot-course">Free</div><div class="slot-room">Open</div></div>`;
+      } else {
+        g.innerHTML += `<div class="schedule-slot ${slot.status}"><div class="slot-course">${slot.course}</div><div class="slot-room">${slot.room}</div></div>`;
+      }
+    });
+  });
+}
+buildSchedule();
+
+/* ─────────────────────────── QUIZ ─────────────────────────── */
+const quizQuestions = [
+  {
+    q:"What does SCORM stand for in e-learning design?",
+    opts:["Structured Content Online Reference Module","Sharable Content Object Reference Model","Standard Course Object Rendering Module","Synchronized Content and Object Resource Model"],
+    ans:1, explain:"SCORM (Sharable Content Object Reference Model) is the industry standard for LMS-compatible e-learning content packaging."
+  },
+  {
+    q:"Which of the following is the most effective method for measuring training effectiveness?",
+    opts:["Counting attendance sheets","Kirkpatrick's Four-Level Evaluation Model","Collecting learner photographs","Reviewing room booking logs"],
+    ans:1, explain:"Kirkpatrick's model evaluates training at four levels: Reaction, Learning, Behavior, and Results — the gold standard in L&D."
+  },
+  {
+    q:"In a Training Needs Analysis (TNA), what does 'gap analysis' identify?",
+    opts:["Gaps in classroom furniture","Difference between current and desired competencies","Number of empty seats in training rooms","Issues with training budgets"],
+    ans:1, explain:"Gap analysis in TNA compares existing employee skill levels with the skills needed for target roles, pinpointing training priorities."
+  },
+  {
+    q:"What is a key benefit of microlearning in digital L&D design?",
+    opts:["It replaces all instructor-led training","It delivers focused 3–10 minute content that fits into daily workflows","It requires expensive LMS infrastructure","It is only suited for technical training"],
+    ans:1, explain:"Microlearning boosts retention by delivering bite-sized, focused modules that learners can access on-demand within their workflow."
+  },
+  {
+    q:"PSTD's strategic partnership with ATD brings which key benefit to Pakistan?",
+    opts:["Free merchandise for learners","Globally recognized talent development certifications and facilitation frameworks","Discounted flight tickets to the USA","A new sports facility in Karachi"],
+    ans:1, explain:"PSTD's partnership with the Association for Talent Development (ATD) delivers globally benchmarked L&D programs and certifications to Pakistani professionals."
+  }
+];
+let qIdx = 0, score = 0, answered = false;
+
+function renderQuiz() {
+  const q = quizQuestions[qIdx];
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = `
+    <div class="quiz-question">${q.q}</div>
+    <div class="quiz-options" id="quiz-opts">
+      ${q.opts.map((o,i)=>`<button class="quiz-option" id="qopt-${i}" onclick="selectOption(${i})">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}
+    </div>
+    <div class="quiz-feedback" id="quiz-feedback"></div>
+  `;
+  document.getElementById('quiz-step-label').textContent = `Question ${qIdx+1} of ${quizQuestions.length}`;
+  document.getElementById('quiz-score-label').textContent = `Score: ${score}`;
+  document.getElementById('quiz-progress-fill').style.width = `${((qIdx)/quizQuestions.length)*100+20}%`;
+  document.getElementById('quiz-next-btn').disabled = true;
+  answered = false;
+}
+
+function selectOption(i) {
+  if(answered) return;
+  answered = true;
+  const q = quizQuestions[qIdx];
+  const opts = document.querySelectorAll('.quiz-option');
+  opts.forEach(o=>o.classList.add('disabled'));
+  const fb = document.getElementById('quiz-feedback');
+  if(i===q.ans) {
+    score++;
+    opts[i].classList.add('correct');
+    fb.className='quiz-feedback correct';
+    fb.textContent = '✅ Correct! '+q.explain;
+  } else {
+    opts[i].classList.add('wrong');
+    opts[q.ans].classList.add('correct');
+    fb.className='quiz-feedback wrong';
+    fb.textContent = '❌ Not quite. '+q.explain;
+  }
+  fb.style.display='block';
+  document.getElementById('quiz-score-label').textContent=`Score: ${score}`;
+  document.getElementById('quiz-next-btn').disabled=false;
+  if(qIdx===quizQuestions.length-1) {
+    document.getElementById('quiz-next-btn').textContent='Finish & Get Certificate 🎓';
+  }
+}
+
+function quizNext() {
+  qIdx++;
+  if(qIdx>=quizQuestions.length) { showCert(); return; }
+  renderQuiz();
+}
+
+function showCert() {
+  document.getElementById('quiz-progress-fill').style.width='100%';
+  const pct = Math.round((score/quizQuestions.length)*100);
+  document.getElementById('cert-final-score').textContent = `${score}/${quizQuestions.length} (${pct}%)`;
+  document.getElementById('cert-date').textContent = new Date().toLocaleDateString('en-PK',{day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('cert-modal').classList.add('open');
+}
+
+function closeCert() {
+  document.getElementById('cert-modal').classList.remove('open');
+  qIdx=0; score=0;
+  renderQuiz();
+  document.getElementById('quiz-next-btn').textContent='Next →';
+}
+
+renderQuiz(); // init
+
+/* ─────────────────────────── FEEDBACK METRICS ─────────────────────────── */
+const feedbackMetrics = [
+  {label:"Content Quality",val:91,color:"#f59e0b"},
+  {label:"Facilitator Rating",val:88,color:"#22c55e"},
+  {label:"Practical Relevance",val:85,color:"#3b82f6"},
+  {label:"Venue & Facilities",val:94,color:"#a855f7"},
+  {label:"Would Recommend",val:89,color:"#f97316"},
+];
+document.getElementById('feedback-metrics').innerHTML = feedbackMetrics.map(m=>`
+  <div class="metric-row">
+    <div class="metric-label">${m.label}</div>
+    <div class="metric-bar-wrap"><div class="metric-bar" style="width:0%;background:${m.color}" data-target="${m.val}"></div></div>
+    <div class="metric-value">${m.val}%</div>
+  </div>
+`).join('');
+// animate bars on load
+setTimeout(()=>{
+  document.querySelectorAll('.metric-bar').forEach(b=>{
+    b.style.width = b.dataset.target+'%';
+  });
+},300);
+
+/* ─────────────────────────── COURSE CATALOG ─────────────────────────── */
+const courses = [
+  {icon:'🤖',color:'rgba(245,158,11,0.15)',name:'Generative AI for Leaders',duration:'1 Day',seats:12},
+  {icon:'📐',color:'rgba(168,85,247,0.12)',name:'SCORM & LMS Authoring',duration:'3 Days',seats:18},
+  {icon:'💼',color:'rgba(59,130,246,0.12)',name:'Strategic Leadership',duration:'3 Days',seats:6},
+  {icon:'📊',color:'rgba(34,197,94,0.1)',name:'Power BI Masterclass',duration:'2 Days',seats:20},
+  {icon:'🎨',color:'rgba(249,115,22,0.12)',name:'Design Thinking Workshop',duration:'2 Days',seats:15},
+];
+document.getElementById('course-catalog').innerHTML = courses.map(c=>`
+  <div class="course-item">
+    <div class="course-icon" style="background:${c.color}">${c.icon}</div>
+    <div>
+      <div class="course-name">${c.name}</div>
+      <div class="course-meta">⏱ ${c.duration} &nbsp;·&nbsp; 📍 DHA Karachi</div>
+    </div>
+    <div class="course-seats"><b>${c.seats}</b>seats left</div>
+  </div>
+`).join('');
+
+</script>
+</body>
+</html>

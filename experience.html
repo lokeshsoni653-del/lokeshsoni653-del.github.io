@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Experience — Lokesh Kumar</title>
+  <meta name="description" content="Lokesh Kumar's work experience — Data & AI Intern at Pakistan Hindu Council, Web Development Intern at Interns Pakistan."/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .exp-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 4rem; align-items: start; }
+    .exp-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); }
+    .exp-sidebar__card {
+      background: var(--clr-surface); border: 1px solid var(--clr-border);
+      border-radius: var(--radius-lg); padding: 1.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .exp-sidebar__icon { font-size: 1.5rem; margin-bottom: 0.75rem; }
+    .exp-sidebar__num { font-family: var(--ff-serif); font-size: 2.25rem; letter-spacing: -0.02em; color: var(--clr-accent); }
+    .exp-sidebar__label { font-size: 0.8rem; color: var(--clr-muted); }
+
+    .exp-card {
+      background: var(--clr-surface); border: 1px solid var(--clr-border);
+      border-radius: var(--radius-xl); padding: 2.25rem; margin-bottom: 2rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .exp-card::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+      background: var(--clr-accent);
+    }
+    .exp-card:hover { border-color: rgba(37,99,235,0.25); box-shadow: var(--shadow-md); }
+    .exp-card__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 0.5rem; }
+    .exp-card__title { font-size: 1.15rem; font-weight: 700; }
+    .exp-card__badge { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .exp-card__company { font-size: 0.95rem; color: var(--clr-accent); font-weight: 600; margin-bottom: 0.25rem; }
+    .exp-card__date { font-size: 0.8rem; color: var(--clr-muted); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem; }
+    .exp-card__date::before { content: '📅'; }
+    .exp-card__desc { font-size: 0.875rem; color: var(--clr-muted); line-height: 1.7; margin-bottom: 1.25rem; }
+    .exp-card__bullets { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.5rem; }
+    .exp-card__bullet { display: flex; align-items: flex-start; gap: 0.65rem; font-size: 0.875rem; }
+    .exp-card__bullet-icon { width: 22px; height: 22px; border-radius: 50%; background: var(--clr-accent-lt); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.65rem; font-weight: 700; color: var(--clr-accent); margin-top: 1px; }
+    .exp-card__bullet-text { color: var(--clr-muted); line-height: 1.6; }
+    .exp-card__skills { margin-top: 1rem; }
+
+    .current-badge { background: #F0FDF4; color: #15803D; border: 1px solid #BBF7D0; font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 100px; display: flex; align-items: center; gap: 0.3rem; }
+    .current-badge::before { content: ''; width: 6px; height: 6px; background: var(--clr-green); border-radius: 50%; animation: pulse 2s infinite; }
+
+    @media(max-width:800px){ .exp-layout{grid-template-columns:1fr;} .exp-sidebar{position:static;} }
+  </style>
+</head>
+<body>
+<nav class="nav" id="main-nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">Lokesh<span>.</span></a>
+    <div class="nav__links">
+      <a href="index.html"          class="nav__link">Home</a>
+      <a href="about.html"          class="nav__link">About</a>
+      <a href="skills.html"         class="nav__link">Skills</a>
+      <a href="projects.html"       class="nav__link">Projects</a>
+      <a href="experience.html"     class="nav__link active">Experience</a>
+      <a href="education.html"      class="nav__link">Education</a>
+      <a href="certifications.html" class="nav__link">Certs</a>
+      <a href="testimonials.html"   class="nav__link">Testimonials</a>
+    </div>
+    <a href="contact.html" class="nav__cta">Hire Me →</a>
+    <button class="nav__hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+  <div class="nav__mobile" id="mobile-menu">
+    <a href="index.html" class="nav__link">Home</a>
+    <a href="about.html" class="nav__link">About</a>
+    <a href="skills.html" class="nav__link">Skills</a>
+    <a href="projects.html" class="nav__link">Projects</a>
+    <a href="experience.html" class="nav__link active">Experience</a>
+    <a href="education.html" class="nav__link">Education</a>
+    <a href="certifications.html" class="nav__link">Certifications</a>
+    <a href="testimonials.html" class="nav__link">Testimonials</a>
+    <a href="contact.html" class="nav__cta btn btn-primary">Hire Me →</a>
+  </div>
+</nav>
+
+<header class="page-header">
+  <p class="label page-header__label">Professional Journey</p>
+  <h1 class="h1 page-header__title">Work Experience</h1>
+  <p class="page-header__sub">Applying data engineering and AI to solve real operational problems for organizations that matter.</p>
+</header>
+
+<section class="section">
+  <div class="container">
+    <div class="exp-layout">
+      <!-- Sidebar -->
+      <div class="exp-sidebar">
+        <div class="exp-sidebar__card reveal">
+          <div class="exp-sidebar__icon">💼</div>
+          <div class="exp-sidebar__num">2</div>
+          <div class="exp-sidebar__label">Internships Completed</div>
+        </div>
+        <div class="exp-sidebar__card reveal delay-1">
+          <div class="exp-sidebar__icon">⏱️</div>
+          <div class="exp-sidebar__num">1+</div>
+          <div class="exp-sidebar__label">Year of Experience</div>
+        </div>
+        <div class="exp-sidebar__card reveal delay-2">
+          <div class="exp-sidebar__icon">🔥</div>
+          <div class="exp-sidebar__num">2</div>
+          <div class="exp-sidebar__label">Domains: Data/AI + Web Dev</div>
+        </div>
+        <div style="margin-top:1.5rem" class="reveal delay-3">
+          <p class="label" style="margin-bottom:0.75rem">Currently</p>
+          <div class="current-badge" style="font-size:0.8rem;padding:0.45rem 0.85rem">
+            Open to new opportunities
+          </div>
+        </div>
+      </div>
+
+      <!-- Main -->
+      <div>
+        <!-- Experience 1 -->
+        <div class="exp-card reveal">
+          <div class="exp-card__header">
+            <div>
+              <div class="exp-card__title">Data, Operations &amp; AI Intern</div>
+              <div class="exp-card__company">Pakistan Hindu Council</div>
+            </div>
+            <span class="tag">Completed</span>
+          </div>
+          <div class="exp-card__date">March 26, 2026 – May 7, 2026 · 6 Weeks · Hybrid</div>
+          <p class="exp-card__desc">Working at the intersection of community data management and artificial intelligence to modernize how the Pakistan Hindu Council handles sensitive operational data at scale across decentralized regions.</p>
+          <div class="exp-card__bullets">
+            <div class="exp-card__bullet">
+              <div class="exp-card__bullet-icon">1</div>
+              <div class="exp-card__bullet-text">Restructured manual data collection pipelines for decentralized operations, ensuring sensitive community data was processed <strong>securely</strong> while significantly reducing reporting latency.</div>
+            </div>
+            <div class="exp-card__bullet">
+              <div class="exp-card__bullet-icon">2</div>
+              <div class="exp-card__bullet-text">Developed custom, <strong>automated Python-based reporting formats</strong> to clean, filter, and anonymize regional operational data with minimal human intervention.</div>
+            </div>
+            <div class="exp-card__bullet">
+              <div class="exp-card__bullet-icon">3</div>
+              <div class="exp-card__bullet-text">Designed privacy-compliant data schemas to protect community member information while enabling organizational insights and decision-making.</div>
+            </div>
+            <div class="exp-card__bullet">
+              <div class="exp-card__bullet-icon">4</div>
+              <div class="exp-card__bullet-text">Exploring AI-driven (NLP/RAG) tools to help non-technical staff retrieve operational information more efficiently.</div>
+            </div>
+          </div>
+          <div class="exp-card__skills">
+            <div class="tags-row">
+              <span class="tag accent">Python</span>
+              <span class="tag accent">Pandas</span>
+              <span class="tag">Data Pipelines</span>
+              <span class="tag">NLP / RAG</span>
+              <span class="tag">Data Anonymization</span>
+              <span class="tag">Streamlit</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Experience 2 -->
+        <div class="exp-card reveal delay-1">
+          <div class="exp-card__header">
+            <div>
+              <div class="exp-card__title">Web Development Intern</div>
+              <div class="exp-card__company">Interns Pakistan</div>
+            </div>
+            <span class="tag">Completed</span>
+          </div>
+          <div class="exp-card__date">December 2024 – January 2025 · 1 Month</div>
+          <p class="exp-card__desc">Contributed to accelerated front-end development projects within a professional sprint-based environment, building accessible and functional digital interfaces under strict deadlines.</p>
+          <div class="exp-card__bullets">
+            <div class="exp-card__bullet">
+              <div class="exp-card__bullet-icon">1</div>
+              <div class="exp-card__bullet-text">Executed rapid front-end structural development tasks using <strong>HTML5, CSS3, and JavaScript</strong> to build accessible digital interfaces.</div>
+            </div>
+            <div class="exp-card__bullet">
+              <div class="exp-card__bullet-icon">2</div>
+              <div class="exp-card__bullet-text">Completed modular project assignments matching strict <strong>functional design criteria</strong> within aggressive sprint deadlines.</div>
+            </div>
+            <div class="exp-card__bullet">
+              <div class="exp-card__bullet-icon">3</div>
+              <div class="exp-card__bullet-text">Gained hands-on experience with WordPress, PHP, and modern front-end workflows in a team setting.</div>
+            </div>
+          </div>
+          <div class="exp-card__skills">
+            <div class="tags-row">
+              <span class="tag">HTML5</span>
+              <span class="tag">CSS3</span>
+              <span class="tag">JavaScript</span>
+              <span class="tag">PHP</span>
+              <span class="tag">WordPress</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Certificate notes -->
+        <div style="display:flex;flex-direction:column;gap:1rem;">
+          <div style="background:var(--clr-accent-lt);border:1px solid #BFDBFE;border-radius:var(--radius-md);padding:1.25rem 1.5rem;display:flex;gap:1rem;align-items:flex-start;" class="reveal">
+            <span style="font-size:1.4rem">🏅</span>
+            <div>
+              <div style="font-weight:600;font-size:0.9rem;margin-bottom:0.25rem">Internship Certificate — Pakistan Hindu Council</div>
+              <div style="font-size:0.8rem;color:var(--clr-muted)">Successfully completed the PHC Internship Program (March 26, 2026 – May 7, 2026) as a Data, Operations &amp; AI Intern. Certified by Dr. Ramesh Kumar Vankwani, Patron-in-Chief. <a href="https://freeimage.host/i/CBVPY8l" target="_blank" rel="noopener" style="color:var(--clr-accent);text-decoration:none;font-weight:600;">View Certificate ↗</a></div>
+            </div>
+          </div>
+
+          <div style="background:var(--clr-accent-lt);border:1px solid #BFDBFE;border-radius:var(--radius-md);padding:1.25rem 1.5rem;display:flex;gap:1rem;align-items:flex-start;" class="reveal">
+            <span style="font-size:1.4rem">🏅</span>
+            <div>
+              <div style="font-weight:600;font-size:0.9rem;margin-bottom:0.25rem">Internship Certificate — Interns Pakistan</div>
+              <div style="font-size:0.8rem;color:var(--clr-muted)">Successfully completed the Interns Program (Dec 16, 2024 – Jan 16, 2025). Certified by Shahzaib Khan, Founder, Interns Pakistan. Certificate ID: IPB5078277/16012025. Verifiable at verify@interns.pk</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__inner">
+      <div class="footer__logo">Lokesh<span>.</span></div>
+      <nav class="footer__links">
+        <a href="index.html" class="footer__link">Home</a>
+        <a href="projects.html" class="footer__link">Projects</a>
+        <a href="contact.html" class="footer__link">Contact</a>
+      </nav>
+      <p class="footer__copy">© 2026 Lokesh Kumar.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav=document.getElementById('main-nav');
+  window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>20));
+  document.getElementById('hamburger').addEventListener('click',()=>document.getElementById('mobile-menu').classList.toggle('open'));
+  const observer=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('visible');observer.unobserve(x.target)}}),{threshold:0.1});
+  document.querySelectorAll('.reveal').forEach(r=>observer.observe(r));
+</script>
+</body>
+</html>

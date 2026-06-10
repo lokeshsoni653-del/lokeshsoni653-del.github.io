@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Lokesh Kumar — Resume</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 10.2pt;
+    color: #1a1915;
+    background: #e5e7eb;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 2rem;
+    min-height: 100vh;
+  }
+
+  .page {
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    padding: 11mm 13mm 11mm 13mm;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  }
+
+  /* ── HEADER ── */
+  .header { text-align: center; margin-bottom: 9px; }
+  .header h1 { font-size: 22pt; font-weight: 700; letter-spacing: -0.5px; color: #111; }
+  .header .role { font-size: 10pt; color: #555; margin: 3px 0 5px; font-weight: 400; }
+  .contact-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px 16px; font-size: 8.8pt; color: #444; }
+  .contact-row a { color: #2563EB; text-decoration: none; }
+  .contact-row span { display: flex; align-items: center; gap: 4px; }
+  .icon { font-size: 8pt; }
+
+  /* ── SECTION ── */
+  .section { margin-bottom: 8px; }
+  .section-title {
+    font-size: 10.5pt; font-weight: 700; color: #2563EB;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    padding-bottom: 2px;
+    border-bottom: 1.5px solid #BFDBFE;
+    margin-bottom: 5px;
+  }
+
+  /* ── SUMMARY ── */
+  .summary { font-size: 9.4pt; line-height: 1.55; color: #333; }
+
+  /* ── SKILLS TABLE ── */
+  .skills-table { width: 100%; border-collapse: collapse; }
+  .skills-table td { padding: 1.5px 4px; font-size: 9pt; vertical-align: top; line-height: 1.5; }
+  .skills-table td:first-child { font-weight: 600; color: #1a1915; white-space: nowrap; padding-right: 10px; width: 34%; }
+  .skills-table td:last-child { color: #444; }
+
+  /* ── EXPERIENCE ── */
+  .job { margin-bottom: 7px; }
+  .job-header { display: flex; justify-content: space-between; align-items: baseline; }
+  .job-company { font-weight: 700; font-size: 9.8pt; }
+  .job-date { font-size: 8.5pt; color: #555; font-style: italic; }
+  .job-role { font-size: 9pt; color: #2563EB; font-weight: 500; margin: 1px 0 3px; }
+  ul { padding-left: 14px; }
+  ul li { font-size: 9pt; color: #333; line-height: 1.5; margin-bottom: 1px; }
+  ul li::marker { color: #2563EB; }
+
+  /* ── PROJECTS ── */
+  .project { margin-bottom: 6px; }
+  .project-title { font-weight: 700; font-size: 9.4pt; color: #1a1915; }
+  .project-title a { color: #2563EB; text-decoration: none; font-weight: 400; font-size: 8.4pt; margin-left: 5px; }
+  .project p { font-size: 9pt; color: #444; line-height: 1.5; margin-top: 2px; padding-left: 14px; }
+
+  /* ── EDUCATION ── */
+  .edu-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .edu-school { font-weight: 700; font-size: 9.5pt; }
+  .edu-date { font-size: 8.5pt; color: #555; font-style: italic; }
+  .edu-degree { font-size: 9pt; color: #444; }
+  .edu-score { font-weight: 600; color: #2563EB; }
+
+  /* ── CERTS ── */
+  .certs-list { padding-left: 14px; }
+  .certs-list li { font-size: 9pt; color: #333; line-height: 1.55; margin-bottom: 1px; }
+  .certs-list li::marker { color: #2563EB; }
+  .certs-list a { color: #2563EB; text-decoration: none; font-size: 8pt; }
+
+  /* ── DIVIDER ── */
+  .divider { border: none; border-top: 1px solid #e5e7eb; margin: 5px 0; }
+
+  /* ── PRINT ── */
+  @media print {
+    body { background: #fff; padding: 0; }
+    .page { box-shadow: none; padding: 10mm 13mm; }
+    @page { size: A4; margin: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>Lokesh Kumar</h1>
+    <div class="role">Software Engineer &mdash; Supply Chain &amp; Data Systems Architect</div>
+    <div class="contact-row">
+      <span>📍 Hyderabad, Sindh, Pakistan</span>
+      <span>📞 <a href="tel:+923033021048">0303-3021048</a></span>
+      <span>✉️ <a href="mailto:lokeshsoni653@gmail.com">lokeshsoni653@gmail.com</a></span>
+      <span>🌐 <a href="https://lokeshsoni653-del.github.io/lokesh-kumar-portfolio-website/lokesh-portfolio/">Portfolio</a></span>
+      <span>💻 <a href="https://github.com/lokeshsoni653-del">github.com/lokeshsoni653-del</a></span>
+      <span>💼 <a href="https://www.linkedin.com/in/lokesh-kumar-76060722a">linkedin.com/in/lokesh-kumar-76060722a</a></span>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="section">
+    <div class="section-title">Professional Summary</div>
+    <p class="summary">
+      Final-year Software Engineering student <strong>(CGPA: 3.00)</strong> with <strong>20+ live deployed Python applications</strong> built for Pakistan's leading enterprises — Engro, Nestlé, Telenor, Hamdard, Colgate, Akhuwat, and more. Specializing in geospatial supply chain routing, retail telematics dashboards, and operational data pipelines. Proven ability to translate complex logistics and inventory data into secure, real-time web applications that reduce dispatch latency and optimize large-scale FMCG distribution networks.
+    </p>
+  </div>
+
+  <!-- SKILLS -->
+  <div class="section">
+    <div class="section-title">Technical Skills</div>
+    <table class="skills-table">
+      <tr>
+        <td>Supply Chain &amp; Retail IT</td>
+        <td>Geospatial Route Optimization, Decentralized Inventory Reporting, Live ETA Tracking, Cold Chain Analytics, Demand Forecasting</td>
+      </tr>
+      <tr>
+        <td>Languages &amp; Data Eng.</td>
+        <td>Python (Pandas, NumPy, NetworkX), SQL, JavaScript (ES6+), HTML5, CSS3</td>
+      </tr>
+      <tr>
+        <td>Frameworks &amp; Arch.</td>
+        <td>Streamlit, Custom WebSocket Engines, Folium/Leaflet (Spatial Mapping), NLP/RAG Pipelines</td>
+      </tr>
+      <tr>
+        <td>Tools &amp; Methods</td>
+        <td>Git/GitHub, Agile/Scrum, CI/CD, Rapid Prototyping, WordPress/Elementor, Advanced MS Excel</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- EXPERIENCE -->
+  <div class="section">
+    <div class="section-title">Professional Experience</div>
+
+    <div class="job">
+      <div class="job-header">
+        <span class="job-company">Pakistan Hindu Council</span>
+        <span class="job-date">March 26, 2026 &ndash; May 7, 2026 &nbsp;|&nbsp; Karachi, Pakistan</span>
+      </div>
+      <div class="job-role">Data, Operations &amp; AI Intern</div>
+      <ul>
+        <li>Architected a secure <strong>NLP/RAG chatbot</strong> in Python enabling staff to query internal operational databases in natural language — eliminating manual document sorting and reducing data retrieval time across decentralized regional hubs.</li>
+        <li>Restructured manual data collection pipelines with automated Python workflows, significantly reducing reporting latency and improving data accuracy delivered to executive management.</li>
+        <li>Developed custom Python scripts to clean, filter, and aggregate multi-source operational data into structured, executive-ready reporting formats.</li>
+      </ul>
+    </div>
+
+    <div class="job">
+      <div class="job-header">
+        <span class="job-company">Interns Pakistan</span>
+        <span class="job-date">December 2024 &ndash; January 2025 &nbsp;|&nbsp; Remote</span>
+      </div>
+      <div class="job-role">Web Development Intern</div>
+      <ul>
+        <li>Built responsive digital interfaces using HTML5, CSS3, and JavaScript as part of the Career Accelerator Internship Program; performance rated above expectations. (Certificate ID: IPB5078277)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PROJECTS -->
+  <div class="section">
+    <div class="section-title">Key Projects &nbsp;<span style="font-weight:400;font-size:8.5pt;color:#555;text-transform:none;letter-spacing:0">(20+ live deployments — full portfolio at link above)</span></div>
+
+    <div class="project">
+      <div class="project-title">
+        PhishShield — AI-Powered Phishing URL Detector
+        <a href="https://gregarious-elf-40417f.netlify.app/">↗ Live App</a>
+      </div>
+      <p>Real-time AI-powered threat intelligence engine analyzing URLs for 18+ lexical and structural signals. Built with a responsive risk-score gauge, bulk scanning tools, and simulated live threat feeds to defend against zero-day phishing.</p>
+    </div>
+
+    <div class="project">
+      <div class="project-title">
+        Nestlé Agri-Logistics &amp; Supply Chain Optimizer
+        <a href="https://nestle-agri-logistics-optimizer-irgdbj84hmrf7m7zq6ktir.streamlit.app/">↗ Live App</a>
+      </div>
+      <p>Geospatial routing engine mapping milk collection from 1,000+ rural farms to processing facilities. Enforces freshness time-windows, vehicle capacity constraints, and spoilage risk scoring — applicable to regional FMCG retail distribution.</p>
+    </div>
+
+    <div class="project">
+      <div class="project-title">
+        FMCG Telemetry Engine — Industrial Hub Digital Twin
+        <a href="https://github.com/lokeshsoni653-del/mondelez-digital-twin-engine">↗ GitHub</a>
+      </div>
+      <p>High-velocity telemetry pipeline using pure Python WebSockets to process real-time operational data simulating FMCG manufacturing lines, monitoring system velocity and capacity thresholds.</p>
+    </div>
+
+    <div class="project">
+      <div class="project-title">
+        S&P Global CI/CD Pipeline Simulator &amp; Visualizer
+        <a href="https://sp-global-cicd-pipeline-jscgp9kscdwknuwctqvo7v.streamlit.app/">↗ Live App</a>
+      </div>
+      <p>Developed an interactive Python-based DevOps dashboard simulating automated Salesforce release stages, static code analysis verification, UAT staging checks, and deployment validation workflows to visually demonstrate enterprise pipeline best practices.</p>
+    </div>
+  </div>
+
+  <!-- EDUCATION -->
+  <div class="section">
+    <div class="section-title">Education</div>
+    <div class="edu-row">
+      <span class="edu-school">Sindh Agriculture University, Tando Jam</span>
+      <span class="edu-date">Expected December 2026</span>
+    </div>
+    <div class="edu-degree">BS in Software Engineering &nbsp;&mdash;&nbsp; <span class="edu-score">CGPA: 3.00</span></div>
+
+    <div style="margin-top:5px">
+      <div class="edu-row">
+        <span class="edu-school">Higher Secondary School Certificate (Pre-Medical)</span>
+        <span class="edu-date">2022</span>
+      </div>
+      <div class="edu-degree">Score: <span class="edu-score">94.18%</span></div>
+    </div>
+  </div>
+
+  <!-- CERTIFICATIONS -->
+  <div class="section">
+    <div class="section-title">Certifications &amp; Achievements</div>
+    <ul class="certs-list">
+      <li><strong>Google</strong> &mdash; Google Agile Essentials Specialization <em>(Coursera, 2026)</em> <a href="https://coursera.org/share/9033557cbead26c661c1e8bff045b7ce">[Verify]</a></li>
+      <li><strong>Pakistan Hindu Council</strong> &mdash; Certificate of Internship in Data, Operations &amp; AI <em>(2026)</em> <a href="https://freeimage.host/i/CBVPY8l">[Verify]</a></li>
+      <li><strong>IBM</strong> &mdash; Introduction to Software Engineering Professional Certificate <em>(Coursera, 2025)</em> <a href="https://coursera.org/verify/E42GWWF22X5S">[Verify]</a></li>
+      <li><strong>DeepLearning.AI</strong> &mdash; AI For Everyone, taught by Andrew Ng <em>(Coursera, 2025)</em> <a href="https://www.coursera.org/account/accomplishments/verify/BTJWB77W6W2Q">[Verify]</a></li>
+      <li><strong>World Bank Group</strong> &mdash; Sustainable MSME Finance <em>(2025)</em></li>
+      <li><strong>Digital Skills Pakistan</strong> &mdash; Kamyaab Freelancer Program (KFP) <em>(2025)</em></li>
+      <li><strong>Great Future Pakistan</strong> &mdash; 🏆 <strong>National Talent Award</strong>, Great Future Talent Olympiad Batch VI <em>(December 2025)</em></li>
+      <li><strong>SAU Tando Jam STEP</strong> &mdash; Certificate of Achievement, Web Development Training Program <em>(2024)</em></li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- Print Button (hidden on print) -->
+<div style="position:fixed;bottom:2rem;right:2rem;display:flex;gap:0.75rem;z-index:99" class="no-print">
+  <button onclick="window.print()"
+    style="background:#2563EB;color:#fff;border:none;padding:0.75rem 1.5rem;border-radius:8px;font-size:0.9rem;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(37,99,235,0.35)">
+    🖨️ Save as PDF
+  </button>
+</div>
+
+<style>
+  @media print { .no-print { display: none !important; } }
+</style>
+</body>
+</html>

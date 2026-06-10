@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Certifications — Lokesh Kumar</title>
+  <meta name="description" content="Lokesh Kumar's certifications — IBM, DeepLearning.AI, World Bank, Great Future Talent Olympiad, and more."/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .cert-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+    .cert-card {
+      background: var(--clr-surface); border: 1px solid var(--clr-border);
+      border-radius: var(--radius-lg); padding: 0; overflow: hidden;
+      transition: all 0.3s var(--ease-out);
+    }
+    .cert-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); border-color: transparent; }
+    .cert-card__banner {
+      padding: 1.75rem 2rem 1.25rem;
+      position: relative; overflow: hidden;
+    }
+    .cert-card__banner::before {
+      content: ''; position: absolute; inset: 0;
+      opacity: 0.08;
+    }
+    .cert-card__issuer-icon { font-size: 2.25rem; margin-bottom: 0.75rem; }
+    .cert-card__name { font-size: 1.05rem; font-weight: 700; line-height: 1.35; }
+    .cert-card__body { padding: 1.25rem 2rem 1.75rem; }
+    .cert-card__issuer { font-size: 0.875rem; font-weight: 600; color: var(--clr-accent); margin-bottom: 0.25rem; }
+    .cert-card__date { font-size: 0.78rem; color: var(--clr-muted); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.35rem; }
+    .cert-card__desc { font-size: 0.825rem; color: var(--clr-muted); line-height: 1.6; margin-bottom: 1rem; }
+
+    .achievement-card {
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      border-radius: var(--radius-xl); padding: 2.5rem; color: #fff;
+      display: grid; grid-template-columns: auto 1fr; gap: 2rem; align-items: center;
+      margin-bottom: 3rem;
+    }
+    .achievement-trophy { font-size: 4rem; }
+    .achievement-title { font-family: var(--ff-serif); font-size: 1.6rem; line-height: 1.2; margin-bottom: 0.5rem; }
+    .achievement-sub { font-size: 0.9rem; opacity: 0.85; margin-bottom: 1rem; }
+    .achievement-meta { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .achievement-tag { background: rgba(255,255,255,0.2); border-radius: 100px; padding: 0.3rem 0.8rem; font-size: 0.78rem; font-weight: 600; }
+
+    .ibm-theme    .cert-card__banner { background: #EFF6FF; }
+    .dl-theme     .cert-card__banner { background: #F0FDF4; }
+    .wb-theme     .cert-card__banner { background: #FFF7ED; }
+    .kfp-theme    .cert-card__banner { background: #FAF5FF; }
+    .interns-theme .cert-card__banner { background: #F0FDF4; }
+    .step-theme    .cert-card__banner { background: #EEF2FF; }
+    .google-theme  .cert-card__banner { background: #F0F9FF; }
+    .phc-theme     .cert-card__banner { background: #FFFBEB; }
+
+    @media(max-width:700px){ .achievement-card{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+<nav class="nav" id="main-nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">Lokesh<span>.</span></a>
+    <div class="nav__links">
+      <a href="index.html"          class="nav__link">Home</a>
+      <a href="about.html"          class="nav__link">About</a>
+      <a href="skills.html"         class="nav__link">Skills</a>
+      <a href="projects.html"       class="nav__link">Projects</a>
+      <a href="experience.html"     class="nav__link">Experience</a>
+      <a href="education.html"      class="nav__link">Education</a>
+      <a href="certifications.html" class="nav__link active">Certs</a>
+      <a href="testimonials.html"   class="nav__link">Testimonials</a>
+    </div>
+    <a href="contact.html" class="nav__cta">Hire Me →</a>
+    <button class="nav__hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+  <div class="nav__mobile" id="mobile-menu">
+    <a href="index.html" class="nav__link">Home</a>
+    <a href="about.html" class="nav__link">About</a>
+    <a href="skills.html" class="nav__link">Skills</a>
+    <a href="projects.html" class="nav__link">Projects</a>
+    <a href="experience.html" class="nav__link">Experience</a>
+    <a href="education.html" class="nav__link">Education</a>
+    <a href="certifications.html" class="nav__link active">Certifications</a>
+    <a href="testimonials.html" class="nav__link">Testimonials</a>
+    <a href="contact.html" class="nav__cta btn btn-primary">Hire Me →</a>
+  </div>
+</nav>
+
+<header class="page-header">
+  <p class="label page-header__label">Credentials &amp; Awards</p>
+  <h1 class="h1 page-header__title">Certifications &amp; Achievements</h1>
+  <p class="page-header__sub">Verified credentials from globally recognized institutions — IBM, DeepLearning.AI, World Bank, and more.</p>
+</header>
+
+<section class="section">
+  <div class="container">
+
+    <!-- National Award -->
+    <div class="achievement-card reveal">
+      <div class="achievement-trophy">🏆</div>
+      <div>
+        <div class="achievement-title">National Talent Award</div>
+        <div class="achievement-sub">Great Future Talent Olympiad — Batch VI (2025)</div>
+        <div class="achievement-meta">
+          <span class="achievement-tag">📅 December 22, 2025</span>
+          <span class="achievement-tag">🎖️ Certificate of Appreciation</span>
+          <span class="achievement-tag">🏅 Best Award</span>
+          <span class="achievement-tag">🇵🇰 Great Future Pakistan</span>
+        </div>
+        <p style="margin-top:1rem;font-size:0.875rem;opacity:0.85">
+          Awarded by Engr. Abdul Qayyum, Controller Examination, Great Future Pakistan — for outstanding efforts in one of Pakistan's national talent competitions.
+        </p>
+        <div style="margin-top:1.25rem">
+          <a href="https://freeimage.host/i/C26q5TQ" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:0.4rem;background:rgba(255,255,255,0.2);border:1.5px solid rgba(255,255,255,0.4);color:#fff;font-size:0.8rem;font-weight:700;padding:0.5rem 1rem;border-radius:6px;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+            View Certificate ↗
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Certifications Grid -->
+    <div class="sec-header reveal">
+      <p class="label sec-header__label">International Certifications</p>
+      <h2 class="sec-header__title">Professional Credentials</h2>
+      <div class="sec-header__line"></div>
+    </div>
+
+    <div class="cert-grid">
+
+      <div class="cert-card google-theme reveal">
+        <div class="cert-card__banner">
+          <div class="cert-card__issuer-icon">🔵</div>
+          <div class="cert-card__name">Google Agile Essentials Specialization</div>
+        </div>
+        <div class="cert-card__body">
+          <div class="cert-card__issuer">Google (via Coursera)</div>
+          <div class="cert-card__date">📅 June 6, 2026 &nbsp;·&nbsp; 3-Course Specialization</div>
+          <p class="cert-card__desc">Authorized by Google and delivered via Coursera. Covers Foundations of Agile Project Management, Implementing Scrum Framework, and Organizing Projects & Measuring Scrum Productivity. Includes hands-on Scrum artifacts, sprint planning, and retrospectives.</p>
+          <div class="tags-row">
+            <span class="tag accent">Google</span>
+            <span class="tag">Agile</span>
+            <span class="tag">Scrum</span>
+            <span class="tag">Project Management</span>
+          </div>
+          <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap">
+            <a href="https://coursera.org/verify/specialization/GZW3MCSAGXNX" target="_blank" rel="noopener" class="btn btn-outline" style="font-size:0.78rem;padding:0.4rem 0.85rem">
+              Verify Certificate ↗
+            </a>
+            <a href="https://coursera.org/share/9033557cbead26c661c1e8bff045b7ce" target="_blank" rel="noopener" class="btn btn-outline" style="font-size:0.78rem;padding:0.4rem 0.85rem">
+              Share Link ↗
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="cert-card phc-theme reveal">
+        <div class="cert-card__banner">
+          <div class="cert-card__issuer-icon">🧡</div>
+          <div class="cert-card__name">Certificate of Internship — Pakistan Hindu Council</div>
+        </div>
+        <div class="cert-card__body">
+          <div class="cert-card__issuer">Pakistan Hindu Council</div>
+          <div class="cert-card__date">📅 March 26, 2026 – May 7, 2026</div>
+          <p class="cert-card__desc">Successfully completed the structured PHC Internship Program as a Data, Operations & AI Intern. Certified by Dr. Ramesh Kumar Vankwani, Patron-in-Chief. Demonstrated outstanding skills, self-motivation, and technical expertise in automating operations and building NLP/RAG tools.</p>
+          <div class="tags-row">
+            <span class="tag accent">Pakistan Hindu Council</span>
+            <span class="tag">Data & AI</span>
+            <span class="tag">Operations Automation</span>
+          </div>
+          <div style="margin-top:1rem">
+            <a href="https://freeimage.host/i/CBVPY8l" target="_blank" rel="noopener" class="btn btn-outline" style="font-size:0.78rem;padding:0.4rem 0.85rem">
+              View Certificate ↗
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="cert-card ibm-theme reveal">
+        <div class="cert-card__banner">
+          <div class="cert-card__issuer-icon">🔵</div>
+          <div class="cert-card__name">Introduction to Software Engineering Professional Certificate</div>
+        </div>
+        <div class="cert-card__body">
+          <div class="cert-card__issuer">IBM (via Coursera)</div>
+          <div class="cert-card__date">📅 February 27, 2025</div>
+          <p class="cert-card__desc">Authorized by IBM and delivered through Coursera. Covers software development lifecycle, agile methodologies, software architecture, and engineering best practices.</p>
+          <div class="tags-row">
+            <span class="tag accent">IBM</span>
+            <span class="tag">Software Engineering</span>
+          </div>
+          <div style="margin-top:1rem">
+            <a href="https://coursera.org/verify/E42GWWF22X5S" target="_blank" rel="noopener" class="btn btn-outline" style="font-size:0.78rem;padding:0.4rem 0.85rem">
+              Verify Certificate ↗
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="cert-card dl-theme reveal delay-1">
+        <div class="cert-card__banner">
+          <div class="cert-card__issuer-icon">🧠</div>
+          <div class="cert-card__name">AI For Everyone</div>
+        </div>
+        <div class="cert-card__body">
+          <div class="cert-card__issuer">DeepLearning.AI (via Coursera)</div>
+          <div class="cert-card__date">📅 2025</div>
+          <p class="cert-card__desc">Taught by Andrew Ng. Demystifies AI concepts for everyone — covering what AI can and cannot do, AI strategy, and how to navigate the AI-powered world.</p>
+          <div class="tags-row">
+            <span class="tag accent">DeepLearning.AI</span>
+            <span class="tag">Artificial Intelligence</span>
+          </div>
+          <div style="margin-top:1rem">
+            <a href="https://www.coursera.org/account/accomplishments/verify/BTJWB77W6W2Q" target="_blank" rel="noopener" class="btn btn-outline" style="font-size:0.78rem;padding:0.4rem 0.85rem">
+              Verify Certificate ↗
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="cert-card wb-theme reveal delay-2">
+        <div class="cert-card__banner">
+          <div class="cert-card__issuer-icon">🌍</div>
+          <div class="cert-card__name">Sustainable MSME Finance</div>
+        </div>
+        <div class="cert-card__body">
+          <div class="cert-card__issuer">World Bank Group</div>
+          <div class="cert-card__date">📅 2025</div>
+          <p class="cert-card__desc">Focused on sustainable financing strategies for Micro, Small and Medium Enterprises (MSMEs) — covering financial inclusion, risk assessment, and sustainable growth frameworks.</p>
+          <div class="tags-row">
+            <span class="tag gold">World Bank</span>
+            <span class="tag">Finance</span>
+          </div>
+          <div style="margin-top:1rem">
+            <a href="https://wbg.sabacloud.com/content/prodencryption/5BT3QsvzHHOwEQGPA-RBYQ/1780041518/0216MDEzNkc3dWFLQkJydVVYZEt5L1hwUlIycmxjalZYM05NMm1rbVRuQ1E1ZFZQQ09XZVRNbk00VmZqS05oOWxzQXl5MGZ1V1gyREZJSVkxRnNwZXY3alBheXZ3SWxlZWlxUXFUQzlBbXpRUUVReklhWWdjVHJYYVhFanJPTUhyTVN2M0c4SmljSFNRPT0wMDE2WHlHajVLNGlwR3JSUHhhYQ==RnJpIE1heSAyOSAwMzo1ODoyMyBFRFQgMjAyNg==/eot/CertificateLearner_ofapr000000004787510.html" target="_blank" rel="noopener" class="btn btn-outline" style="font-size:0.78rem;padding:0.4rem 0.85rem">
+              Verify Certificate ↗
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="cert-card kfp-theme reveal">
+        <div class="cert-card__banner">
+          <div class="cert-card__issuer-icon">💻</div>
+          <div class="cert-card__name">Kamyaab Freelancer Program (KFP)</div>
+        </div>
+        <div class="cert-card__body">
+          <div class="cert-card__issuer">Digital Skills Pakistan</div>
+          <div class="cert-card__date">📅 2025</div>
+          <p class="cert-card__desc">Government of Pakistan initiative covering digital marketing, freelancing platforms, client communication, and building a sustainable freelance career in the digital economy.</p>
+          <div class="tags-row">
+            <span class="tag">Digital Skills</span>
+            <span class="tag">Freelancing</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cert-card interns-theme reveal delay-1">
+        <div class="cert-card__banner">
+          <div class="cert-card__issuer-icon">🏢</div>
+          <div class="cert-card__name">Web Development Internship Certificate</div>
+        </div>
+        <div class="cert-card__body">
+          <div class="cert-card__issuer">Interns Pakistan</div>
+          <div class="cert-card__date">📅 Dec 16, 2024 – Jan 16, 2025</div>
+          <p class="cert-card__desc">Successfully completed the Career Accelerator Internship Program covering HTML/CSS/JS/PHP/WordPress. Certificate ID: IPB5078277/16012025. Performance exceeded expectations.</p>
+          <div class="tags-row">
+            <span class="tag green">Interns Pakistan</span>
+            <span class="tag">Web Development</span>
+          </div>
+          <div style="margin-top:1rem">
+            <a href="https://freeimage.host/i/C26XtQR" target="_blank" rel="noopener" class="btn btn-outline" style="font-size:0.78rem;padding:0.4rem 0.85rem">
+              View Certificate ↗
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- SAU STEP Certificate (new) -->
+      <div class="cert-card step-theme reveal delay-2">
+        <div class="cert-card__banner">
+          <div class="cert-card__issuer-icon">⭐</div>
+          <div class="cert-card__name">Certificate of Achievement — Web Development Training Program</div>
+        </div>
+        <div class="cert-card__body">
+          <div class="cert-card__issuer">SAU Tando Jam — Faculty of Agricultural Social Sciences (STEP)</div>
+          <div class="cert-card__date">📅 August 12 – October 12, 2024</div>
+          <p class="cert-card__desc">Awarded for successfully completing the 2-month Web Development Training Program as part of the Soft Skills Development Program under the <strong>Students–Teachers Engagement Program (STEP)</strong>. Marked <strong>Satisfied ⭐⭐⭐⭐⭐</strong> (5-star rating).</p>
+          <div class="tags-row">
+            <span class="tag accent">SAU Tando Jam</span>
+            <span class="tag">STEP Program</span>
+            <span class="tag">Web Development</span>
+          </div>
+          <div style="margin-top:1rem;font-size:0.78rem;color:var(--clr-muted);border-top:1px solid var(--clr-border);padding-top:0.75rem;display:flex;flex-direction:column;gap:0.2rem">
+            <div>👤 <strong>Signed by:</strong> Muhammad Uzair Bhatti (Office Skills Mentor)</div>
+            <div>🎓 <strong>&amp;</strong> Pro. Dr. Aijaz Ali Khooharo (Dean &amp; Chairman STEP)</div>
+          </div>
+          <div style="margin-top:1rem">
+            <a href="https://freeimage.host/i/C26HRcl" target="_blank" rel="noopener" class="btn btn-outline" style="font-size:0.78rem;padding:0.4rem 0.85rem">
+              View Certificate ↗
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Summary strip -->
+    <div style="display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center;margin-top:3rem" class="reveal">
+      <div style="text-align:center;background:var(--clr-surface);border:1px solid var(--clr-border);border-radius:var(--radius-md);padding:1.25rem 2rem;">
+        <div style="font-family:var(--ff-serif);font-size:2.5rem;color:var(--clr-accent)">9+</div>
+        <div style="font-size:0.8rem;color:var(--clr-muted)">Certifications</div>
+      </div>
+      <div style="text-align:center;background:var(--clr-surface);border:1px solid var(--clr-border);border-radius:var(--radius-md);padding:1.25rem 2rem;">
+        <div style="font-family:var(--ff-serif);font-size:2.5rem;color:var(--clr-gold)">1</div>
+        <div style="font-size:0.8rem;color:var(--clr-muted)">National Award</div>
+      </div>
+      <div style="text-align:center;background:var(--clr-surface);border:1px solid var(--clr-border);border-radius:var(--radius-md);padding:1.25rem 2rem;">
+        <div style="font-family:var(--ff-serif);font-size:2.5rem;color:var(--clr-green)">5+</div>
+        <div style="font-size:0.8rem;color:var(--clr-muted)">Global Institutions</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__inner">
+      <div class="footer__logo">Lokesh<span>.</span></div>
+      <nav class="footer__links">
+        <a href="index.html" class="footer__link">Home</a>
+        <a href="testimonials.html" class="footer__link">Testimonials</a>
+        <a href="contact.html" class="footer__link">Contact</a>
+      </nav>
+      <p class="footer__copy">© 2026 Lokesh Kumar.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav=document.getElementById('main-nav');
+  window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>20));
+  document.getElementById('hamburger').addEventListener('click',()=>document.getElementById('mobile-menu').classList.toggle('open'));
+  const observer=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('visible');observer.unobserve(x.target)}}),{threshold:0.1});
+  document.querySelectorAll('.reveal').forEach(r=>observer.observe(r));
+</script>
+</body>
+</html>

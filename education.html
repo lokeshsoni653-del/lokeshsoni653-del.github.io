@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Education — Lokesh Kumar</title>
+  <meta name="description" content="Lokesh Kumar's education — BS Software Engineering at Sindh Agriculture University, HSSC Pre-Medical with 94.18% score."/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .edu-card {
+      background: var(--clr-surface); border: 1px solid var(--clr-border);
+      border-radius: var(--radius-xl); padding: 2.5rem; margin-bottom: 2rem;
+      display: grid; grid-template-columns: auto 1fr; gap: 2rem; align-items: start;
+      transition: all 0.3s var(--ease-out);
+    }
+    .edu-card:hover { box-shadow: var(--shadow-md); border-color: rgba(37,99,235,0.2); transform: translateY(-3px); }
+    .edu-card__logo {
+      width: 72px; height: 72px; border-radius: var(--radius-md);
+      background: var(--clr-accent-lt); display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; flex-shrink: 0;
+    }
+    .edu-card__degree { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .edu-card__field { font-size: 0.975rem; color: var(--clr-accent); font-weight: 600; margin-bottom: 0.2rem; }
+    .edu-card__institution { font-size: 0.875rem; color: var(--clr-muted); margin-bottom: 0.75rem; }
+    .edu-card__meta { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem; }
+    .edu-card__stat { display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; }
+    .edu-card__stat-icon { color: var(--clr-accent); }
+    .edu-card__courses { margin-top: 1.25rem; }
+    .edu-card__courses-title { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--clr-muted); margin-bottom: 0.75rem; }
+
+    .marks-table { width: 100%; border-collapse: collapse; margin-top: 1.25rem; font-size: 0.85rem; }
+    .marks-table th { text-align: left; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--clr-muted); padding: 0.5rem 0.75rem; border-bottom: 2px solid var(--clr-border); }
+    .marks-table td { padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--clr-border); color: var(--clr-muted); }
+    .marks-table tr:last-child td { border-bottom: none; font-weight: 700; color: var(--clr-text); }
+    .marks-table tbody tr:hover td { background: var(--clr-tag-bg); }
+
+    .grade-badge { display: inline-flex; align-items: center; gap: 0.4rem; background: #FEF9EE; color: #92400E; border: 1px solid #FDE68A; border-radius: 100px; padding: 0.35rem 0.85rem; font-size: 0.8rem; font-weight: 700; }
+    .cgpa-ring {
+      width: 120px; height: 120px; position: relative; margin: 0 auto;
+    }
+    .cgpa-ring svg { transform: rotate(-90deg); }
+    .cgpa-ring__text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .cgpa-val { font-family: var(--ff-serif); font-size: 1.75rem; letter-spacing: -0.02em; }
+    .cgpa-label { font-size: 0.65rem; color: var(--clr-muted); }
+
+    .score-card {
+      background: linear-gradient(135deg, #1e40af, #3b82f6);
+      border-radius: var(--radius-lg); padding: 2rem; color: #fff; text-align: center; margin-top: 2rem;
+    }
+    .score-card__pct { font-family: var(--ff-serif); font-size: 3rem; letter-spacing: -0.03em; }
+    .score-card__label { font-size: 0.85rem; opacity: 0.85; margin-top: 0.25rem; }
+    .score-card__grade { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.2); border-radius: 100px; padding: 0.3rem 0.85rem; font-size: 0.8rem; font-weight: 700; margin-top: 0.75rem; }
+
+    @media(max-width:600px){ .edu-card{ grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+<nav class="nav" id="main-nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">Lokesh<span>.</span></a>
+    <div class="nav__links">
+      <a href="index.html"          class="nav__link">Home</a>
+      <a href="about.html"          class="nav__link">About</a>
+      <a href="skills.html"         class="nav__link">Skills</a>
+      <a href="projects.html"       class="nav__link">Projects</a>
+      <a href="experience.html"     class="nav__link">Experience</a>
+      <a href="education.html"      class="nav__link active">Education</a>
+      <a href="certifications.html" class="nav__link">Certs</a>
+      <a href="testimonials.html"   class="nav__link">Testimonials</a>
+    </div>
+    <a href="contact.html" class="nav__cta">Hire Me →</a>
+    <button class="nav__hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+  <div class="nav__mobile" id="mobile-menu">
+    <a href="index.html" class="nav__link">Home</a>
+    <a href="about.html" class="nav__link">About</a>
+    <a href="skills.html" class="nav__link">Skills</a>
+    <a href="projects.html" class="nav__link">Projects</a>
+    <a href="experience.html" class="nav__link">Experience</a>
+    <a href="education.html" class="nav__link active">Education</a>
+    <a href="certifications.html" class="nav__link">Certifications</a>
+    <a href="testimonials.html" class="nav__link">Testimonials</a>
+    <a href="contact.html" class="nav__cta btn btn-primary">Hire Me →</a>
+  </div>
+</nav>
+
+<header class="page-header">
+  <p class="label page-header__label">Academic Background</p>
+  <h1 class="h1 page-header__title">Education</h1>
+  <p class="page-header__sub">A strong academic foundation in Software Engineering, complemented by outstanding pre-university performance.</p>
+</header>
+
+<section class="section">
+  <div class="container" style="max-width:860px">
+
+    <!-- BS Card -->
+    <div class="edu-card reveal">
+      <div class="edu-card__logo">🎓</div>
+      <div>
+        <span class="tag green" style="margin-bottom:0.75rem">Currently Enrolled</span>
+        <h2 class="edu-card__degree">Bachelor of Science</h2>
+        <div class="edu-card__field">Software Engineering</div>
+        <div class="edu-card__institution">Sindh Agriculture University, Tando Jam</div>
+        <div class="edu-card__meta">
+          <div class="edu-card__stat">
+            <span class="edu-card__stat-icon">📅</span>
+            <span>Expected: December 2026</span>
+          </div>
+          <div class="edu-card__stat">
+            <span class="edu-card__stat-icon">📍</span>
+            <span>Tando Jam, Sindh, Pakistan</span>
+          </div>
+        </div>
+
+        <!-- CGPA Visual -->
+        <div style="display:flex;align-items:center;gap:2rem;flex-wrap:wrap;margin-bottom:1.25rem">
+          <div class="cgpa-ring">
+            <svg width="120" height="120" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="50" fill="none" stroke="var(--clr-border)" stroke-width="10"/>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="var(--clr-accent)" stroke-width="10"
+                stroke-dasharray="314" stroke-dashoffset="78.5" stroke-linecap="round"
+                style="transition:stroke-dashoffset 1.5s cubic-bezier(0.16,1,0.3,1)"/>
+            </svg>
+            <div class="cgpa-ring__text">
+              <div class="cgpa-val">3.0</div>
+              <div class="cgpa-label">CGPA / 4.0</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:0.875rem;color:var(--clr-muted);line-height:1.7">
+              Maintaining a <strong>CGPA of 3.00</strong> (out of 4.0) while simultaneously building real-world projects, completing international certifications, and contributing to community data initiatives.
+            </div>
+            <div class="tags-row" style="margin-top:0.75rem">
+              <span class="tag accent">Year 4 of 4</span>
+              <span class="tag">Final Year</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="edu-card__courses">
+          <div class="edu-card__courses-title">Core Subjects</div>
+          <div class="tags-row">
+            <span class="tag">Data Structures &amp; Algorithms</span>
+            <span class="tag">Software Engineering Principles</span>
+            <span class="tag">Database Systems</span>
+            <span class="tag">Operating Systems</span>
+            <span class="tag">Computer Networks</span>
+            <span class="tag">AI &amp; Machine Learning</span>
+            <span class="tag">Web Engineering</span>
+            <span class="tag">Project Management</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HSSC Card -->
+    <div class="edu-card reveal">
+      <div class="edu-card__logo">🏫</div>
+      <div>
+        <div class="grade-badge" style="margin-bottom:0.75rem">Grade A-1</div>
+        <h2 class="edu-card__degree">Higher Secondary School Certificate</h2>
+        <div class="edu-card__field">Pre-Medical (HSC-II)</div>
+        <div class="edu-card__institution">Govt. (B) Degree College Mithi, Tharparkar | BISE Mirpurkhas</div>
+        <div class="edu-card__meta">
+          <div class="edu-card__stat">
+            <span class="edu-card__stat-icon">📅</span>
+            <span>Annual Examination 2023 (Improved)</span>
+          </div>
+          <div class="edu-card__stat">
+            <span class="edu-card__stat-icon">🎫</span>
+            <span>Seat No. 47163</span>
+          </div>
+        </div>
+
+        <div class="score-card" style="margin-top:1rem">
+          <div class="score-card__pct">94.18%</div>
+          <div class="score-card__label">1036 / 1100 Total Marks</div>
+          <div><span class="score-card__grade">🏆 Grade A-1</span></div>
+        </div>
+
+        <div style="margin-top:1.5rem">
+          <div class="edu-card__courses-title">Marks Breakdown</div>
+          <table class="marks-table">
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Max Marks</th>
+                <th>Obtained</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Urdu / Sindhi (Salees) I &amp; II</td><td>200</td><td>182</td></tr>
+              <tr><td>English I &amp; II</td><td>200</td><td>180</td></tr>
+              <tr><td>Islamiyat / Ethics</td><td>50</td><td>48</td></tr>
+              <tr><td>Pakistan Studies</td><td>50</td><td>46</td></tr>
+              <tr><td>Physics I &amp; II</td><td>200</td><td>193</td></tr>
+              <tr><td>Chemistry I &amp; II</td><td>200</td><td>193</td></tr>
+              <tr><td>Biology I &amp; II</td><td>200</td><td>194</td></tr>
+              <tr><td><strong>TOTAL</strong></td><td><strong>1100</strong></td><td><strong>1036</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__inner">
+      <div class="footer__logo">Lokesh<span>.</span></div>
+      <nav class="footer__links">
+        <a href="index.html" class="footer__link">Home</a>
+        <a href="certifications.html" class="footer__link">Certifications</a>
+        <a href="contact.html" class="footer__link">Contact</a>
+      </nav>
+      <p class="footer__copy">© 2026 Lokesh Kumar.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav=document.getElementById('main-nav');
+  window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>20));
+  document.getElementById('hamburger').addEventListener('click',()=>document.getElementById('mobile-menu').classList.toggle('open'));
+  const observer=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('visible');observer.unobserve(x.target)}}),{threshold:0.1});
+  document.querySelectorAll('.reveal').forEach(r=>observer.observe(r));
+</script>
+</body>
+</html>
