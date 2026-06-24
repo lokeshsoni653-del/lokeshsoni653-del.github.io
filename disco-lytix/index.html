@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DISCOlytix (VoltSave AI) — Power Sector KPI & Energy Audit Dashboard</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --bg-input: #334155;
+      --border-color: #334155;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --primary: #06b6d4; /* Neon Cyan */
+      --primary-hover: #0891b2;
+      --accent: #d97706; /* Amber Gold */
+      --accent-hover: #b45309;
+      --success: #10b981; /* Emerald Green */
+      --danger: #ef4444; /* Rose Red */
+      --glow-cyan: rgba(6, 182, 212, 0.15);
+      --glow-gold: rgba(217, 119, 6, 0.15);
+      --glow-green: rgba(16, 185, 129, 0.15);
+      --glow-red: rgba(239, 68, 68, 0.15);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-main);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-secondary);
+    }
+
+    header {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+      background-opacity: 0.9;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--bg-main);
+      box-shadow: 0 0 20px var(--glow-cyan);
+    }
+
+    .logo-text h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(to right, var(--primary), var(--text-primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logo-text p {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* Tabs */
+    .tab-container {
+      display: flex;
+      background: var(--bg-main);
+      border: 1px solid var(--border-color);
+      border-radius: 30px;
+      padding: 0.25rem;
+      gap: 0.25rem;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      padding: 0.6rem 1.25rem;
+      border-radius: 25px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: var(--bg-main);
+      box-shadow: 0 0 15px var(--glow-cyan);
+    }
+
+    .tab-btn.active.b2b-active {
+      background: var(--accent);
+      box-shadow: 0 0 15px var(--glow-gold);
+    }
+
+    main {
+      flex: 1;
+      padding: 2rem;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Dashboard Layout */
+    .dashboard-panel {
+      display: none;
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    .dashboard-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Header controls */
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .panel-title h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .panel-title p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    .panel-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    select.disco-select {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 0.6rem 1.25rem;
+      border-radius: 8px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    select.disco-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 10px var(--glow-cyan);
+    }
+
+    .btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 0.6rem 1.25rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s;
+    }
+
+    .btn:hover {
+      background: var(--border-color);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--bg-main);
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      box-shadow: 0 0 15px var(--glow-cyan);
+    }
+
+    .btn-accent {
+      background: var(--accent);
+      color: var(--bg-main);
+      border: none;
+    }
+
+    .btn-accent:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 0 15px var(--glow-gold);
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--primary);
+      opacity: 0.7;
+    }
+
+    .kpi-card.accent-border::before {
+      background: var(--accent);
+    }
+
+    .kpi-card.success-border::before {
+      background: var(--success);
+    }
+
+    .kpi-card.danger-border::before {
+      background: var(--danger);
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--text-secondary);
+      box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    .kpi-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .kpi-value {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin: 0.5rem 0;
+      display: flex;
+      align-items: baseline;
+      gap: 0.25rem;
+    }
+
+    .kpi-unit {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .kpi-trend {
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .kpi-trend.up { color: var(--success); }
+    .kpi-trend.down { color: var(--danger); }
+    .kpi-trend.warning { color: var(--accent); }
+
+    /* Main Grid */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 968px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.75rem;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-body {
+      flex: 1;
+      position: relative;
+    }
+
+    /* Tables */
+    .data-table-container {
+      overflow-x: auto;
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    table.data-table th {
+      color: var(--text-secondary);
+      font-weight: 600;
+      padding: 0.75rem 1rem;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    table.data-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    table.data-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Badge styles */
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-success { background: var(--glow-green); color: var(--success); }
+    .badge-warning { background: var(--glow-gold); color: var(--accent); }
+    .badge-danger { background: var(--glow-red); color: var(--danger); }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .input-control {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 0.65rem 1rem;
+      border-radius: 8px;
+      font-weight: 500;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .input-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 10px var(--glow-cyan);
+    }
+
+    .input-control.accent-focus:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 10px var(--glow-gold);
+    }
+
+    /* Mode B: B2B Auditor grid */
+    .audit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .audit-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .audit-card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--accent);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
+    }
+
+    .audit-result {
+      background: var(--bg-main);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: auto;
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-row:last-child {
+      margin-bottom: 0;
+      border-top: 1px solid var(--border-color);
+      padding-top: 0.5rem;
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+
+    .result-val {
+      font-weight: 700;
+    }
+
+    .result-val.highlight {
+      color: var(--success);
+    }
+
+    .result-val.alert {
+      color: var(--danger);
+    }
+
+    /* Slider styling */
+    .slider-container {
+      margin: 1rem 0;
+    }
+
+    .slider-val {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: var(--bg-input);
+      height: 6px;
+      border-radius: 3px;
+      outline: none;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--glow-gold);
+    }
+
+    /* Footer styling */
+    footer {
+      background: #0b0f19;
+      border-top: 1px solid var(--border-color);
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: auto;
+    }
+
+    footer span {
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    /* B2B SaaS Badge details */
+    .b2b-header-badge {
+      background: var(--glow-gold);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 20px;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    /* Animation values */
+    .flash {
+      animation: pulseRed 1.5s infinite alternate;
+    }
+
+    @keyframes pulseRed {
+      from { border-color: var(--border-color); box-shadow: none; }
+      to { border-color: var(--danger); box-shadow: 0 0 15px var(--glow-red); }
+    }
+
+    /* MTO Print Layout Styles */
+    @media print {
+      body {
+        background: white !important;
+        color: black !important;
+      }
+      header, footer, .tab-container, .panel-actions, .input-control, select, button, .btn {
+        display: none !important;
+      }
+      .card, .kpi-card, .audit-card, .audit-result {
+        background: white !important;
+        border: 1px solid #ccc !important;
+        color: black !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+      }
+      main {
+        padding: 0 !important;
+      }
+      .dashboard-panel {
+        display: block !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-container">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-text">
+        <h1>DISCOlytix</h1>
+        <p>VoltSave AI Panel</p>
+      </div>
+    </div>
+
+    <!-- Mode Switcher Tabs -->
+    <div class="tab-container">
+      <button class="tab-btn active" id="tab-mto" onclick="switchTab('mto')">
+        📊 DISCO Performance Monitor
+      </button>
+      <button class="tab-btn" id="tab-b2b" onclick="switchTab('b2b')">
+        💰 VoltSave B2B SaaS Panel
+      </button>
+    </div>
+
+    <div class="header-info">
+      <div class="b2b-header-badge" id="b2b-badge" style="display: none;">
+        ★ Premium B2B Auditor Active
+      </div>
+      <div class="b2b-header-badge" id="mto-badge" style="color: var(--primary); border-color: var(--primary); background: var(--glow-cyan);">
+        ♟️ Grid MTO Workspace
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main>
+
+    <!-- ==================== MODE A: DISCO PERFORMANCE MONITOR ==================== -->
+    <div class="dashboard-panel active" id="panel-mto">
+      
+      <div class="panel-header">
+        <div class="panel-title">
+          <h2>DISCO Performance Monitor</h2>
+          <p>National grid operational efficiency, utility recoveries, and T&D losses auditor portal.</p>
+        </div>
+        <div class="panel-actions">
+          <select class="disco-select" id="disco-selector" onchange="loadDiscoData()">
+            <option value="LESCO">LESCO — Lahore</option>
+            <option value="KE">K-Electric — Karachi</option>
+            <option value="FESCO">FESCO — Faisalabad</option>
+            <option value="IESCO">IESCO — Islamabad</option>
+            <option value="HESCO">HESCO — Hyderabad</option>
+            <option value="PESCO">PESCO — Peshawar</option>
+          </select>
+          <button class="btn btn-primary" onclick="window.print()">
+            🖨️ Export PDF Report
+          </button>
+          <button class="btn" onclick="downloadCSV()">
+            📥 Download CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI scorecards -->
+      <div class="kpi-grid">
+        <div class="kpi-card" id="kpi-losses">
+          <div class="kpi-label">T&D Losses</div>
+          <div class="kpi-value"><span id="val-losses">11.2</span><span class="kpi-unit">%</span></div>
+          <div class="kpi-trend down" id="trend-losses">▼ -0.3% vs Target</div>
+        </div>
+        <div class="kpi-card accent-border" id="kpi-recovery">
+          <div class="kpi-label">Billing Recovery Rate</div>
+          <div class="kpi-value"><span id="val-recovery">98.4</span><span class="kpi-unit">%</span></div>
+          <div class="kpi-trend up" id="trend-recovery">▲ +0.6% MoM</div>
+        </div>
+        <div class="kpi-card success-border" id="kpi-demand">
+          <div class="kpi-label">Peak Demand Served</div>
+          <div class="kpi-value"><span id="val-demand">4,120</span><span class="kpi-unit">MW</span></div>
+          <div class="kpi-trend warning" id="trend-demand">● Stable Margin</div>
+        </div>
+        <div class="kpi-card danger-border" id="kpi-nepra">
+          <div class="kpi-label">NEPRA Compliance Score</div>
+          <div class="kpi-value"><span id="val-nepra">92</span><span class="kpi-unit">%</span></div>
+          <div class="kpi-trend up" id="trend-nepra">▲ A Grade</div>
+        </div>
+      </div>
+
+      <!-- Main Section: Charts and Data Grid -->
+      <div class="main-grid">
+        
+        <!-- Loss vs Recovery Chart -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">📈 T&D Losses vs. Billing Recovery Trends</h3>
+            <span class="badge badge-success">Historical Monthly telemetry</span>
+          </div>
+          <div class="card-body" style="min-height: 350px;">
+            <canvas id="mtoTrendChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Compliance Check List -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">🔍 MTO Compliance Audit Checklist</h3>
+          </div>
+          <div class="card-body">
+            <div class="data-table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Compliance Directive</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="compliance-rows">
+                  <!-- JS populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ==================== MODE B: VOLTSAVE B2B SAAS ENERGY AUDITOR ==================== -->
+    <div class="dashboard-panel" id="panel-b2b">
+      
+      <div class="panel-header">
+        <div class="panel-title">
+          <h2>VoltSave AI B2B Energy Audit Panel</h2>
+          <p>Monetizable B2B audit dashboard for commercial and industrial grid consumers in Pakistan.</p>
+        </div>
+        <div class="panel-actions">
+          <button class="btn btn-accent" onclick="runB2BAudit()">
+            ⚡ Recalculate Audit Details
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Audit Input & Output Cards -->
+      <div class="audit-grid">
+        
+        <!-- 1. Tariff Peak Shifting Optimizer -->
+        <div class="audit-card">
+          <div class="audit-card-title">💵 Tariff Peak Shifting Optimizer</div>
+          
+          <div class="form-group">
+            <label for="b2b-tariff-cat">Industrial/Commercial Category</label>
+            <select class="input-control" id="b2b-tariff-cat" onchange="runB2BAudit()">
+              <option value="B2">B2 — Industrial (Peak: 54.8 PKR, Off-Peak: 38.3 PKR)</option>
+              <option value="B3">B3 — Heavy Industrial (Peak: 53.5 PKR, Off-Peak: 37.1 PKR)</option>
+              <option value="A3">A3 — Commercial (Peak: 56.2 PKR, Off-Peak: 39.5 PKR)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="b2b-monthly-kwh">Total Monthly Consumption (kWh)</label>
+            <input type="number" class="input-control" id="b2b-monthly-kwh" value="45000" step="1000" onchange="runB2BAudit()">
+          </div>
+
+          <div class="form-group">
+            <label for="b2b-peak-percent">Current Peak-Hour Share (%)</label>
+            <input type="number" class="input-control" id="b2b-peak-percent" value="35" min="0" max="100" onchange="runB2BAudit()">
+          </div>
+
+          <div class="slider-container">
+            <label for="b2b-shift-slider">Load Shifting Target to Off-Peak Hour</label>
+            <input type="range" id="b2b-shift-slider" min="0" max="40" value="15" oninput="runB2BAudit()">
+            <div class="slider-val">
+              <span>0% (No shift)</span>
+              <span style="color: var(--accent); font-weight:700;" id="slider-target-val">15% shifted</span>
+              <span>40% (Max shift)</span>
+            </div>
+          </div>
+
+          <div class="audit-result">
+            <div class="result-row">
+              <span>Base Monthly Bill:</span>
+              <span class="result-val" id="b2b-base-bill">PKR 1,980,000</span>
+            </div>
+            <div class="result-row">
+              <span>Optimized Bill:</span>
+              <span class="result-val" id="b2b-opt-bill">PKR 1,868,625</span>
+            </div>
+            <div class="result-row">
+              <span>Monthly Tariff Savings:</span>
+              <span class="result-val highlight" id="b2b-tariff-savings">PKR 111,375</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Power Factor Penalty Warning -->
+        <div class="audit-card" id="b2b-pf-card">
+          <div class="audit-card-title">⚠️ Power Factor (PF) Guard</div>
+          
+          <div class="form-group">
+            <label for="b2b-pf-kw">Active Demand (kW)</label>
+            <input type="number" class="input-control" id="b2b-pf-kw" value="250" onchange="runB2BAudit()">
+          </div>
+
+          <div class="form-group">
+            <label for="b2b-pf-current">Measured Power Factor (0.50 to 1.00)</label>
+            <input type="number" class="input-control" id="b2b-pf-current" value="0.82" step="0.01" min="0.5" max="1.0" onchange="runB2BAudit()">
+          </div>
+
+          <div class="form-group">
+            <label for="b2b-pf-target">Target Power Factor</label>
+            <input type="number" class="input-control" id="b2b-pf-target" value="0.95" disabled>
+          </div>
+
+          <div class="audit-result">
+            <div class="result-row">
+              <span>Measured Power Factor:</span>
+              <span class="result-val alert" id="b2b-pf-status">0.82 (PENALTY ACTIVED)</span>
+            </div>
+            <div class="result-row">
+              <span>Estimated Penalty Rate:</span>
+              <span class="result-val alert" id="b2b-pf-penalty">8.0% of Active Bill</span>
+            </div>
+            <div class="result-row">
+              <span>Recommended Capacitor Bank:</span>
+              <span class="result-val highlight" id="b2b-pf-recom-kvar">138 kVAR Bank</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Net-Metering Estimator -->
+        <div class="audit-card">
+          <div class="audit-card-title">☀️ Net-Metering Verification</div>
+          
+          <div class="form-group">
+            <label for="solar-generation">Solar Generation Exported (kWh)</label>
+            <input type="number" class="input-control" id="solar-generation" value="12000" onchange="runB2BAudit()">
+          </div>
+
+          <div class="form-group">
+            <label for="grid-import">Grid Energy Imported (kWh)</label>
+            <input type="number" class="input-control" id="grid-import" value="18000" onchange="runB2BAudit()">
+          </div>
+
+          <div class="form-group">
+            <label for="feed-in-tariff">National Feed-in Tariff (PKR/kWh)</label>
+            <input type="number" class="input-control" id="feed-in-tariff" value="22.0" step="0.5" onchange="runB2BAudit()">
+          </div>
+
+          <div class="audit-result">
+            <div class="result-row">
+              <span>Grid Import Cost:</span>
+              <span class="result-val" id="b2b-import-cost">PKR 810,000</span>
+            </div>
+            <div class="result-row">
+              <span>Solar Export Credit:</span>
+              <span class="result-val highlight" id="b2b-export-credit">PKR 264,000</span>
+            </div>
+            <div class="result-row">
+              <span>Net Monthly Utility Cost:</span>
+              <span class="result-val" id="b2b-net-cost" style="color: #fbbf24;">PKR 546,000</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SaaS B2B Explanatory Info Card -->
+      <div class="card" style="border-color: var(--accent); background: linear-gradient(135deg, #1e293b 0%, rgba(217, 119, 6, 0.05) 100%);">
+        <div class="card-header" style="border-color: rgba(217, 119, 6, 0.2);">
+          <h3 class="card-title" style="color: var(--accent);">💡 Monetization & Deployment Model</h3>
+        </div>
+        <div class="card-body">
+          <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-secondary);">
+            <strong>DISCOlytix (VoltSave AI)</strong> serves as a robust commercial consulting toolkit. Energy auditors, factory manager operations officers, and solar developers in Pakistan pay a monthly license fee (SaaS) to access this optimization panel. By correcting poor power factors to avoid severe DISCO billing penalties (NEPRA directives) and shifting industrial load from expensive peak hours (55+ PKR/kWh) to off-peak periods (37+ PKR/kWh), commercial facilities can reduce utility expenses by up to <strong>15% to 25% monthly</strong>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>DISCOlytix (VoltSave AI) © 2026. Built for Power Sector Analytics &amp; B2B Energy Auditing in Pakistan. <span>Active Session (Islamabad)</span></p>
+  </footer>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // Mock Data for DISCOs
+    const discoData = {
+      LESCO: {
+        losses: 11.2,
+        lossesTarget: 11.5,
+        lossesTrend: "▼ -0.3% vs Target",
+        lossesStatus: "down",
+        recovery: 98.4,
+        recoveryTrend: "▲ +0.6% MoM",
+        recoveryStatus: "up",
+        demand: 4120,
+        nepra: 92,
+        nepraGrade: "▲ A Grade",
+        chartLosses: [12.4, 12.1, 11.9, 11.6, 11.4, 11.2],
+        chartRecovery: [97.2, 97.5, 97.9, 98.1, 98.2, 98.4],
+        compliance: [
+          { item: "NEPRA Loss Reduction Target Achieved", status: "pass" },
+          { item: "Billing Reconciliation Reporting Completed", status: "pass" },
+          { item: "Substation Feeder Asset Load Audits Done", status: "pass" },
+          { item: "Peak Demand Load Management Verification", status: "warning" },
+          { item: "Under-Frequency Load Shedding Log Review", status: "pass" }
+        ]
+      },
+      KE: {
+        losses: 15.3,
+        lossesTarget: 14.8,
+        lossesTrend: "▲ +0.5% vs Target",
+        lossesStatus: "warning",
+        recovery: 96.1,
+        recoveryTrend: "▼ -0.4% MoM",
+        recoveryStatus: "down",
+        demand: 3250,
+        nepra: 85,
+        nepraGrade: "● B+ Grade",
+        chartLosses: [16.2, 15.9, 15.8, 15.6, 15.4, 15.3],
+        chartRecovery: [96.8, 96.5, 96.3, 96.2, 96.1, 96.1],
+        compliance: [
+          { item: "NEPRA Loss Reduction Target Achieved", status: "danger" },
+          { item: "Billing Reconciliation Reporting Completed", status: "pass" },
+          { item: "Substation Feeder Asset Load Audits Done", status: "pass" },
+          { item: "Peak Demand Load Management Verification", status: "pass" },
+          { item: "Under-Frequency Load Shedding Log Review", status: "pass" }
+        ]
+      },
+      FESCO: {
+        losses: 8.9,
+        lossesTarget: 9.5,
+        lossesTrend: "▼ -0.6% vs Target",
+        lossesStatus: "down",
+        recovery: 99.1,
+        recoveryTrend: "▲ +0.2% MoM",
+        recoveryStatus: "up",
+        demand: 2890,
+        nepra: 96,
+        nepraGrade: "▲ A+ Grade",
+        chartLosses: [9.8, 9.5, 9.3, 9.1, 9.0, 8.9],
+        chartRecovery: [98.5, 98.7, 98.9, 99.0, 99.0, 99.1],
+        compliance: [
+          { item: "NEPRA Loss Reduction Target Achieved", status: "pass" },
+          { item: "Billing Reconciliation Reporting Completed", status: "pass" },
+          { item: "Substation Feeder Asset Load Audits Done", status: "pass" },
+          { item: "Peak Demand Load Management Verification", status: "pass" },
+          { item: "Under-Frequency Load Shedding Log Review", status: "pass" }
+        ]
+      },
+      IESCO: {
+        losses: 7.8,
+        lossesTarget: 8.2,
+        lossesTrend: "▼ -0.4% vs Target",
+        lossesStatus: "down",
+        recovery: 99.3,
+        recoveryTrend: "▲ +0.1% MoM",
+        recoveryStatus: "up",
+        demand: 2150,
+        nepra: 98,
+        nepraGrade: "▲ A+ Grade",
+        chartLosses: [8.5, 8.3, 8.1, 7.9, 7.9, 7.8],
+        chartRecovery: [99.0, 99.1, 99.1, 99.2, 99.3, 99.3],
+        compliance: [
+          { item: "NEPRA Loss Reduction Target Achieved", status: "pass" },
+          { item: "Billing Reconciliation Reporting Completed", status: "pass" },
+          { item: "Substation Feeder Asset Load Audits Done", status: "pass" },
+          { item: "Peak Demand Load Management Verification", status: "pass" },
+          { item: "Under-Frequency Load Shedding Log Review", status: "pass" }
+        ]
+      },
+      HESCO: {
+        losses: 22.4,
+        lossesTarget: 21.0,
+        lossesTrend: "▲ +1.4% vs Target",
+        lossesStatus: "warning",
+        recovery: 89.2,
+        recoveryTrend: "▲ +1.2% MoM",
+        recoveryStatus: "up",
+        demand: 1120,
+        nepra: 71,
+        nepraGrade: "▼ C Grade",
+        chartLosses: [24.5, 23.8, 23.1, 22.9, 22.6, 22.4],
+        chartRecovery: [87.5, 88.0, 88.3, 88.6, 88.9, 89.2],
+        compliance: [
+          { item: "NEPRA Loss Reduction Target Achieved", status: "danger" },
+          { item: "Billing Reconciliation Reporting Completed", status: "danger" },
+          { item: "Substation Feeder Asset Load Audits Done", status: "warning" },
+          { item: "Peak Demand Load Management Verification", status: "pass" },
+          { item: "Under-Frequency Load Shedding Log Review", status: "danger" }
+        ]
+      },
+      PESCO: {
+        losses: 31.2,
+        lossesTarget: 28.5,
+        lossesTrend: "▲ +2.7% vs Target",
+        lossesStatus: "warning",
+        recovery: 84.5,
+        recoveryTrend: "▼ -0.3% MoM",
+        recoveryStatus: "down",
+        demand: 1890,
+        nepra: 63,
+        nepraGrade: "▼ D Grade",
+        chartLosses: [33.5, 32.8, 32.1, 31.9, 31.4, 31.2],
+        chartRecovery: [85.1, 84.9, 84.8, 84.7, 84.6, 84.5],
+        compliance: [
+          { item: "NEPRA Loss Reduction Target Achieved", status: "danger" },
+          { item: "Billing Reconciliation Reporting Completed", status: "danger" },
+          { item: "Substation Feeder Asset Load Audits Done", status: "danger" },
+          { item: "Peak Demand Load Management Verification", status: "warning" },
+          { item: "Under-Frequency Load Shedding Log Review", status: "danger" }
+        ]
+      }
+    };
+
+    let chartInstance = null;
+
+    // Tab Switching
+    function switchTab(mode) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'b2b-active'));
+      document.querySelectorAll('.dashboard-panel').forEach(panel => panel.classList.remove('active'));
+      
+      const tabMto = document.getElementById('tab-mto');
+      const tabB2b = document.getElementById('tab-b2b');
+      const badgeMto = document.getElementById('mto-badge');
+      const badgeB2b = document.getElementById('b2b-badge');
+
+      if (mode === 'mto') {
+        tabMto.classList.add('active');
+        document.getElementById('panel-mto').classList.add('active');
+        badgeMto.style.display = 'inline-flex';
+        badgeB2b.style.display = 'none';
+        // Render chart
+        setTimeout(renderChart, 50);
+      } else {
+        tabB2b.classList.add('active', 'b2b-active');
+        document.getElementById('panel-b2b').classList.add('active');
+        badgeMto.style.display = 'none';
+        badgeB2b.style.display = 'inline-flex';
+        runB2BAudit();
+      }
+    }
+
+    // Load MTO Data
+    function loadDiscoData() {
+      const selected = document.getElementById('disco-selector').value;
+      const data = discoData[selected];
+
+      // Update KPI
+      document.getElementById('val-losses').innerText = data.losses;
+      document.getElementById('val-recovery').innerText = data.recovery;
+      document.getElementById('val-demand').innerText = data.demand.toLocaleString();
+      document.getElementById('val-nepra').innerText = data.nepra;
+
+      // Update Trend
+      const trendLosses = document.getElementById('trend-losses');
+      trendLosses.innerText = data.lossesTrend;
+      trendLosses.className = 'kpi-trend ' + data.lossesStatus;
+
+      const trendRecovery = document.getElementById('trend-recovery');
+      trendRecovery.innerText = data.recoveryTrend;
+      trendRecovery.className = 'kpi-trend ' + data.recoveryStatus;
+
+      const trendNepra = document.getElementById('trend-nepra');
+      trendNepra.innerText = data.nepraGrade;
+      trendNepra.className = 'kpi-trend ' + (data.nepra >= 90 ? 'up' : data.nepra >= 80 ? 'warning' : 'down');
+
+      // Update compliance checklist
+      const compRows = document.getElementById('compliance-rows');
+      compRows.innerHTML = '';
+      data.compliance.forEach(item => {
+        const badgeClass = item.status === 'pass' ? 'badge-success' : item.status === 'warning' ? 'badge-warning' : 'badge-danger';
+        const statusText = item.status === 'pass' ? 'Verified Pass' : item.status === 'warning' ? 'Audit Pending' : 'Non-Compliant';
+        compRows.innerHTML += `
+          <tr>
+            <td>${item.item}</td>
+            <td><span class="badge ${badgeClass}">${statusText}</span></td>
+          </tr>
+        `;
+      });
+
+      // Update Chart
+      renderChart();
+    }
+
+    // Render Chart.js
+    function renderChart() {
+      const selected = document.getElementById('disco-selector').value;
+      const data = discoData[selected];
+      const ctx = document.getElementById('mtoTrendChart').getContext('2d');
+
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          datasets: [
+            {
+              label: 'T&D Losses (%)',
+              data: data.chartLosses,
+              backgroundColor: 'rgba(6, 182, 212, 0.4)',
+              borderColor: 'rgba(6, 182, 212, 1)',
+              borderWidth: 2,
+              yAxisID: 'yLosses',
+              type: 'bar'
+            },
+            {
+              label: 'Billing Recovery Rate (%)',
+              data: data.chartRecovery,
+              borderColor: 'rgba(217, 119, 6, 1)',
+              backgroundColor: 'rgba(217, 119, 6, 0.1)',
+              borderWidth: 3,
+              fill: true,
+              yAxisID: 'yRecovery',
+              type: 'line',
+              tension: 0.3
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: { color: '#94a3b8', font: { weight: 'bold' } }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#94a3b8' }
+            },
+            yLosses: {
+              position: 'left',
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#06b6d4' },
+              title: { display: true, text: 'T&D Losses (%)', color: '#06b6d4', font: { weight: 'bold' } }
+            },
+            yRecovery: {
+              position: 'right',
+              grid: { drawOnChartArea: false },
+              ticks: { color: '#d97706' },
+              title: { display: true, text: 'Billing Recovery Rate (%)', color: '#d97706', font: { weight: 'bold' } }
+            }
+          }
+        }
+      });
+    }
+
+    // Mock CSV Downloader
+    function downloadCSV() {
+      const selected = document.getElementById('disco-selector').value;
+      const data = discoData[selected];
+
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Month,T&D Losses (%),Billing Recovery Rate (%)\r\n";
+      
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+      months.forEach((m, idx) => {
+        csvContent += `${m},${data.chartLosses[idx]},${data.chartRecovery[idx]}\r\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `${selected}_grid_audit_telemetry.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // ==================== MODE B: VOLTSAVE B2B ALGORITHMS ====================
+    function runB2BAudit() {
+      // 1. Peak Shifting Optimizer
+      const category = document.getElementById('b2b-tariff-cat').value;
+      const totalKwh = parseFloat(document.getElementById('b2b-monthly-kwh').value) || 0;
+      const currentPeakPercent = parseFloat(document.getElementById('b2b-peak-percent').value) || 0;
+      const shiftTarget = parseFloat(document.getElementById('b2b-shift-slider').value) || 0;
+
+      // Set slider text
+      document.getElementById('slider-target-val').innerText = `${shiftTarget}% shifted`;
+
+      // Tariff Rates (Peak, Off-Peak)
+      let peakRate = 54.8;
+      let offPeakRate = 38.3;
+      if (category === 'B3') {
+        peakRate = 53.5;
+        offPeakRate = 37.1;
+      } else if (category === 'A3') {
+        peakRate = 56.2;
+        offPeakRate = 39.5;
+      }
+
+      // Calculations
+      const currentPeakKwh = totalKwh * (currentPeakPercent / 100);
+      const currentOffPeakKwh = totalKwh * (1 - (currentPeakPercent / 100));
+      const baseBill = (currentPeakKwh * peakRate) + (currentOffPeakKwh * offPeakRate);
+
+      // Load Shifting
+      const newPeakPercent = Math.max(0, currentPeakPercent - shiftTarget);
+      const newPeakKwh = totalKwh * (newPeakPercent / 100);
+      const newOffPeakKwh = totalKwh * (1 - (newPeakPercent / 100));
+      const optimizedBill = (newPeakKwh * peakRate) + (newOffPeakKwh * offPeakRate);
+      const monthlySavings = baseBill - optimizedBill;
+
+      // Update UI elements
+      document.getElementById('b2b-base-bill').innerText = `PKR ${Math.round(baseBill).toLocaleString()}`;
+      document.getElementById('b2b-opt-bill').innerText = `PKR ${Math.round(optimizedBill).toLocaleString()}`;
+      document.getElementById('b2b-tariff-savings').innerText = `PKR ${Math.round(monthlySavings).toLocaleString()}`;
+
+      // 2. Power Factor calculations
+      const kw = parseFloat(document.getElementById('b2b-pf-kw').value) || 0;
+      const currentPf = parseFloat(document.getElementById('b2b-pf-current').value) || 0;
+      const targetPf = 0.95;
+
+      const pfCard = document.getElementById('b2b-pf-card');
+      const pfStatus = document.getElementById('b2b-pf-status');
+      const pfPenalty = document.getElementById('b2b-pf-penalty');
+      const pfRecomKvar = document.getElementById('b2b-pf-recom-kvar');
+
+      if (currentPf < 0.90) {
+        pfCard.classList.add('flash');
+        pfStatus.className = 'result-val alert';
+        pfStatus.innerText = `${currentPf.toFixed(2)} (PENALTY ACTIVE)`;
+        // Under Pakistani rules, penalty is typically 2% of active bill for every 0.01 deviation below 0.90
+        const deviationPoints = Math.round((0.90 - currentPf) * 100);
+        const penaltyRatePercent = deviationPoints * 2;
+        pfPenalty.innerText = `${penaltyRatePercent.toFixed(1)}% of Active Bill`;
+        
+        // Calculate recommended Capacitor Bank size:
+        // kVAR = kW * (tan(acos(current_pf)) - tan(acos(target_pf)))
+        const angleCurrent = Math.acos(currentPf);
+        const angleTarget = Math.acos(targetPf);
+        const kvarRequired = kw * (Math.tan(angleCurrent) - Math.tan(angleTarget));
+        pfRecomKvar.innerText = `${Math.round(kvarRequired)} kVAR Bank`;
+      } else {
+        pfCard.classList.remove('flash');
+        pfStatus.className = 'result-val highlight';
+        pfStatus.innerText = `${currentPf.toFixed(2)} (COMPLIANT)`;
+        pfPenalty.className = 'result-val highlight';
+        pfPenalty.innerText = `0.0% (No Penalty)`;
+        pfRecomKvar.innerText = `None Required`;
+      }
+
+      // 3. Net-Metering Verification
+      const solarExport = parseFloat(document.getElementById('solar-generation').value) || 0;
+      const gridImport = parseFloat(document.getElementById('grid-import').value) || 0;
+      const exportRate = parseFloat(document.getElementById('feed-in-tariff').value) || 0;
+      // Import rate matches selected tariff category off-peak rate for simplicity
+      const importRate = offPeakRate + 7.0; // Adding utility transmission surcharge
+
+      const importCost = gridImport * importRate;
+      const exportCredit = solarExport * exportRate;
+      const netUtilityCost = importCost - exportCredit;
+
+      document.getElementById('b2b-import-cost').innerText = `PKR ${Math.round(importCost).toLocaleString()}`;
+      document.getElementById('b2b-export-credit').innerText = `PKR ${Math.round(exportCredit).toLocaleString()}`;
+      document.getElementById('b2b-net-cost').innerText = `PKR ${Math.round(netUtilityCost).toLocaleString()}`;
+    }
+
+    // Startup Init
+    window.onload = function() {
+      loadDiscoData();
+    };
+  </script>
+</body>
+</html>
