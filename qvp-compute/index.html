@@ -1,0 +1,1851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuantumLink OS (QVP-Compute) — Quantum &amp; HPC Portal</title>
+  <!-- Google Fonts: Orbitron & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-dark: #0b0f19;
+      --bg-card: #151c2e;
+      --bg-input: #1e2942;
+      --border-color: #2a3a5c;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent-purple: #8b5cf6;
+      --accent-purple-glow: rgba(139, 92, 246, 0.25);
+      --accent-cyan: #06b6d4;
+      --accent-cyan-glow: rgba(6, 182, 212, 0.25);
+      --accent-green: #22c55e;
+      --accent-green-glow: rgba(34, 197, 94, 0.25);
+      --accent-red: #ef4444;
+      --accent-red-glow: rgba(239, 68, 68, 0.25);
+      --accent-gold: #f59e0b;
+      --accent-gold-glow: rgba(245, 158, 11, 0.25);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-dark);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-purple);
+    }
+
+    /* Sidebar Layout */
+    .sidebar {
+      width: 280px;
+      background: #0f1626;
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 10;
+    }
+
+    .sidebar-header {
+      padding: 2rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .sidebar-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 1.35rem;
+      letter-spacing: 0.1em;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sidebar-logo span {
+      color: var(--accent-purple);
+      text-shadow: 0 0 10px var(--accent-purple-glow);
+    }
+
+    .sidebar-logo-sub {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    .user-profile {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(139, 92, 246, 0.03);
+    }
+
+    .user-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+      box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+    }
+
+    .user-info {
+      flex: 1;
+    }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .user-role {
+      font-size: 0.72rem;
+      color: var(--accent-purple);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .sidebar-menu {
+      padding: 1.5rem 1rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .menu-header {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+      padding-left: 0.5rem;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .menu-item:hover, .menu-item.active {
+      color: var(--text-primary);
+      background: rgba(139, 92, 246, 0.1);
+      border-left: 3px solid var(--accent-purple);
+    }
+
+    .menu-item svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+    }
+
+    .mode-switch-container {
+      padding: 1.5rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .mode-switch-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+    }
+
+    .mode-switch-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .mode-switch-btn:hover {
+      border-color: var(--accent-purple);
+    }
+
+    .mode-switch-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .mode-toggle-indicator {
+      width: 36px;
+      height: 20px;
+      background: #475569;
+      border-radius: 10px;
+      position: relative;
+      transition: background 0.3s;
+    }
+
+    .mode-toggle-indicator::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: white;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.3s;
+    }
+
+    .mode-switch-btn.active .mode-toggle-indicator {
+      background: var(--accent-purple);
+    }
+
+    .mode-switch-btn.active .mode-toggle-indicator::after {
+      transform: translateX(16px);
+    }
+
+    /* Main Dashboard Layout */
+    .dashboard-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background-image: radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.015) 0%, transparent 60%);
+    }
+
+    .top-bar {
+      height: 70px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      background: #0f1626;
+    }
+
+    .top-bar-title {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: 0.05em;
+    }
+
+    .top-bar-stats {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .top-stat {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .top-stat-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 8px var(--accent-green-glow);
+    }
+
+    .top-stat-dot.pulse {
+      animation: pulse-green 2s infinite;
+    }
+
+    @keyframes pulse-green {
+      0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+
+    /* Content Area */
+    .dashboard-content {
+      padding: 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .dashboard-panel {
+      display: none;
+    }
+
+    .dashboard-panel.active {
+      display: block;
+    }
+
+    /* Grid System */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .col-12 { grid-column: span 12; }
+    .col-8 { grid-column: span 8; }
+    .col-4 { grid-column: span 4; }
+    .col-6 { grid-column: span 6; }
+
+    @media (max-width: 1024px) {
+      .col-8, .col-4, .col-6 { grid-column: span 12; }
+    }
+
+    /* Cards */
+    .panel-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      transition: border-color 0.3s;
+    }
+
+    .panel-card:hover {
+      border-color: rgba(139, 92, 246, 0.4);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 0.75rem;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-family: 'Orbitron', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-badge {
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .badge-purple {
+      background: rgba(139, 92, 246, 0.15);
+      color: #c084fc;
+      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+
+    .badge-cyan {
+      background: rgba(6, 182, 212, 0.15);
+      color: #22d3ee;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+
+    .badge-green {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    /* Quantum Circuit Simulator Controls */
+    .quantum-simulator-area {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .circuit-grid {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      position: relative;
+    }
+
+    .qubit-line-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      position: relative;
+    }
+
+    .qubit-label {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      width: 40px;
+    }
+
+    .qubit-line {
+      flex: 1;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.2);
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 0 1rem;
+    }
+
+    .qubit-line::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 100%;
+      background: inherit;
+    }
+
+    .quantum-gate {
+      width: 38px;
+      height: 38px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      z-index: 2;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      user-select: none;
+    }
+
+    .gate-h {
+      background: var(--accent-purple);
+      color: white;
+      border: 1px solid #a78bfa;
+    }
+
+    .gate-x {
+      background: var(--accent-cyan);
+      color: white;
+      border: 1px solid #67e8f9;
+    }
+
+    .gate-cnot {
+      background: var(--accent-gold);
+      color: white;
+      border: 1px solid #fcd34d;
+    }
+
+    .gate-phase {
+      background: #ec4899;
+      color: white;
+      border: 1px solid #fbcfe8;
+    }
+
+    .gate-measure {
+      background: var(--accent-green);
+      color: white;
+      border: 1px solid #86efac;
+    }
+
+    .gate-empty {
+      width: 38px;
+      height: 38px;
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      color: rgba(255, 255, 255, 0.2);
+      transition: all 0.3s;
+    }
+
+    .gate-empty:hover {
+      border-color: var(--accent-purple);
+      color: var(--accent-purple);
+      background: rgba(139, 92, 246, 0.05);
+    }
+
+    .simulator-toolbox {
+      display: flex;
+      gap: 0.75rem;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .toolbox-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      align-self: center;
+      margin-right: 0.5rem;
+    }
+
+    .toolbox-gate {
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 1px solid transparent;
+    }
+
+    .toolbox-gate:hover {
+      transform: translateY(-2px);
+    }
+
+    .simulator-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 0.65rem 1.5rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-purple), #7c3aed);
+      color: white;
+      box-shadow: 0 4px 15px var(--accent-purple-glow);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--bg-input);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: #2e3e60;
+    }
+
+    .visualizer-output {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .visualizer-output { grid-template-columns: 1fr; }
+    }
+
+    .bloch-sphere-visualizer {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 260px;
+      position: relative;
+    }
+
+    .sphere-container {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      border: 2px dashed rgba(6, 182, 212, 0.4);
+      position: relative;
+      transform-style: preserve-3d;
+      animation: rotate-sphere 15s linear infinite;
+    }
+
+    @keyframes rotate-sphere {
+      0% { transform: rotateY(0deg) rotateX(15deg); }
+      100% { transform: rotateY(360deg) rotateX(15deg); }
+    }
+
+    .sphere-axes {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+    }
+
+    .axis-z {
+      width: 2px;
+      height: 100%;
+      left: 50%;
+      top: 0;
+    }
+
+    .axis-x {
+      height: 2px;
+      width: 100%;
+      top: 50%;
+      left: 0;
+    }
+
+    .state-vector {
+      position: absolute;
+      width: 3px;
+      height: 70px;
+      background: var(--accent-cyan);
+      box-shadow: 0 0 10px var(--accent-cyan);
+      bottom: 50%;
+      left: 50%;
+      transform-origin: bottom center;
+      transform: rotate(0deg);
+      transition: transform 0.5s ease-out;
+    }
+
+    .state-label {
+      position: absolute;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    .label-zero { top: -20px; left: 50%; transform: translateX(-50%); color: var(--accent-cyan); }
+    .label-one { bottom: -20px; left: 50%; transform: translateX(-50%); }
+
+    /* HPC Monitoring */
+    .hpc-stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .hpc-stat-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .hpc-stat-val {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      color: var(--accent-purple);
+    }
+
+    .hpc-stat-lbl {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .hpc-nodes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-height: 250px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+
+    .hpc-node-row {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+    }
+
+    .node-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .node-name {
+      font-weight: 600;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .node-spec {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+    }
+
+    .node-util {
+      text-align: right;
+    }
+
+    .util-pct {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      color: var(--accent-green);
+    }
+
+    .progress-bar-container {
+      width: 100px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      margin-top: 0.25rem;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: var(--accent-green);
+      width: 65%;
+      transition: width 0.5s;
+    }
+
+    /* PQC Benchmark Table */
+    .pqc-benchmark-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+    }
+
+    .pqc-benchmark-table th {
+      text-align: left;
+      padding: 0.65rem;
+      background: rgba(255, 255, 255, 0.03);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.72rem;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-secondary);
+    }
+
+    .pqc-benchmark-table td {
+      padding: 0.75rem 0.65rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .defense-score {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+    }
+
+    .pqc-secure { color: var(--accent-green); }
+    .pqc-vulnerable { color: var(--accent-red); }
+
+    /* Workload Submission Form */
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .form-control {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.6rem 0.75rem;
+      color: white;
+      font-size: 0.82rem;
+      transition: border-color 0.3s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--accent-purple);
+    }
+
+    /* GPU SaaS Hosting */
+    .hosting-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .hosting-metric-row {
+      background: var(--bg-input);
+      border-radius: 8px;
+      padding: 1rem;
+      border: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .metric-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .metric-label {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    .metric-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .fan-control-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-top: 1rem;
+    }
+
+    .fan-slider-row {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .fan-slider {
+      flex: 1;
+      height: 6px;
+      background: #475569;
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .fan-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent-purple);
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+    }
+
+    .fan-pct {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      width: 50px;
+      text-align: right;
+    }
+
+    /* Billing calculator slider block */
+    .calculator-block {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+
+    .calc-slider-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .calc-slider-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.4rem;
+    }
+
+    .calc-slider {
+      width: 100%;
+      height: 6px;
+      background: #475569;
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .calc-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+    }
+
+    .estimated-bill-box {
+      text-align: center;
+      background: rgba(6, 182, 212, 0.05);
+      border: 1px solid rgba(6, 182, 212, 0.2);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+
+    .bill-val {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--accent-cyan);
+      text-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+    }
+
+    /* Telemetry logs */
+    .telemetry-log-area {
+      background: #090d16;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: monospace;
+      font-size: 0.72rem;
+      color: var(--accent-green);
+      height: 150px;
+      overflow-y: auto;
+      margin-top: 0.5rem;
+    }
+
+    .log-line {
+      margin-bottom: 0.35rem;
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .log-time {
+      color: var(--text-secondary);
+    }
+
+    .log-tag {
+      font-weight: bold;
+      color: var(--accent-purple);
+    }
+
+    .log-tag.sec { color: var(--accent-cyan); }
+    .log-tag.err { color: var(--accent-red); }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <span>QVP</span>-Link
+      </div>
+      <div class="sidebar-logo-sub">Compute OS v1.0</div>
+    </div>
+
+    <!-- Candidate badge -->
+    <div class="user-profile">
+      <div class="user-avatar">LK</div>
+      <div class="user-info">
+        <div class="user-name">Lokesh Kumar</div>
+        <div class="user-role">Developer Fellow</div>
+      </div>
+    </div>
+
+    <!-- Menu -->
+    <nav class="sidebar-menu">
+      <div class="menu-header">Modules</div>
+      <div class="menu-item active" id="menu-qvp" onclick="switchPanel('qvp')">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+        </svg>
+        Quantum Research
+      </div>
+      <div class="menu-item" id="menu-gpu" onclick="switchPanel('gpu')">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
+        </svg>
+        VoltCompute SaaS
+      </div>
+    </nav>
+
+    <!-- Mode Switch -->
+    <div class="mode-switch-container">
+      <div class="mode-switch-title">Operational Mode</div>
+      <button class="mode-switch-btn" id="mode-selector" onclick="toggleOperationalMode()">
+        <span class="mode-switch-label" id="mode-text">MoD QVP Panel</span>
+        <div class="mode-toggle-indicator"></div>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="dashboard-main">
+    <header class="top-bar">
+      <div class="top-bar-title" id="dashboard-header-title">Quantum Valley Pakistan (Phase-I)</div>
+      <div class="top-bar-stats">
+        <div class="top-stat">
+          <span class="top-stat-dot pulse"></span>
+          Grid Status: <span style="color: white; font-weight: 600;">ACTIVE</span>
+        </div>
+        <div class="top-stat">
+          Ping: <span style="color: var(--accent-cyan); font-weight: 600;">14ms</span>
+        </div>
+        <div class="top-stat">
+          Nodes Online: <span style="color: var(--accent-purple); font-weight: 600;">128/128</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="dashboard-content">
+
+      <!-- ==================== MODE A: QUANTUM RESEARCH PANEL ==================== -->
+      <div class="dashboard-panel active" id="panel-qvp">
+        <div class="dashboard-grid">
+          
+          <!-- Quantum Circuit Simulator -->
+          <div class="panel-card col-8">
+            <div class="card-header">
+              <div class="card-title">
+                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color: var(--accent-purple);">
+                  <path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                </svg>
+                Quantum Circuit Editor
+              </div>
+              <span class="card-badge badge-purple">Research Sandbox</span>
+            </div>
+            
+            <div class="quantum-simulator-area">
+              <div class="simulator-toolbox">
+                <div class="toolbox-label">Available Gates:</div>
+                <div class="toolbox-gate gate-h" onclick="addGate('H')">Hadamard (H)</div>
+                <div class="toolbox-gate gate-x" onclick="addGate('X')">Pauli-X (X)</div>
+                <div class="toolbox-gate gate-cnot" onclick="addGate('CNOT')">CNOT Target</div>
+                <div class="toolbox-gate gate-phase" onclick="addGate('P')">Phase (S)</div>
+                <div class="toolbox-gate gate-measure" onclick="addGate('M')">Measure (Z)</div>
+              </div>
+
+              <div class="circuit-grid">
+                <!-- Qubit 0 -->
+                <div class="qubit-line-container">
+                  <div class="qubit-label">Q0 |0⟩</div>
+                  <div class="qubit-line" id="qubit-line-0">
+                    <div class="gate-empty" id="g-0-0" onclick="triggerGatePlacement(0, 0)">+</div>
+                    <div class="gate-empty" id="g-0-1" onclick="triggerGatePlacement(0, 1)">+</div>
+                    <div class="gate-empty" id="g-0-2" onclick="triggerGatePlacement(0, 2)">+</div>
+                    <div class="gate-empty" id="g-0-3" onclick="triggerGatePlacement(0, 3)">+</div>
+                  </div>
+                </div>
+                <!-- Qubit 1 -->
+                <div class="qubit-line-container">
+                  <div class="qubit-label">Q1 |0⟩</div>
+                  <div class="qubit-line" id="qubit-line-1">
+                    <div class="gate-empty" id="g-1-0" onclick="triggerGatePlacement(1, 0)">+</div>
+                    <div class="gate-empty" id="g-1-1" onclick="triggerGatePlacement(1, 1)">+</div>
+                    <div class="gate-empty" id="g-1-2" onclick="triggerGatePlacement(1, 2)">+</div>
+                    <div class="gate-empty" id="g-1-3" onclick="triggerGatePlacement(1, 3)">+</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="simulator-actions">
+                <button class="btn btn-primary" onclick="simulateQuantumCircuit()">
+                  <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                  </svg>
+                  Simulate Circuit Grid
+                </button>
+                <button class="btn btn-secondary" onclick="clearQuantumCircuit()">Clear Timeline</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bloch Sphere Visualizer -->
+          <div class="panel-card col-4">
+            <div class="card-header">
+              <div class="card-title">Q0 Bloch Sphere</div>
+              <span class="card-badge badge-cyan">Vector Projection</span>
+            </div>
+            <div class="bloch-sphere-visualizer">
+              <div class="sphere-container">
+                <div class="sphere-axes">
+                  <div class="axis-z"></div>
+                  <div class="axis-x"></div>
+                </div>
+                <div class="state-vector" id="bloch-vector"></div>
+                <div class="state-label label-zero">|0⟩ (Z+)</div>
+                <div class="state-label label-one">|1⟩ (Z-)</div>
+              </div>
+              <div style="margin-top: 1.5rem; text-align: center;">
+                <div style="font-size: 0.72rem; color: var(--text-secondary);">Calculated Qubit State:</div>
+                <div id="qubit-state-string" style="font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: bold; color: var(--accent-cyan); margin-top: 0.25rem;">|Ψ⟩ = 1.00|0⟩ + 0.00|1⟩</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="dashboard-grid">
+          
+          <!-- Quantum State Probabilities Output -->
+          <div class="panel-card col-6">
+            <div class="card-header">
+              <div class="card-title">Measurement State Probabilities</div>
+              <span class="card-badge badge-cyan">Chart Metrics</span>
+            </div>
+            <div style="height: 250px;">
+              <canvas id="quantumProbabilityChart"></canvas>
+            </div>
+          </div>
+
+          <!-- HPC Cluster Monitor -->
+          <div class="panel-card col-6">
+            <div class="card-header">
+              <div class="card-title">HPC Supercomputing Nodes</div>
+              <span class="card-badge badge-green">Resource Grid</span>
+            </div>
+            <div class="hpc-stats-row">
+              <div class="hpc-stat-box">
+                <div class="hpc-stat-val" id="hpc-flops">2.4 PFLOPS</div>
+                <div class="hpc-stat-lbl">Agg. Compute</div>
+              </div>
+              <div class="hpc-stat-box">
+                <div class="hpc-stat-val" id="hpc-jobs">14 Active</div>
+                <div class="hpc-stat-lbl">Queue Length</div>
+              </div>
+              <div class="hpc-stat-box">
+                <div class="hpc-stat-val" id="hpc-temp">42°C</div>
+                <div class="hpc-stat-lbl">Avg. Core Temp</div>
+              </div>
+            </div>
+
+            <div class="hpc-nodes-list" id="nodes-container">
+              <div class="hpc-node-row">
+                <div class="node-meta">
+                  <span class="node-name">Node-A100-01</span>
+                  <span class="node-spec">8x NVIDIA A100 SXM4 80GB</span>
+                </div>
+                <div class="node-util">
+                  <span class="util-pct" id="util-node-0">78% Util</span>
+                  <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="fill-node-0" style="width: 78%;"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="hpc-node-row">
+                <div class="node-meta">
+                  <span class="node-name">Node-H100-02</span>
+                  <span class="node-spec">8x NVIDIA H100 PCIe 80GB</span>
+                </div>
+                <div class="node-util">
+                  <span class="util-pct" id="util-node-1" style="color: var(--accent-purple);">92% Util</span>
+                  <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="fill-node-1" style="width: 92%; background: var(--accent-purple);"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="hpc-node-row">
+                <div class="node-meta">
+                  <span class="node-name">Node-RTX4090-Shared</span>
+                  <span class="node-spec">4x NVIDIA RTX 4090 24GB</span>
+                </div>
+                <div class="node-util">
+                  <span class="util-pct" id="util-node-2" style="color: var(--accent-cyan);">24% Util</span>
+                  <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="fill-node-2" style="width: 24%; background: var(--accent-cyan);"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- Workload Dispatcher -->
+          <div class="panel-card col-4">
+            <div class="card-header">
+              <div class="card-title">Dispatch HPC Task</div>
+              <span class="card-badge badge-purple">Scheduler</span>
+            </div>
+            <form onsubmit="event.preventDefault(); submitWorkload();">
+              <div class="form-group">
+                <label class="form-label">Select Project Domain</label>
+                <select class="form-control" id="task-domain">
+                  <option value="Agri-Tech Analytics">QVP Agri-Tech Analytics (Crop Yield Models)</option>
+                  <option value="Bio-Technology Fold">QVP Bio-Technology (Protein Folding Sim)</option>
+                  <option value="Minerals Advanced Vision">QVP Mineral Exploration (Spectral Vision)</option>
+                  <option value="Quantum Circuit Solver">Quantum Sim (Circuit Solver Grid)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Compute Node Priority</label>
+                <select class="form-control" id="task-node">
+                  <option value="Node-H100-02">Node-H100-02 (High Priority)</option>
+                  <option value="Node-A100-01">Node-A100-01 (Standard Priority)</option>
+                  <option value="Node-RTX4090-Shared">Node-RTX4090-Shared (Low Priority / Spot)</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" type="submit" style="width: 100%; justify-content: center;">Dispatch Task to Grid</button>
+            </form>
+          </div>
+
+          <!-- Post-Quantum Cryptography Benchmark Playground -->
+          <div class="panel-card col-8">
+            <div class="card-header">
+              <div class="card-title">Post-Quantum Cryptographic Performance Auditor</div>
+              <span class="card-badge badge-cyan">Audit Metrics</span>
+            </div>
+            <div style="overflow-x: auto;">
+              <table class="pqc-benchmark-table">
+                <thead>
+                  <tr>
+                    <th>Algorithm Scheme</th>
+                    <th>Key Generation</th>
+                    <th>Encryption Time</th>
+                    <th>Decryption Time</th>
+                    <th>Key Size (Bytes)</th>
+                    <th>Quantum Security Level</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="font-weight: 600; color: var(--accent-purple);">Kyber-1024 (PQC)</td>
+                    <td>0.08 ms</td>
+                    <td>0.12 ms</td>
+                    <td>0.14 ms</td>
+                    <td>1,568 B</td>
+                    <td><span class="defense-score pqc-secure">🟢 100% Secure</span></td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 600; color: var(--accent-purple);">Dilithium-5 (PQC)</td>
+                    <td>1.24 ms</td>
+                    <td>0.38 ms</td>
+                    <td>0.45 ms</td>
+                    <td>4,592 B</td>
+                    <td><span class="defense-score pqc-secure">🟢 100% Secure</span></td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 600;">RSA-4096 (Classical)</td>
+                    <td>184.20 ms</td>
+                    <td>8.45 ms</td>
+                    <td>12.80 ms</td>
+                    <td>512 B</td>
+                    <td><span class="defense-score pqc-vulnerable">🔴 Vulnerable</span></td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 600;">ECC-384 (Classical)</td>
+                    <td>4.10 ms</td>
+                    <td>2.60 ms</td>
+                    <td>3.10 ms</td>
+                    <td>48 B</td>
+                    <td><span class="defense-score pqc-vulnerable">🔴 Vulnerable</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ==================== MODE B: VOLTCOMPUTE SAAS PANEL ==================== -->
+      <div class="dashboard-panel" id="panel-gpu">
+        <div class="dashboard-grid">
+          
+          <!-- GPU Host Sharing Dashboard -->
+          <div class="panel-card col-6">
+            <div class="card-header">
+              <div class="card-title">Decentralized GPU Host Configurator</div>
+              <span class="card-badge badge-green">Earn SaaS</span>
+            </div>
+            
+            <div class="hosting-stats">
+              <div class="hosting-metric-row">
+                <div class="metric-info">
+                  <span class="metric-label">Local Host Spec</span>
+                  <span class="metric-value" style="color: var(--accent-purple);">NVIDIA RTX 4090 (24GB VRAM)</span>
+                </div>
+              </div>
+              <div class="hosting-metric-row">
+                <div class="metric-info">
+                  <span class="metric-label">Today's Earnings</span>
+                  <span class="metric-value" id="today-earnings" style="color: var(--accent-green); font-size: 1.5rem;">$12.4500</span>
+                </div>
+                <div class="node-util">
+                  <span class="card-badge badge-green" id="hosting-status-badge">Idle</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="fan-control-box">
+              <div style="display: flex; justify-content: space-between;">
+                <span class="form-label" style="margin-bottom: 0;">GPU Fan Curve Duty Cycle</span>
+                <span style="font-size: 0.75rem; color: var(--accent-purple);" id="gpu-temp-readout">Temp: 44°C</span>
+              </div>
+              <div class="fan-slider-row">
+                <input type="range" min="20" max="100" value="45" class="fan-slider" id="fanRange" oninput="updateFanSpeed(this.value)">
+                <span class="fan-pct" id="fanPctReadout">45%</span>
+              </div>
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+              <button class="btn btn-primary" id="btn-toggle-hosting" onclick="toggleGpuHosting()" style="flex: 1; justify-content: center;">Start Compute Leasing</button>
+              <button class="btn btn-secondary" onclick="triggerPayout()" style="flex: 1; justify-content: center;">Payout Balance</button>
+            </div>
+          </div>
+
+          <!-- Spot Billing & Marketplace Estimator -->
+          <div class="panel-card col-6">
+            <div class="card-header">
+              <div class="card-title">SaaS Cost &amp; Compute Estimator</div>
+              <span class="card-badge badge-cyan">Billing Sandbox</span>
+            </div>
+            
+            <div class="calculator-block">
+              <div class="calc-slider-group">
+                <div class="calc-slider-row">
+                  <span>GPU Nodes Required</span>
+                  <span id="nodes-qty-label" style="font-weight: 700; color: white;">1 Node</span>
+                </div>
+                <input type="range" min="1" max="16" value="1" class="calc-slider" id="calcNodes" oninput="calculateSaaSBill()">
+              </div>
+
+              <div class="calc-slider-group">
+                <div class="calc-slider-row">
+                  <span>Weekly Rental Hours</span>
+                  <span id="hours-qty-label" style="font-weight: 700; color: white;">40 Hours</span>
+                </div>
+                <input type="range" min="1" max="168" value="40" class="calc-slider" id="calcHours" oninput="calculateSaaSBill()">
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Compute Server Tier</label>
+                <select class="form-control" id="calcTier" onchange="calculateSaaSBill()">
+                  <option value="0.22">RTX 4090 Spot instance ($0.22/hr)</option>
+                  <option value="1.89">A100 Dedicated Cloud ($1.89/hr)</option>
+                  <option value="3.49">H100 SXM Premium Cluster ($3.49/hr)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="estimated-bill-box">
+              <div style="font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">Estimated Weekly Cost</div>
+              <div class="bill-val" id="bill-estimate-value">$8.80</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- Network Telemetry Diagnostics -->
+          <div class="panel-card col-12">
+            <div class="card-header">
+              <div class="card-title">Network Telemetry &amp; Latency Analytics</div>
+              <span class="card-badge badge-cyan">SaaS Engine</span>
+            </div>
+            <div style="height: 220px; margin-bottom: 1.5rem;">
+              <canvas id="networkTelemetryChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Telemetry Activity Logs Console -->
+      <div class="panel-card col-12" style="margin-top: 1.5rem;">
+        <div class="card-header" style="margin-bottom: 0.75rem; padding-bottom: 0.5rem;">
+          <div class="card-title" style="font-size: 0.8rem; letter-spacing: 0.1em;">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color: var(--accent-green);">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            System Console Diagnostics Log
+          </div>
+          <span class="card-badge badge-green">Grid Log</span>
+        </div>
+        <div class="telemetry-log-area" id="console-logs">
+          <div class="log-line">
+            <span class="log-time">[14:31:02]</span>
+            <span class="log-tag">SYS</span>
+            <span>QuantumLink OS kernel initialized successfully.</span>
+          </div>
+          <div class="log-line">
+            <span class="log-time">[14:31:05]</span>
+            <span class="log-tag sec">NET</span>
+            <span>Secure handshake established with QVP Phase-1 Supercomputing cluster.</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // System variables
+    let currentPanel = 'qvp';
+    let isHostingGpu = false;
+    let earningsTimer = null;
+    let accumulatedEarnings = 12.4500;
+    let selectedCell = null;
+    let circuitMatrix = [
+      [null, null, null, null],
+      [null, null, null, null]
+    ];
+
+    // Chart variables
+    let probabilityChart = null;
+    let telemetryChart = null;
+
+    window.onload = function() {
+      initCharts();
+      updateSimulationDisplay();
+      startTelemetrySimulation();
+    };
+
+    function switchPanel(panelId) {
+      document.querySelectorAll('.dashboard-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+      
+      document.getElementById('panel-' + panelId).classList.add('active');
+      document.getElementById('menu-' + panelId).classList.add('active');
+      currentPanel = panelId;
+      
+      if (panelId === 'qvp') {
+        document.getElementById('dashboard-header-title').innerText = "Quantum Valley Pakistan (Phase-I)";
+      } else {
+        document.getElementById('dashboard-header-title').innerText = "VoltCompute AI — GPU Cloud Marketplace";
+      }
+    }
+
+    function toggleOperationalMode() {
+      const btn = document.getElementById('mode-selector');
+      const text = document.getElementById('mode-text');
+      btn.classList.toggle('active');
+      
+      if (btn.classList.contains('active')) {
+        text.innerText = "VoltCompute SaaS";
+        switchPanel('gpu');
+        appendLog('SYS', 'Switched context to Commercial B2B GPU Cloud mode.');
+      } else {
+        text.innerText = "MoD QVP Panel";
+        switchPanel('qvp');
+        appendLog('SYS', 'Switched context to Ministry of Defence QVP Research mode.');
+      }
+    }
+
+    // Console logs function
+    function appendLog(tag, msg, isError = false) {
+      const logs = document.getElementById('console-logs');
+      const now = new Date();
+      const timeStr = `[${now.toTimeString().split(' ')[0]}]`;
+      
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      
+      let tagClass = 'log-tag';
+      if (tag === 'NET' || tag === 'SaaS') tagClass += ' sec';
+      if (isError) tagClass += ' err';
+      
+      line.innerHTML = `<span class="log-time">${timeStr}</span><span class="${tagClass}">${tag}</span><span>${msg}</span>`;
+      logs.appendChild(line);
+      logs.scrollTop = logs.scrollHeight;
+    }
+
+    // Grid Circuit Simulator functions
+    function triggerGatePlacement(row, col) {
+      // Highlight selection
+      if (selectedCell) {
+        document.getElementById(`g-${selectedCell.row}-${selectedCell.col}`).style.borderColor = 'rgba(255,255,255,0.15)';
+      }
+      selectedCell = { row, col };
+      document.getElementById(`g-${row}-${col}`).style.borderColor = 'var(--accent-purple)';
+      appendLog('SYS', `Selected circuit grid slot Q${row} [Position ${col}]. Select a gate from the toolbox above.`);
+    }
+
+    function addGate(gateType) {
+      if (selectedCell === null) {
+        alert("Please select a grid slot (+) in the Quantum Circuit Editor first!");
+        return;
+      }
+      
+      const { row, col } = selectedCell;
+      circuitMatrix[row][col] = gateType;
+      
+      const cell = document.getElementById(`g-${row}-${col}`);
+      cell.className = `quantum-gate gate-${gateType.toLowerCase()}`;
+      cell.innerText = gateType === 'CNOT' ? '●' : gateType;
+      
+      appendLog('SYS', `Placed Gate [${gateType}] at Q${row} [Position ${col}].`);
+      
+      // Clear selection border
+      cell.style.borderColor = 'transparent';
+      selectedCell = null;
+      
+      updateSimulationDisplay();
+    }
+
+    function clearQuantumCircuit() {
+      circuitMatrix = [
+        [null, null, null, null],
+        [null, null, null, null]
+      ];
+      for (let r = 0; r < 2; r++) {
+        for (let c = 0; c < 4; c++) {
+          const cell = document.getElementById(`g-${r}-${c}`);
+          cell.className = 'gate-empty';
+          cell.innerText = '+';
+          cell.style.borderColor = 'rgba(255,255,255,0.15)';
+        }
+      }
+      selectedCell = null;
+      appendLog('SYS', 'Cleared quantum circuit editor timeline.');
+      updateSimulationDisplay();
+    }
+
+    function updateSimulationDisplay() {
+      // Analyze grid and guess output probabilities
+      let hasH = false;
+      let hasX = false;
+      let hasCNOT = false;
+
+      for (let r = 0; r < 2; r++) {
+        for (let c = 0; c < 4; c++) {
+          if (circuitMatrix[r][c] === 'H') hasH = true;
+          if (circuitMatrix[r][c] === 'X') hasX = true;
+          if (circuitMatrix[r][c] === 'CNOT') hasCNOT = true;
+        }
+      }
+
+      let probabilities = [1, 0, 0, 0]; // |00>, |01>, |10>, |11>
+      let stateString = "|Ψ⟩ = 1.00|00⟩";
+      let angle = 0;
+
+      if (hasH && hasCNOT) {
+        // Bell state
+        probabilities = [0.5, 0, 0, 0.5];
+        stateString = "|Ψ⟩ = 0.71|00⟩ + 0.71|11⟩";
+        angle = 45;
+      } else if (hasH) {
+        // Superposition
+        probabilities = [0.5, 0, 0.5, 0];
+        stateString = "|Ψ⟩ = 0.71|00⟩ + 0.71|10⟩";
+        angle = 90;
+      } else if (hasX) {
+        // State flip
+        probabilities = [0, 0, 1, 0];
+        stateString = "|Ψ⟩ = 1.00|10⟩";
+        angle = 180;
+      }
+
+      // Rotate Bloch vector
+      document.getElementById('bloch-vector').style.transform = `rotate(${angle}deg)`;
+      document.getElementById('qubit-state-string').innerText = stateString;
+
+      // Update probability chart
+      if (probabilityChart) {
+        probabilityChart.data.datasets[0].data = probabilities;
+        probabilityChart.update();
+      }
+    }
+
+    function simulateQuantumCircuit() {
+      appendLog('SYS', 'Compiling circuit and running simulation on QVP Node-A100-01...');
+      setTimeout(() => {
+        updateSimulationDisplay();
+        appendLog('SYS', 'Simulation completed. Measurement states plotted successfully.');
+      }, 600);
+    }
+
+    // Submit Workload Form
+    function submitWorkload() {
+      const domain = document.getElementById('task-domain').value;
+      const node = document.getElementById('task-node').value;
+      
+      appendLog('SYS', `Dispatching workload [${domain}] to node [${node}]...`);
+      
+      setTimeout(() => {
+        appendLog('SYS', `Task [${domain}] allocated on [${node}]. Executing parallel tensor pipelines...`);
+        // Raise average temperature and workload util temporarily
+        document.getElementById('hpc-temp').innerText = "54°C";
+        document.getElementById('hpc-jobs').innerText = "15 Active";
+        setTimeout(() => {
+          document.getElementById('hpc-temp').innerText = "45°C";
+          document.getElementById('hpc-jobs').innerText = "14 Active";
+          appendLog('SYS', `Workload [${domain}] execution finished. Results written to QVP database.`);
+        }, 5000);
+      }, 1000);
+    }
+
+    // GPU SaaS Leasing functions
+    function toggleGpuHosting() {
+      const btn = document.getElementById('btn-toggle-hosting');
+      const badge = document.getElementById('hosting-status-badge');
+      
+      isHostingGpu = !isHostingGpu;
+      
+      if (isHostingGpu) {
+        btn.innerText = "Stop Compute Leasing";
+        btn.style.background = 'linear-gradient(135deg, var(--accent-red), #dc2626)';
+        badge.innerText = "Hosting";
+        badge.className = "card-badge badge-green";
+        
+        appendLog('SaaS', 'RTX 4090 lease engine active. Server registered to decentralized marketplace.');
+        
+        // Start earning simulation
+        earningsTimer = setInterval(() => {
+          accumulatedEarnings += 0.00045; // Lease earnings
+          document.getElementById('today-earnings').innerText = `$${accumulatedEarnings.toFixed(4)}`;
+          
+          // Random temp fluct
+          const temp = Math.floor(Math.random() * 8) + 56;
+          document.getElementById('gpu-temp-readout').innerText = `Temp: ${temp}°C`;
+          
+          if (temp > 62) {
+            appendLog('SaaS', `Node lease in progress. Running neural model training session. Core temp: ${temp}°C`);
+          }
+        }, 1200);
+      } else {
+        btn.innerText = "Stop Compute Leasing";
+        btn.style.background = 'linear-gradient(135deg, var(--accent-purple), #7c3aed)';
+        badge.innerText = "Idle";
+        badge.className = "card-badge badge-purple";
+        
+        appendLog('SaaS', 'RTX 4090 lease engine suspended. Host set offline.');
+        clearInterval(earningsTimer);
+        document.getElementById('gpu-temp-readout').innerText = "Temp: 44°C";
+      }
+    }
+
+    function triggerPayout() {
+      if (accumulatedEarnings <= 0.01) {
+        alert("Minimum payout threshold is $1.00!");
+        return;
+      }
+      alert(`Payout of $${accumulatedEarnings.toFixed(4)} triggered to wallet successfully!`);
+      appendLog('SaaS', `Cleared balance payout of $${accumulatedEarnings.toFixed(4)} to wallet Address QVP-3580`);
+      accumulatedEarnings = 0.0000;
+      document.getElementById('today-earnings').innerText = "$0.0000";
+    }
+
+    function updateFanSpeed(val) {
+      document.getElementById('fanPctReadout').innerText = val + '%';
+      appendLog('SaaS', `Adjusted hardware fan cooling threshold to ${val}%.`);
+    }
+
+    function calculateSaaSBill() {
+      const qty = parseInt(document.getElementById('calcNodes').value);
+      const hours = parseInt(document.getElementById('calcHours').value);
+      const rate = parseFloat(document.getElementById('calcTier').value);
+      
+      document.getElementById('nodes-qty-label').innerText = `${qty} Node` + (qty > 1 ? 's' : '');
+      document.getElementById('hours-qty-label').innerText = `${hours} Hour` + (hours > 1 ? 's' : '');
+      
+      const total = qty * hours * rate;
+      document.getElementById('bill-estimate-value').innerText = `$${total.toFixed(2)}`;
+    }
+
+    // Chart Initializations
+    function initCharts() {
+      // 1. Quantum Probability Chart
+      const qCtx = document.getElementById('quantumProbabilityChart').getContext('2d');
+      probabilityChart = new Chart(qCtx, {
+        type: 'bar',
+        data: {
+          labels: ['|00⟩', '|01⟩', '|10⟩', '|11⟩'],
+          datasets: [{
+            label: 'Probability Output',
+            data: [1, 0, 0, 0],
+            backgroundColor: [
+              'rgba(139, 92, 246, 0.6)',
+              'rgba(6, 182, 212, 0.6)',
+              'rgba(34, 197, 94, 0.6)',
+              'rgba(245, 158, 11, 0.6)'
+            ],
+            borderColor: [
+              '#8b5cf6',
+              '#06b6d4',
+              '#22c55e',
+              '#f59e0b'
+            ],
+            borderWidth: 1.5
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 1.0,
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#94a3b8' }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#94a3b8', font: { family: 'Orbitron' } }
+            }
+          }
+        }
+      });
+
+      // 2. Network Telemetry Chart
+      const nCtx = document.getElementById('networkTelemetryChart').getContext('2d');
+      telemetryChart = new Chart(nCtx, {
+        type: 'line',
+        data: {
+          labels: ['14:25', '14:26', '14:27', '14:28', '14:29', '14:30'],
+          datasets: [
+            {
+              label: 'Throughput (Gbps)',
+              data: [4.2, 5.8, 6.1, 5.4, 7.8, 8.2],
+              borderColor: '#8b5cf6',
+              backgroundColor: 'rgba(139, 92, 246, 0.1)',
+              fill: true,
+              tension: 0.4
+            },
+            {
+              label: 'Audit Latency (ms)',
+              data: [18, 14, 15, 17, 14, 14],
+              borderColor: '#06b6d4',
+              backgroundColor: 'transparent',
+              borderDash: [5, 5],
+              tension: 0.4,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#94a3b8' }
+            },
+            y1: {
+              position: 'right',
+              grid: { display: false },
+              ticks: { color: '#94a3b8' }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#94a3b8' }
+            }
+          }
+        }
+      });
+    }
+
+    // Loop system metrics fluctuation
+    function startTelemetrySimulation() {
+      setInterval(() => {
+        // Fluctuate node loads
+        for (let i = 0; i < 3; i++) {
+          const utilSpan = document.getElementById(`util-node-${i}`);
+          const fill = document.getElementById(`fill-node-${i}`);
+          const curr = parseInt(utilSpan.innerText);
+          const diff = Math.floor(Math.random() * 11) - 5; // -5 to +5
+          let next = Math.max(10, Math.min(98, curr + diff));
+          
+          utilSpan.innerText = next + '% Util';
+          fill.style.width = next + '%';
+        }
+
+        // Fluctuate network chart
+        if (telemetryChart) {
+          const len = telemetryChart.data.datasets[0].data.length;
+          telemetryChart.data.datasets[0].data.shift();
+          telemetryChart.data.datasets[1].data.shift();
+          
+          const nextVal = (Math.random() * 4 + 5).toFixed(1);
+          const nextLat = Math.floor(Math.random() * 6) + 12;
+          
+          telemetryChart.data.datasets[0].data.push(nextVal);
+          telemetryChart.data.datasets[1].data.push(nextLat);
+          
+          // Rotate time label
+          const lastTime = telemetryChart.data.labels[len - 1];
+          const [h, m] = lastTime.split(':').map(Number);
+          let nextM = m + 1;
+          let nextH = h;
+          if (nextM >= 60) { nextM = 0; nextH++; }
+          const nextLabel = `${String(nextH).padStart(2, '0')}:${String(nextM).padStart(2, '0')}`;
+          
+          telemetryChart.data.labels.shift();
+          telemetryChart.data.labels.push(nextLabel);
+          
+          telemetryChart.update();
+        }
+      }, 5000);
+    }
+  </script>
+</body>
+</html>
