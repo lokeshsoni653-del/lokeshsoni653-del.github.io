@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vital Retail-Optima — Retail Development &amp; Expansion Console</title>
+  <!-- Google Fonts: Orbitron & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-dark: #0a0d16;
+      --bg-card: #121824;
+      --bg-input: #1b2438;
+      --border-color: #24324f;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent-red: #ef4444;
+      --accent-red-glow: rgba(239, 68, 68, 0.25);
+      --accent-cyan: #06b6d4;
+      --accent-cyan-glow: rgba(6, 182, 212, 0.25);
+      --accent-green: #10b981;
+      --accent-green-glow: rgba(16, 185, 129, 0.25);
+      --accent-gold: #f59e0b;
+      --accent-gold-glow: rgba(245, 158, 11, 0.25);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-dark);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-red);
+    }
+
+    /* Sidebar Layout */
+    .sidebar {
+      width: 280px;
+      background: #0d121f;
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 10;
+    }
+
+    .sidebar-header {
+      padding: 2rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .sidebar-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 1.35rem;
+      letter-spacing: 0.1em;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sidebar-logo span {
+      color: var(--accent-red);
+      text-shadow: 0 0 10px var(--accent-red-glow);
+    }
+
+    .sidebar-logo-sub {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    .user-profile {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(239, 68, 68, 0.02);
+    }
+
+    .user-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent-red), #b91c1c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+    }
+
+    .user-info {
+      flex: 1;
+    }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .user-role {
+      font-size: 0.72rem;
+      color: var(--accent-red);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .sidebar-menu {
+      padding: 1.5rem 1rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .menu-header {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+      padding-left: 0.5rem;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .menu-item:hover, .menu-item.active {
+      color: var(--text-primary);
+      background: rgba(239, 68, 68, 0.08);
+      border-left: 3px solid var(--accent-red);
+    }
+
+    .menu-item svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+    }
+
+    .mode-switch-container {
+      padding: 1.5rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .mode-switch-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+    }
+
+    .mode-switch-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .mode-switch-btn:hover {
+      border-color: var(--accent-red);
+    }
+
+    .mode-switch-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .mode-toggle-indicator {
+      width: 36px;
+      height: 20px;
+      background: #475569;
+      border-radius: 10px;
+      position: relative;
+      transition: background 0.3s;
+    }
+
+    .mode-toggle-indicator::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: white;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.3s;
+    }
+
+    .mode-switch-btn.active .mode-toggle-indicator {
+      background: var(--accent-red);
+    }
+
+    .mode-switch-btn.active .mode-toggle-indicator::after {
+      transform: translateX(16px);
+    }
+
+    /* Main Dashboard Layout */
+    .dashboard-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background-image: radial-gradient(circle at 10% 20%, rgba(239, 68, 68, 0.015) 0%, transparent 60%);
+    }
+
+    .top-bar {
+      height: 70px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      background: #0d121f;
+    }
+
+    .top-bar-title {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: 0.05em;
+    }
+
+    .top-bar-stats {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .top-stat {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .top-stat-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 8px var(--accent-green-glow);
+    }
+
+    .top-stat-dot.pulse {
+      animation: pulse-green 2s infinite;
+    }
+
+    @keyframes pulse-green {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* Content Area */
+    .dashboard-content {
+      padding: 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .dashboard-panel {
+      display: none;
+    }
+
+    .dashboard-panel.active {
+      display: block;
+    }
+
+    /* Grid System */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .col-12 { grid-column: span 12; }
+    .col-8 { grid-column: span 8; }
+    .col-4 { grid-column: span 4; }
+    .col-6 { grid-column: span 6; }
+
+    @media (max-width: 1024px) {
+      .col-8, .col-4, .col-6 { grid-column: span 12; }
+    }
+
+    /* Cards */
+    .panel-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      transition: border-color 0.3s;
+    }
+
+    .panel-card:hover {
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 0.75rem;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-family: 'Orbitron', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-badge {
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .badge-red {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .badge-cyan {
+      background: rgba(6, 182, 212, 0.15);
+      color: #22d3ee;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+
+    .badge-green {
+      background: rgba(16, 185, 129, 0.15);
+      color: #a7f3d0;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    /* GIS Site Selection Panel */
+    .gis-planner-area {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .site-map-grid {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 4px;
+      position: relative;
+    }
+
+    .map-cell {
+      aspect-ratio: 1;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: bold;
+      color: rgba(255, 255, 255, 0.15);
+      transition: all 0.2s;
+    }
+
+    .map-cell:hover {
+      border-color: var(--accent-red);
+      background: rgba(239, 68, 68, 0.05);
+      color: var(--accent-red);
+    }
+
+    .map-cell.selected {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: var(--accent-red);
+      color: white;
+      box-shadow: 0 0 10px var(--accent-red-glow);
+    }
+
+    .map-cell.competitor {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: var(--accent-gold);
+      color: var(--accent-gold);
+    }
+
+    .map-cell.depot {
+      background: rgba(6, 182, 212, 0.15);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    .gis-sliders {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 600px) {
+      .gis-sliders { grid-template-columns: 1fr; }
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .form-control {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.6rem 0.75rem;
+      color: white;
+      font-size: 0.82rem;
+      transition: border-color 0.3s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--accent-red);
+    }
+
+    .btn {
+      padding: 0.65rem 1.5rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-red), #b91c1c);
+      color: white;
+      box-shadow: 0 4px 15px var(--accent-red-glow);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--bg-input);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: #2e3e60;
+    }
+
+    /* Viability Output Box */
+    .viability-output-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+      text-align: center;
+    }
+
+    .viability-score {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--accent-red);
+      text-shadow: 0 0 15px var(--accent-red-glow);
+      margin-bottom: 0.25rem;
+    }
+
+    .viability-lbl {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+    }
+
+    .viability-recommendation {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent-green);
+    }
+
+    /* Station Sales Track */
+    .station-stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .station-stat-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .station-stat-val {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      color: var(--accent-cyan);
+    }
+
+    .station-stat-lbl {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Logistics Tanker Monitor */
+    .logistics-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-height: 250px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+
+    .logistics-row {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+    }
+
+    .logistics-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .station-name {
+      font-weight: 600;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .tank-capacity {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+    }
+
+    .tank-level {
+      text-align: right;
+    }
+
+    .level-pct {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      color: var(--accent-green);
+    }
+
+    .level-pct.critical {
+      color: var(--accent-red);
+      animation: flash-red 1.5s infinite;
+    }
+
+    @keyframes flash-red {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .progress-bar-container {
+      width: 100px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      margin-top: 0.25rem;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: var(--accent-green);
+      width: 70%;
+      transition: width 0.5s;
+    }
+
+    .progress-bar-fill.critical {
+      background: var(--accent-red);
+    }
+
+    /* Dynamic Pricing Box */
+    .pricing-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+
+    .pricing-slider-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .pricing-slider-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.4rem;
+    }
+
+    .pricing-slider {
+      width: 100%;
+      height: 6px;
+      background: #475569;
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .pricing-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent-red);
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--accent-red-glow);
+    }
+
+    .estimated-profit-box {
+      text-align: center;
+      background: rgba(16, 185, 129, 0.05);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+
+    .profit-val {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--accent-green);
+      text-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+    }
+
+    /* Basket rule table */
+    .basket-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+    }
+
+    .basket-table th {
+      text-align: left;
+      padding: 0.65rem;
+      background: rgba(255, 255, 255, 0.03);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.72rem;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-secondary);
+    }
+
+    .basket-table td {
+      padding: 0.75rem 0.65rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .rule-strength {
+      font-weight: 600;
+      color: var(--accent-green);
+    }
+
+    /* Telemetry logs */
+    .telemetry-log-area {
+      background: #05080e;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: monospace;
+      font-size: 0.72rem;
+      color: var(--accent-red);
+      height: 150px;
+      overflow-y: auto;
+      margin-top: 0.5rem;
+    }
+
+    .log-line {
+      margin-bottom: 0.35rem;
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .log-time {
+      color: var(--text-secondary);
+    }
+
+    .log-tag {
+      font-weight: bold;
+      color: var(--accent-cyan);
+    }
+
+    .log-tag.sec { color: var(--accent-red); }
+    .log-tag.err { color: var(--accent-gold); }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <span>VITAL</span>-Optima
+      </div>
+      <div class="sidebar-logo-sub">Retail Dev OS v1.0</div>
+    </div>
+
+    <!-- Candidate profile -->
+    <div class="user-profile">
+      <div class="user-avatar">LK</div>
+      <div class="user-info">
+        <div class="user-name">Lokesh Kumar</div>
+        <div class="user-role">Retail Dev Fellow</div>
+      </div>
+    </div>
+
+    <!-- Menu -->
+    <nav class="sidebar-menu">
+      <div class="menu-header">Modules</div>
+      <div class="menu-item active" id="menu-retail" onclick="switchPanel('retail')">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        Site Expansion &amp; GIS
+      </div>
+      <div class="menu-item" id="menu-saas" onclick="switchPanel('saas')">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+        </svg>
+        VoltStation SaaS
+      </div>
+    </nav>
+
+    <!-- Operational Toggle -->
+    <div class="mode-switch-container">
+      <div class="mode-switch-title">Operational Mode</div>
+      <button class="mode-switch-btn" id="mode-selector" onclick="toggleOperationalMode()">
+        <span class="mode-switch-label" id="mode-text">Retail Dev Console</span>
+        <div class="mode-toggle-indicator"></div>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="dashboard-main">
+    <header class="top-bar">
+      <div class="top-bar-title" id="dashboard-header-title">Vital Petroleum Retail Development</div>
+      <div class="top-bar-stats">
+        <div class="top-stat">
+          <span class="top-stat-dot pulse"></span>
+          Terminal status: <span style="color: white; font-weight: 600;">CONNECTED</span>
+        </div>
+        <div class="top-stat">
+          Ping: <span style="color: var(--accent-red); font-weight: 600;">18ms</span>
+        </div>
+        <div class="top-stat">
+          Depots Active: <span style="color: var(--accent-cyan); font-weight: 600;">8/8 Region</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="dashboard-content">
+
+      <!-- ==================== MODE A: RETAIL DEVELOPMENT ==================== -->
+      <div class="dashboard-panel active" id="panel-retail">
+        <div class="dashboard-grid">
+          
+          <!-- GIS site optimizer -->
+          <div class="panel-card col-8">
+            <div class="card-header">
+              <div class="card-title">
+                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color: var(--accent-red);">
+                  <path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                </svg>
+                GIS Retail Site Planner (Lahore Map)
+              </div>
+              <span class="card-badge badge-red">Site Expansion</span>
+            </div>
+
+            <div class="gis-planner-area">
+              <div class="site-map-grid" id="map-grid">
+                <!-- Cells will be generated dynamically by JS -->
+              </div>
+
+              <div class="gis-sliders">
+                <div>
+                  <div class="form-group">
+                    <label class="form-label">Traffic Flow Density</label>
+                    <select class="form-control" id="traffic-density" onchange="calculateSiteViability()">
+                      <option value="high">High density (Major Boulevard / Ring Road)</option>
+                      <option value="medium">Medium density (Commercial Hub / Main Road)</option>
+                      <option value="low">Low density (Residential / Suburban)</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Distance to Competitor (km)</label>
+                    <input type="range" min="0" max="10" value="5" step="0.5" class="pricing-slider" id="competitor-dist" oninput="calculateSiteViability()">
+                    <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-secondary); margin-top:0.25rem;">
+                      <span>0km (Direct Competition)</span>
+                      <span id="comp-dist-lbl" style="font-weight: 700; color: white;">5.0 km</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="form-group">
+                    <label class="form-label">Local Population (5km Radius)</label>
+                    <select class="form-control" id="pop-density" onchange="calculateSiteViability()">
+                      <option value="large">&gt; 50,000 residents</option>
+                      <option value="medium">20,000 - 50,000 residents</option>
+                      <option value="small">&lt; 20,000 residents</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Distance to Nearest Depot (km)</label>
+                    <input type="range" min="5" max="150" value="35" class="pricing-slider" id="depot-dist" oninput="calculateSiteViability()">
+                    <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-secondary); margin-top:0.25rem;">
+                      <span>5km (Low logistics cost)</span>
+                      <span id="depot-dist-lbl" style="font-weight: 700; color: white;">35 km</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Site viability output -->
+          <div class="panel-card col-4">
+            <div class="card-header">
+              <div class="card-title">Viability Scorecard</div>
+              <span class="card-badge badge-cyan">GIS Output</span>
+            </div>
+            <div class="viability-output-box">
+              <div class="viability-score" id="score-readout">78%</div>
+              <div class="viability-lbl">Evaluation Grade</div>
+              <div class="viability-recommendation" id="recom-readout">🟢 HIGHLY VIABLE</div>
+              <div style="margin-top: 1rem; font-size: 0.72rem; color: var(--text-secondary);" id="viability-notes">Excellent demographics and competitor separation offset moderate logistics depot distance.</div>
+            </div>
+            <button class="btn btn-primary" onclick="dispatchSiteProposal()" style="width: 100%; justify-content: center; margin-top: 1rem;">Lock Site &amp; Send Proposal</button>
+          </div>
+
+        </div>
+
+        <div class="dashboard-grid">
+          
+          <!-- Station sales chart -->
+          <div class="panel-card col-6">
+            <div class="card-header">
+              <div class="card-title">Monthly Fuel Volume Trends (Litres)</div>
+              <span class="card-badge badge-cyan">Sales Analytics</span>
+            </div>
+            <div style="height: 250px;">
+              <canvas id="stationSalesChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Depot scheduler and station fuel levels -->
+          <div class="panel-card col-6">
+            <div class="card-header">
+              <div class="card-title">Retail Station Tank Capacity Monitor</div>
+              <span class="card-badge badge-green">Logistics Monitor</span>
+            </div>
+            
+            <div class="station-stats-row">
+              <div class="station-stat-box">
+                <div class="station-stat-val" id="stat-canal">38,000 L</div>
+                <div class="station-stat-lbl">Canal Station Vol</div>
+              </div>
+              <div class="station-stat-box">
+                <div class="station-stat-val" id="stat-dha">12,000 L</div>
+                <div class="station-stat-lbl">DHA Tank Level</div>
+              </div>
+              <div class="station-stat-box">
+                <div class="station-stat-val" id="stat-transits">2 Active</div>
+                <div class="station-stat-lbl">Transit Tankers</div>
+              </div>
+            </div>
+
+            <div class="logistics-list" id="stations-list">
+              <div class="logistics-row">
+                <div class="logistics-meta">
+                  <span class="station-name">Vital Station — Canal Road</span>
+                  <span class="tank-capacity">Max Capacity: 50,000 Litres</span>
+                </div>
+                <div class="tank-level">
+                  <span class="level-pct" id="level-lbl-0">76% Full</span>
+                  <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="fill-0" style="width: 76%;"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="logistics-row">
+                <div class="logistics-meta">
+                  <span class="station-name">Vital Station — Johar Town</span>
+                  <span class="tank-capacity">Max Capacity: 40,000 Litres</span>
+                </div>
+                <div class="tank-level">
+                  <span class="level-pct" id="level-lbl-1">45% Full</span>
+                  <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="fill-1" style="width: 45%; background: var(--accent-gold);"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="logistics-row">
+                <div class="logistics-meta">
+                  <span class="station-name">Vital Station — DHA Phase 6</span>
+                  <span class="tank-capacity">Max Capacity: 60,000 Litres</span>
+                </div>
+                <div class="tank-level">
+                  <div style="display:flex; align-items:center; gap:0.4rem;">
+                    <span class="level-pct critical" id="level-lbl-2">12% Critical</span>
+                  </div>
+                  <div class="progress-bar-container">
+                    <div class="progress-bar-fill critical" id="fill-2" style="width: 12%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top: 1.25rem; display: flex; gap: 0.75rem;">
+              <button class="btn btn-primary" onclick="dispatchTanker(2)" style="flex: 1; justify-content: center;">Dispatch Tanker to DHA</button>
+              <button class="btn btn-secondary" onclick="simulateRestockAll()" style="flex: 1; justify-content: center;">Restock Logistics</button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ==================== MODE B: VOLTSTATION SAAS PANEL ==================== -->
+      <div class="dashboard-panel" id="panel-saas">
+        <div class="dashboard-grid">
+          
+          <!-- Dynamic fuel pricing -->
+          <div class="panel-card col-6">
+            <div class="card-header">
+              <div class="card-title">Dynamic Price Margin Configurator</div>
+              <span class="card-badge badge-green">VoltStation SaaS</span>
+            </div>
+            
+            <div class="pricing-box">
+              <div class="pricing-slider-group">
+                <div class="pricing-slider-row">
+                  <span>Base Fuel Markup (PKR / Litre)</span>
+                  <span id="markup-val-label" style="font-weight: 700; color: white;">+Rs 8.50</span>
+                </div>
+                <input type="range" min="1" max="25" value="8.5" step="0.5" class="pricing-slider" id="priceMarkup" oninput="calculateSaaSMargins()">
+              </div>
+
+              <div class="pricing-slider-group" style="margin-bottom: 0;">
+                <div class="pricing-slider-row">
+                  <span>Daily Retail Volume Factor</span>
+                  <span id="volume-val-label" style="font-weight: 700; color: white;">120,000 Litres</span>
+                </div>
+                <input type="range" min="10000" max="300000" value="120000" step="5000" class="pricing-slider" id="dailyVolume" oninput="calculateSaaSMargins()">
+              </div>
+            </div>
+
+            <div class="estimated-profit-box">
+              <div style="font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">Predicted Weekly Revenue</div>
+              <div class="profit-val" id="profit-readout">Rs 7,140,000</div>
+            </div>
+          </div>
+
+          <!-- Basket association rule mining convenience store -->
+          <div class="panel-card col-6">
+            <div class="card-header">
+              <div class="card-title">NFR Basket Cross-Selling Analyzer</div>
+              <span class="card-badge badge-cyan">AI Recommendations</span>
+            </div>
+            <div style="overflow-x: auto;">
+              <table class="basket-table">
+                <thead>
+                  <tr>
+                    <th>Purchased Basket Item</th>
+                    <th>Recommended Cross-Sell</th>
+                    <th>Rule Confidence</th>
+                    <th>SaaS Action Recommendation</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="font-weight: 600;">Super Petrol Refuel</td>
+                    <td>Express Convenience Drink</td>
+                    <td><span class="rule-strength">82% Confidence</span></td>
+                    <td>Nozzle LED Screen Promotion</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 600;">Vital Engine Lube Oil</td>
+                    <td>Free Express Car Wash</td>
+                    <td><span class="rule-strength">67% Confidence</span></td>
+                    <td>Receipt Voucher Trigger</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 600;">Hi-Octane Refuel</td>
+                    <td>Subway Food Combo Deal</td>
+                    <td><span class="rule-strength">58% Confidence</span></td>
+                    <td>App Push Notification</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 600;">Diesel Refuel</td>
+                    <td>Trucker Lounge Tea Pass</td>
+                    <td><span class="rule-strength">45% Confidence</span></td>
+                    <td>Loyalty Point Double Rate</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- Leakage and pump telemetry -->
+          <div class="panel-card col-12">
+            <div class="card-header">
+              <div class="card-title">Storage Tanks Telemetry &amp; Leakage Indicators</div>
+              <span class="card-badge badge-cyan">Audit Diagnostics</span>
+            </div>
+            <div style="height: 220px; margin-bottom: 1.5rem;">
+              <canvas id="pumpTelemetryChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- System Diagnostic Log Area -->
+      <div class="panel-card col-12" style="margin-top: 1.5rem;">
+        <div class="card-header" style="margin-bottom: 0.75rem; padding-bottom: 0.5rem;">
+          <div class="card-title" style="font-size: 0.8rem; letter-spacing: 0.1em;">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color: var(--accent-red);">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            Retail Development Console Log
+          </div>
+          <span class="card-badge badge-red">Active Audit</span>
+        </div>
+        <div class="telemetry-log-area" id="console-logs">
+          <div class="log-line">
+            <span class="log-time">[12:41:02]</span>
+            <span class="log-tag">SYS</span>
+            <span>Vital Retail-Optima platform initialized. Linked to regional Lahore database.</span>
+          </div>
+          <div class="log-line">
+            <span class="log-time">[12:41:06]</span>
+            <span class="log-tag sec">NET</span>
+            <span>Secure interface handshake established with Vital Petroleum bulk storage depot.</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    let currentPanel = 'retail';
+    let activeMapCell = null;
+    let tankerTimers = {};
+    let salesChartInstance = null;
+    let telemetryChartInstance = null;
+
+    // Grid coordinates data
+    const mapGridCells = [
+      { id: 1, type: 'residential', label: 'R1' },
+      { id: 2, type: 'residential', label: 'R2' },
+      { id: 3, type: 'empty', label: 'E1' },
+      { id: 4, type: 'depot', label: 'DEPOT' },
+      { id: 5, type: 'empty', label: 'E2' },
+      { id: 6, type: 'residential', label: 'R3' },
+      { id: 7, type: 'competitor', label: 'COMP' },
+      { id: 8, type: 'empty', label: 'E3' },
+
+      { id: 9, type: 'empty', label: 'E4' },
+      { id: 10, type: 'commercial', label: 'C1' },
+      { id: 11, type: 'commercial', label: 'C2' },
+      { id: 12, type: 'empty', label: 'E5' },
+      { id: 13, type: 'residential', label: 'R4' },
+      { id: 14, type: 'empty', label: 'E6' },
+      { id: 15, type: 'empty', label: 'E7' },
+      { id: 16, type: 'commercial', label: 'C3' },
+
+      { id: 17, type: 'residential', label: 'R5' },
+      { id: 18, type: 'empty', label: 'E8' },
+      { id: 19, type: 'empty', label: 'E9' },
+      { id: 20, type: 'commercial', label: 'C4' },
+      { id: 21, type: 'empty', label: 'E10' },
+      { id: 22, type: 'competitor', label: 'COMP' },
+      { id: 23, type: 'empty', label: 'E11' },
+      { id: 24, type: 'residential', label: 'R6' }
+    ];
+
+    window.onload = function() {
+      generateMapGrid();
+      initCharts();
+      startMetricsSimulation();
+      calculateSiteViability();
+    };
+
+    function switchPanel(panelId) {
+      document.querySelectorAll('.dashboard-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+      
+      document.getElementById('panel-' + panelId).classList.add('active');
+      document.getElementById('menu-' + panelId).classList.add('active');
+      currentPanel = panelId;
+      
+      if (panelId === 'retail') {
+        document.getElementById('dashboard-header-title').innerText = "Vital Petroleum Retail Development";
+      } else {
+        document.getElementById('dashboard-header-title').innerText = "VoltStation SaaS — Fuel Retail Platform";
+      }
+    }
+
+    function toggleOperationalMode() {
+      const btn = document.getElementById('mode-selector');
+      const text = document.getElementById('mode-text');
+      btn.classList.toggle('active');
+      
+      if (btn.classList.contains('active')) {
+        text.innerText = "VoltStation SaaS";
+        switchPanel('saas');
+        appendLog('SYS', 'Switched operational mode to VoltStation B2B SaaS console.');
+      } else {
+        text.innerText = "Retail Dev Console";
+        switchPanel('retail');
+        appendLog('SYS', 'Switched operational mode to Vital Retail Development expansion grid.');
+      }
+    }
+
+    function appendLog(tag, msg, isError = false) {
+      const logs = document.getElementById('console-logs');
+      const now = new Date();
+      const timeStr = `[${now.toTimeString().split(' ')[0]}]`;
+      
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      
+      let tagClass = 'log-tag';
+      if (tag === 'NET' || tag === 'SaaS') tagClass += ' sec';
+      if (isError) tagClass += ' err';
+      
+      line.innerHTML = `<span class="log-time">${timeStr}</span><span class="${tagClass}">${tag}</span><span>${msg}</span>`;
+      logs.appendChild(line);
+      logs.scrollTop = logs.scrollHeight;
+    }
+
+    // Map generation
+    function generateMapGrid() {
+      const grid = document.getElementById('map-grid');
+      grid.innerHTML = '';
+      
+      mapGridCells.forEach(cell => {
+        const div = document.createElement('div');
+        div.className = 'map-cell';
+        if (cell.type === 'competitor') div.classList.add('competitor');
+        if (cell.type === 'depot') div.classList.add('depot');
+        div.id = `map-cell-${cell.id}`;
+        div.innerText = cell.label;
+        
+        div.onclick = function() {
+          selectMapCell(cell.id);
+        };
+        
+        grid.appendChild(div);
+      });
+    }
+
+    function selectMapCell(cellId) {
+      if (activeMapCell) {
+        document.getElementById(`map-cell-${activeMapCell}`).classList.remove('selected');
+      }
+      activeMapCell = cellId;
+      const cell = document.getElementById(`map-cell-${cellId}`);
+      cell.classList.add('selected');
+      
+      // Auto adjust competitor / depot distance depending on cell selection
+      const cellData = mapGridCells.find(c => c.id === cellId);
+      appendLog('SYS', `Selected map grid coordinate slot ${cellData.label} for site survey.`);
+      
+      let compDist = 4.5;
+      let depotDist = 40;
+      
+      if (cellId % 3 === 0) { compDist = 1.5; depotDist = 75; }
+      else if (cellId % 2 === 0) { compDist = 6.0; depotDist = 20; }
+      
+      document.getElementById('competitor-dist').value = compDist;
+      document.getElementById('depot-dist').value = depotDist;
+      
+      calculateSiteViability();
+    }
+
+    function calculateSiteViability() {
+      const traffic = document.getElementById('traffic-density').value;
+      const compDist = parseFloat(document.getElementById('competitor-dist').value);
+      const pop = document.getElementById('pop-density').value;
+      const depotDist = parseInt(document.getElementById('depot-dist').value);
+      
+      document.getElementById('comp-dist-lbl').innerText = `${compDist.toFixed(1)} km`;
+      document.getElementById('depot-dist-lbl').innerText = `${depotDist} km`;
+      
+      // Viability calculation formula
+      let score = 50;
+      
+      if (traffic === 'high') score += 20;
+      else if (traffic === 'medium') score += 10;
+      
+      if (pop === 'large') score += 15;
+      else if (pop === 'medium') score += 8;
+      
+      // Further competitor is, better the score
+      score += Math.min(15, compDist * 1.5);
+      
+      // Closer the depot is, better the score
+      score += Math.max(0, (150 - depotDist) * 0.1);
+      
+      score = Math.min(99, Math.round(score));
+      
+      const scoreEl = document.getElementById('score-readout');
+      const recomEl = document.getElementById('recom-readout');
+      const notesEl = document.getElementById('viability-notes');
+      
+      scoreEl.innerText = `${score}%`;
+      
+      if (score >= 80) {
+        recomEl.innerText = "🟢 HIGHLY VIABLE SITE";
+        recomEl.style.color = "var(--accent-green)";
+        notesEl.innerText = "Optimal location. Premium traffic profile with solid population density and strong logistics parameters.";
+      } else if (score >= 60) {
+        recomEl.innerText = "🟡 VIABLE (PROCEED WITH CAUTION)";
+        recomEl.style.color = "var(--accent-gold)";
+        notesEl.innerText = "Viable location. Logistics depot distance or moderate traffic density could limit high volume sales margins.";
+      } else {
+        recomEl.innerText = "🔴 UNFAVORABLE SITE";
+        recomEl.style.color = "var(--accent-red)";
+        notesEl.innerText = "Direct proximity to competitor stations and poor local traffic flows indicate low site return-on-investment.";
+      }
+    }
+
+    function dispatchSiteProposal() {
+      if (!activeMapCell) {
+        alert("Please select a grid coordinate cell on the Lahore Map first!");
+        return;
+      }
+      const score = document.getElementById('score-readout').innerText;
+      const cellData = mapGridCells.find(c => c.id === activeMapCell);
+      appendLog('SYS', `Dispatched retail expansion site proposal for slot ${cellData.label} (Viability Score: ${score}) to HQ expansion division.`);
+      alert("Proposal submitted successfully!");
+    }
+
+    // Logistics automatic tanker scheduling simulation
+    function dispatchTanker(index) {
+      const lbl = document.getElementById(`level-lbl-${index}`);
+      const fill = document.getElementById(`fill-${index}`);
+      
+      appendLog('NET', `Tanker dispatched from bulk depot terminal to Station DHA Phase 6. Estimated transit time: 6 seconds.`);
+      
+      setTimeout(() => {
+        fill.style.width = '90%';
+        fill.classList.remove('critical');
+        lbl.innerText = '90% Restocked';
+        lbl.classList.remove('critical');
+        document.getElementById('stat-dha').innerText = '54,000 L';
+        appendLog('NET', 'Tanker arrived at Station DHA Phase 6. Fuel storage restocked successfully.');
+      }, 6000);
+    }
+
+    function simulateRestockAll() {
+      for (let i = 0; i < 3; i++) {
+        const lbl = document.getElementById(`level-lbl-${i}`);
+        const fill = document.getElementById(`fill-${i}`);
+        fill.style.width = '85%';
+        fill.classList.remove('critical');
+        lbl.innerText = '85% Full';
+        lbl.classList.remove('critical');
+      }
+      document.getElementById('stat-canal').innerText = '42,500 L';
+      document.getElementById('stat-dha').innerText = '51,000 L';
+      appendLog('NET', 'Logistics sweep triggered: Restocked all regional storage tanks.');
+    }
+
+    // B2B margins calculation
+    function calculateSaaSMargins() {
+      const markup = parseFloat(document.getElementById('priceMarkup').value);
+      const volume = parseInt(document.getElementById('dailyVolume').value);
+      
+      document.getElementById('markup-val-label').innerText = `+Rs ${markup.toFixed(2)}`;
+      document.getElementById('volume-val-label').innerText = `${volume.toLocaleString()} Litres`;
+      
+      const weeklyRevenue = markup * volume * 7;
+      document.getElementById('profit-readout').innerText = `Rs ${Math.round(weeklyRevenue).toLocaleString()}`;
+    }
+
+    // Charts configuration
+    function initCharts() {
+      // 1. Station Sales Volume Trends
+      const sCtx = document.getElementById('stationSalesChart').getContext('2d');
+      salesChartInstance = new Chart(sCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Canal Station', 'Johar Town', 'DHA Phase 6', 'Gulberg Station'],
+          datasets: [
+            {
+              label: 'Super Petrol (L)',
+              data: [18000, 15000, 22000, 29000],
+              backgroundColor: 'rgba(239, 68, 68, 0.75)',
+              borderColor: '#ef4444',
+              borderWidth: 1
+            },
+            {
+              label: 'Hi-Octane (L)',
+              data: [8000, 4500, 12000, 19000],
+              backgroundColor: 'rgba(6, 182, 212, 0.75)',
+              borderColor: '#06b6d4',
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#94a3b8' } }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#94a3b8' }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#94a3b8' }
+            }
+          }
+        }
+      });
+
+      // 2. Storage tanks flow diagnostics telemetry
+      const pCtx = document.getElementById('pumpTelemetryChart').getContext('2d');
+      telemetryChartInstance = new Chart(pCtx, {
+        type: 'line',
+        data: {
+          labels: ['12:35', '12:36', '12:37', '12:38', '12:39', '12:40'],
+          datasets: [
+            {
+              label: 'Tank Nozzle Flow (L/s)',
+              data: [3.4, 4.1, 3.8, 4.5, 4.2, 5.0],
+              borderColor: '#ef4444',
+              backgroundColor: 'rgba(239, 68, 68, 0.05)',
+              tension: 0.3,
+              fill: true
+            },
+            {
+              label: 'Tank Core Temp (°C)',
+              data: [26, 26, 27, 26, 28, 27],
+              borderColor: '#f59e0b',
+              backgroundColor: 'transparent',
+              borderDash: [5, 5],
+              tension: 0.3,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#94a3b8' } }
+          },
+          scales: {
+            y: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#94a3b8' }
+            },
+            y1: {
+              position: 'right',
+              grid: { display: false },
+              ticks: { color: '#94a3b8' }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#94a3b8' }
+            }
+          }
+        }
+      });
+    }
+
+    // Diagnostics simulation loop
+    function startMetricsSimulation() {
+      setInterval(() => {
+        // Fluctuate logs
+        const logData = [
+          { tag: 'SYS', msg: 'GIS optimizer: Recalculated traffic density nodes.' },
+          { tag: 'NET', msg: 'Telemetry update: Flow sensor Canal-04 nozzle verified.' },
+          { tag: 'SaaS', msg: 'Price check: Competitor station matching fuel Rs 258.40/L.' },
+          { tag: 'SYS', msg: 'Logistics check: DHA tanker dispatch in transit.' }
+        ];
+        const log = logData[Math.floor(Math.random() * logData.length)];
+        appendLog(log.tag, log.msg);
+
+        // Fluctuate telemetry chart
+        if (telemetryChartInstance) {
+          const len = telemetryChartInstance.data.datasets[0].data.length;
+          telemetryChartInstance.data.datasets[0].data.shift();
+          telemetryChartInstance.data.datasets[1].data.shift();
+          
+          const nextVal = (Math.random() * 2.5 + 3.0).toFixed(1);
+          const nextTemp = Math.floor(Math.random() * 4) + 25;
+          
+          telemetryChartInstance.data.datasets[0].data.push(nextVal);
+          telemetryChartInstance.data.datasets[1].data.push(nextTemp);
+          
+          const lastTime = telemetryChartInstance.data.labels[len - 1];
+          const [h, m] = lastTime.split(':').map(Number);
+          let nextM = m + 1;
+          let nextH = h;
+          if (nextM >= 60) { nextM = 0; nextH++; }
+          const nextLabel = `${String(nextH).padStart(2, '0')}:${String(nextM).padStart(2, '0')}`;
+          
+          telemetryChartInstance.data.labels.shift();
+          telemetryChartInstance.data.labels.push(nextLabel);
+          
+          telemetryChartInstance.update();
+        }
+      }, 6000);
+    }
+  </script>
+</body>
+</html>
