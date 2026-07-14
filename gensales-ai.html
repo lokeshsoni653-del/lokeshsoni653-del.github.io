@@ -1204,7 +1204,7 @@ function addToCampaign(){
 
 function showToast(msg){
   const t=document.createElement('div');
-  t.style.cssText='position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#1a1a2e;border:1px solid var(--green);color:var(--green);padding:0.65rem 1.5rem;border-radius:10px;font-size:0.84rem;font-weight:600;z-index:999;animation:fadeUp 0.3s ease;';
+  t.style.css?v=2026Text='position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#1a1a2e;border:1px solid var(--green);color:var(--green);padding:0.65rem 1.5rem;border-radius:10px;font-size:0.84rem;font-weight:600;z-index:999;animation:fadeUp 0.3s ease;';
   t.textContent='✅ '+msg;document.body.appendChild(t);
   setTimeout(()=>t.remove(),3000);
 }
