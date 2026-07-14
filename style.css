@@ -812,3 +812,111 @@ html { scroll-behavior: smooth; }
   .lk-chat__toggle-label { display: none; }
   .lk-chat__toggle { padding: 0.8rem; border-radius: 50%; }
 }
+
+/* ══════════════════════════════════════════════
+   MOBILE VIEWPORT & HERO SECTION LAYOUT FIXES
+   ══════════════════════════════════════════════ */
+html, body {
+  overflow-x: hidden !important;
+  width: 100%;
+  max-width: 100vw;
+}
+
+.nav__desktop-ctas {
+  display: flex; gap: 0.5rem; align-items: center;
+}
+
+@media (max-width: 768px) {
+  .nav__desktop-ctas { display: none !important; }
+  
+  .hero {
+    min-height: auto !important;
+    padding-top: calc(var(--nav-h) + 1.25rem) !important;
+    padding-bottom: 3rem !important;
+    overflow: hidden !important;
+  }
+  
+  .hero__grid {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    width: 100% !important;
+    gap: 1.5rem !important;
+  }
+  
+  .hero__avatar-wrap {
+    display: none !important;
+  }
+  
+  .hero__label {
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    font-size: 0.75rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+  
+  .building-pill {
+    max-width: 100% !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    text-align: center !important;
+    justify-content: center !important;
+    font-size: 0.72rem !important;
+    padding: 0.4rem 0.85rem !important;
+    line-height: 1.45 !important;
+    margin-inline: auto !important;
+  }
+  
+  .hero__name {
+    font-size: clamp(2.2rem, 8.5vw, 3.2rem) !important;
+    text-align: center !important;
+    margin-bottom: 0.35rem !important;
+  }
+  
+  .hero__role {
+    font-size: 0.95rem !important;
+    text-align: center !important;
+    margin-bottom: 1.25rem !important;
+  }
+  
+  .hero__bio {
+    max-width: 100% !important;
+    border-left: none !important;
+    border-top: 3px solid var(--clr-accent) !important;
+    padding-left: 0 !important;
+    padding-top: 0.85rem !important;
+    text-align: center !important;
+    margin-inline: auto !important;
+    margin-bottom: 1.75rem !important;
+    font-size: 0.92rem !important;
+  }
+  
+  .hero__actions {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    gap: 0.65rem !important;
+    margin-bottom: 2rem !important;
+  }
+  
+  .hero__actions .btn {
+    width: 100% !important;
+    max-width: 320px !important;
+    justify-content: center !important;
+  }
+  
+  .hero__stats {
+    justify-content: center !important;
+    gap: 1.5rem !important;
+    width: 100% !important;
+  }
+  
+  .flagship-showcase {
+    padding: 1.75rem 1.25rem !important;
+    gap: 1.25rem !important;
+  }
+}
+
