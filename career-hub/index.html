@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Career-Hub — Headhunter Database &amp; Client Matching Console</title>
+  <!-- Google Fonts: Share Tech Mono & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-dark: #050811;
+      --bg-panel: #0d1222;
+      --bg-terminal: #070a13;
+      --border-color: #1f2d4d;
+      --text-primary: #f1f5f9;
+      --text-secondary: #64748b;
+      --terminal-green: #22c55e;
+      --terminal-green-glow: rgba(34, 197, 94, 0.25);
+      --terminal-amber: #eab308;
+      --terminal-amber-glow: rgba(234, 179, 8, 0.25);
+      --neon-cyan: #06b6d4;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* HEADER */
+    .hud-header {
+      height: 60px;
+      background: #090e1a;
+      border-bottom: 2px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      flex-shrink: 0;
+    }
+
+    .brand-logo {
+      font-family: 'Share Tech Mono', monospace;
+      font-weight: 700;
+      font-size: 1.3rem;
+      letter-spacing: 0.05em;
+      color: var(--text-primary);
+    }
+
+    .brand-logo span {
+      color: var(--terminal-green);
+      text-shadow: 0 0 10px var(--terminal-green-glow);
+    }
+
+    .brand-badge {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid var(--terminal-green);
+      color: var(--terminal-green);
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .meta-status {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--terminal-green);
+      box-shadow: 0 0 8px var(--terminal-green-glow);
+      animation: pulse-green 2s infinite;
+    }
+
+    @keyframes pulse-green {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* FULL-SCREEN WORKSPACE */
+    .hud-workspace {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    /* LEFT SCREEN: CLI Terminal Input */
+    .left-terminal {
+      width: 45%;
+      height: 100%;
+      background: var(--bg-terminal);
+      border-right: 2px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+    }
+
+    .terminal-header {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      padding-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .terminal-body {
+      flex: 1;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--terminal-green);
+      overflow-y: auto;
+      margin-bottom: 1rem;
+    }
+
+    .terminal-line {
+      margin-bottom: 0.5rem;
+      line-height: 1.4;
+    }
+
+    .terminal-prompt {
+      color: var(--text-secondary);
+    }
+
+    .terminal-input-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+    }
+
+    .cli-prompt-symbol {
+      color: var(--terminal-green);
+    }
+
+    .cli-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    /* RIGHT SCREEN: Visual Outputs */
+    .right-visuals {
+      width: 55%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-dark);
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .col-span-2 {
+      grid-column: span 2;
+    }
+
+    .hud-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+
+    .card-title {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      padding-bottom: 0.4rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .card-badge {
+      font-size: 0.65rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .badge-green {
+      background: rgba(34, 197, 94, 0.1);
+      color: var(--terminal-green);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    .badge-amber {
+      background: rgba(234, 179, 8, 0.1);
+      color: var(--terminal-amber);
+      border: 1px solid rgba(234, 179, 8, 0.2);
+    }
+
+    /* MATCH RESULTS ITEMS */
+    .match-item {
+      background: var(--bg-terminal);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .match-name {
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--text-primary);
+    }
+
+    .match-skills {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      margin-top: 0.15rem;
+    }
+
+    .match-score {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--terminal-green);
+    }
+
+    /* STAT READOUTS */
+    .stat-display-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .stat-item {
+      background: var(--bg-terminal);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem;
+      text-align: center;
+    }
+
+    .stat-val {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--terminal-amber);
+    }
+
+    .stat-lbl {
+      font-size: 0.68rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 0.2rem;
+    }
+
+    /* CLI command macro list */
+    .macro-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .macro-btn {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 0.35rem 0.75rem;
+      border-radius: 4px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .macro-btn:hover {
+      border-color: var(--terminal-green);
+      background: rgba(34, 197, 94, 0.05);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="hud-header">
+    <div class="brand-logo"><span>CAREER</span>-Hub</div>
+    <span class="brand-badge">Search OS v1.0</span>
+    <div class="meta-status">
+      <div class="status-item">
+        <span class="status-dot"></span>
+        Database: <span style="color: white; font-weight: 600;">CONNECTED</span>
+      </div>
+      <div class="status-item">
+        Clients Active: <span style="color: var(--terminal-amber); font-weight: 600;">150+</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- WORKSPACE -->
+  <div class="hud-workspace">
+
+    <!-- LEFT: CLI Terminal -->
+    <div class="left-terminal">
+      <div class="terminal-header">
+        <span>🤖 Career Pakistan Headhunter Shell</span>
+        <span>Type 'help' or click macros</span>
+      </div>
+
+      <div class="terminal-body" id="terminal-screen">
+        <div class="terminal-line">[System initializing...]</div>
+        <div class="terminal-line">Loaded candidate tables. Database index synced.</div>
+        <div class="terminal-line">Ready. Enter commands below to query candidate pipelines.</div>
+      </div>
+
+      <div class="terminal-input-row">
+        <span class="cli-prompt-symbol">cph@career:~$</span>
+        <input type="text" class="cli-input" id="cli-terminal-input" placeholder="Type command..." autocomplete="off" autofocus onkeydown="handleTerminalCommand(event)">
+      </div>
+
+      <div class="macro-bar">
+        <button class="macro-btn" onclick="executeMacro('help')">run help</button>
+        <button class="macro-btn" onclick="executeMacro('match developer')">match developer</button>
+        <button class="macro-btn" onclick="executeMacro('show clients')">show clients</button>
+        <button class="macro-btn" onclick="executeMacro('talkworld status')">talkworld status</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: Visual outputs -->
+    <div class="right-visuals">
+      <div class="card-grid">
+
+        <!-- Candidate matches -->
+        <div class="hud-card col-span-2">
+          <div class="card-title">Active Candidate Matches <span class="card-badge badge-green">Recruiter HUD</span></div>
+          <div id="candidates-container">
+            <!-- Dynamically populated -->
+            <div style="font-size: 0.85rem; color: var(--text-secondary); text-align: center; padding: 2rem 0;">
+              Use the terminal on the left to run candidate queries.
+            </div>
+          </div>
+        </div>
+
+        <!-- Telemetry & metrics -->
+        <div class="hud-card col-span-2">
+          <div class="card-title">Automated CV Parsing Telemetry <span class="card-badge badge-amber">VoltSearch AI</span></div>
+          <div class="stat-display-row">
+            <div class="stat-item">
+              <div class="stat-val" id="val-scanned">1,420</div>
+              <div class="stat-lbl">CVs Parsed / Min</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-val" id="val-matches">98.4%</div>
+              <div class="stat-lbl">Match Accuracy</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Talk world seats chart -->
+        <div class="hud-card col-span-2" style="height: 200px;">
+          <div class="card-title">Talk World Event Registrations (Engro vs Nestle vs Jazz)</div>
+          <div style="height: 140px;">
+            <canvas id="seatsChart"></canvas>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    let seatsChartInstance = null;
+
+    // Mock candidates
+    const candidates = [
+      { name: "Lokesh Kumar", role: "Software Engineer", skills: "HTML, CSS, JS, SQL, SCADA Telemetry", score: "96%" },
+      { name: "Ayesha Malik", role: "HR Executive", skills: "Sourcing, Screening, ATS, Interpersonal", score: "92%" },
+      { name: "Bilal Ahmed", role: "Marketing Intern", skills: "SEO, Social Media, Public Relations", score: "88%" }
+    ];
+
+    // Mock clients
+    const clientsList = [
+      "Engro Pakistan (Chemicals / Fertilisers)",
+      "Nestlé Pakistan (FMCG Logistics)",
+      "Telenor Pakistan (Telco infrastructure)",
+      "Jazz (Digital finance and operations)"
+    ];
+
+    window.onload = function() {
+      initCharts();
+      startSimulators();
+    };
+
+    function appendLine(text, type = '') {
+      const screen = document.getElementById('terminal-screen');
+      const div = document.createElement('div');
+      div.className = 'terminal-line';
+      if (type === 'input') {
+        div.innerHTML = `<span class="terminal-prompt">cph@career:~$ </span>${text}`;
+      } else {
+        div.innerText = text;
+      }
+      screen.appendChild(div);
+      screen.scrollTop = screen.scrollHeight;
+    }
+
+    function handleTerminalCommand(event) {
+      if (event.key === 'Enter') {
+        const input = document.getElementById('cli-terminal-input');
+        const cmd = input.value.trim().toLowerCase();
+        
+        appendLine(input.value, 'input');
+        input.value = '';
+        
+        processCommand(cmd);
+      }
+    }
+
+    function executeMacro(cmd) {
+      appendLine(cmd, 'input');
+      processCommand(cmd);
+    }
+
+    function processCommand(cmd) {
+      if (cmd === 'help') {
+        appendLine("Available Commands:");
+        appendLine("  help               — Display this instruction guide");
+        appendLine("  match developer    — Query candidates matching Web Developer criteria");
+        appendLine("  show clients       — Show active client companies");
+        appendLine("  talkworld status   — Display attendee seats details for Guest Speaker talks");
+        appendLine("  clear              — Clear the terminal shell log");
+      } 
+      else if (cmd === 'match developer') {
+        appendLine("Searching candidate database... Match score filter >80%");
+        appendLine("Found 1 developer matching core profiles.");
+        displayCandidates();
+      } 
+      else if (cmd === 'show clients') {
+        appendLine("Active Headhunting Clients (Total 150+):");
+        clientsList.forEach(c => appendLine(`  - ${c}`));
+      } 
+      else if (cmd === 'talkworld status') {
+        appendLine("Arranging guest speakers for universities... Status:");
+        appendLine("  Engro Session: 120 seats booked");
+        appendLine("  Nestle Session: 98 seats booked");
+        appendLine("  Jazz Session: 140 seats booked");
+      }
+      else if (cmd === 'clear') {
+        document.getElementById('terminal-screen').innerHTML = '';
+      }
+      else {
+        appendLine(`Command not found: '${cmd}'. Type 'help' for support.`, 'error');
+      }
+    }
+
+    function displayCandidates() {
+      const container = document.getElementById('candidates-container');
+      container.innerHTML = '';
+      
+      const dev = candidates[0]; // Lokesh
+      const div = document.createElement('div');
+      div.className = 'match-item';
+      div.innerHTML = `
+        <div>
+          <div class="match-name">${dev.name}</div>
+          <div class="match-skills">Role: ${dev.role} | Skills: ${dev.skills}</div>
+        </div>
+        <div class="match-score">${dev.score}</div>
+      `;
+      container.appendChild(div);
+      appendLine(`Recruiter UI populated with developer profile: ${dev.name}`);
+    }
+
+    // Chart.js Setup
+    function initCharts() {
+      const sCtx = document.getElementById('seatsChart').getContext('2d');
+      seatsChartInstance = new Chart(sCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Engro', 'Nestlé', 'Jazz'],
+          datasets: [
+            {
+              label: 'Booked Seats',
+              data: [120, 98, 140],
+              backgroundColor: ['#22c55e', '#0ea5e9', '#eab308'],
+              borderColor: 'transparent',
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: {
+              grid: { color: 'rgba(255, 255, 255, 0.04)' },
+              ticks: { color: '#64748b' }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#64748b' }
+            }
+          }
+        }
+      });
+    }
+
+    function startSimulators() {
+      setInterval(() => {
+        // Fluctuate stats
+        const scanned = Math.floor(Math.random() * 80) + 1380;
+        document.getElementById('val-scanned').innerText = scanned.toLocaleString();
+      }, 5000);
+    }
+  </script>
+</body>
+</html>

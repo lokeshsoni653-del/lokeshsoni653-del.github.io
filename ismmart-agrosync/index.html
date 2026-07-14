@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ISMMART-AgroSync — Commodity Exchange &amp; Logistics Sorter</title>
+  <!-- Google Fonts: Space Grotesk & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #070a13;
+      --bg-panel: #0d1326;
+      --bg-input: #151d38;
+      --border-color: #223154;
+      --text-primary: #f8fafc;
+      --text-secondary: #64748b;
+      --ismmart-amber: #f59e0b;
+      --ismmart-amber-glow: rgba(245, 158, 11, 0.25);
+      --steel-blue: #38bdf8;
+      --steel-blue-glow: rgba(56, 189, 248, 0.15);
+      --success-green: #10b981;
+      --alert-red: #ef4444;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 1.5rem;
+    }
+
+    /* HEADER */
+    .hud-header {
+      height: 60px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      margin-bottom: 1rem;
+      flex-shrink: 0;
+    }
+
+    .brand-logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: 0.05em;
+    }
+
+    .brand-logo span {
+      color: var(--ismmart-amber);
+      text-shadow: 0 0 10px var(--ismmart-amber-glow);
+    }
+
+    .brand-tag {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid var(--ismmart-amber);
+      color: var(--ismmart-amber);
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .meta-status {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--ismmart-amber);
+      box-shadow: 0 0 8px var(--ismmart-amber-glow);
+      animation: pulse-amber 2s infinite;
+    }
+
+    @keyframes pulse-amber {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* MAIN CONTAINER: Split + Bottom Map */
+    .hud-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-height: 0;
+    }
+
+    .hud-top-split {
+      display: flex;
+      flex: 1;
+      gap: 1rem;
+      min-height: 0;
+    }
+
+    /* LEFT PANEL: Radial Dials */
+    .left-dials {
+      width: 45%;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .panel-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .dial-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      flex: 1;
+      align-content: start;
+    }
+
+    .dial-card {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .dial-svg-chassis {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      margin-bottom: 0.5rem;
+    }
+
+    .dial-svg-ring {
+      fill: none;
+      stroke: #1b2640;
+      stroke-width: 8;
+    }
+
+    .dial-svg-fill {
+      fill: none;
+      stroke: var(--ismmart-amber);
+      stroke-width: 8;
+      stroke-linecap: round;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+      transition: stroke-dasharray 0.5s ease;
+    }
+
+    .dial-svg-fill.blue {
+      stroke: var(--steel-blue);
+    }
+
+    .dial-readout {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .dial-lbl {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .dial-subread {
+      font-size: 0.65rem;
+      color: var(--text-primary);
+      margin-top: 0.15rem;
+    }
+
+    /* RIGHT PANEL: Commodity Trade Sizer */
+    .right-ledger {
+      width: 55%;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .form-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .custom-select, .custom-input {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: white;
+      padding: 0.6rem 0.8rem;
+      font-size: 0.82rem;
+      outline: none;
+    }
+
+    .custom-select:focus, .custom-input:focus {
+      border-color: var(--ismmart-amber);
+    }
+
+    /* Ledger Manifest Output */
+    .manifest-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.25rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .manifest-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.04);
+      padding-bottom: 0.4rem;
+    }
+
+    .manifest-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .manifest-lbl {
+      color: var(--text-secondary);
+    }
+
+    .manifest-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+    }
+
+    .manifest-total {
+      border-top: 1px solid var(--border-color);
+      padding-top: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--ismmart-amber);
+    }
+
+    .btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--ismmart-amber), #b45309);
+      border: none;
+      color: white;
+      padding: 0.75rem;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      box-shadow: 0 4px 15px var(--ismmart-amber-glow);
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    /* BOTTOM PANEL: animated route map */
+    .bottom-map {
+      height: 120px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .map-canvas-container {
+      flex: 1;
+      position: relative;
+    }
+
+    /* Vector path route representation */
+    .vector-track {
+      width: 100%;
+      height: 100%;
+    }
+
+    .route-node {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .node-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--steel-blue);
+      box-shadow: 0 0 8px var(--steel-blue-glow);
+    }
+
+    .node-dot.amber {
+      background: var(--ismmart-amber);
+      box-shadow: 0 0 8px var(--ismmart-amber-glow);
+    }
+
+    .node-lbl {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+      text-transform: uppercase;
+    }
+
+    /* CSS Animated Transit truck */
+    .truck-transit {
+      position: absolute;
+      top: 50%;
+      width: 16px;
+      height: 16px;
+      transform: translateY(-50%);
+      background: var(--ismmart-amber);
+      border-radius: 50%;
+      animation: drive-route 12s infinite linear;
+      box-shadow: 0 0 10px var(--ismmart-amber-glow);
+    }
+
+    @keyframes drive-route {
+      0% { left: 10%; }
+      50% { left: 50%; }
+      100% { left: 90%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="hud-header">
+    <div class="brand-logo"><span>ISMMART</span> AgroSync</div>
+    <span class="brand-tag">Paid Intern Console</span>
+    <div class="meta-status">
+      <div class="status-item">
+        <span class="status-dot"></span>
+        Silos Index: <span style="color: white; font-weight: 600;">SYNCED</span>
+      </div>
+      <div class="status-item">
+        Session Rate: <span style="color: var(--steel-blue); font-weight: 600;">Rs 15,000 / Wk</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE -->
+  <div class="hud-main">
+
+    <!-- Top split: dials on left, ledger on right -->
+    <div class="hud-top-split">
+
+      <!-- Left: Silos circular dial telemetry -->
+      <div class="left-dials">
+        <div class="panel-title">
+          <span>🌾 Storage Silos Radial Telemetry</span>
+          <span style="color: var(--steel-blue); font-size: 0.7rem;">Continuous Audits</span>
+        </div>
+
+        <div class="dial-grid">
+          <!-- Silo 1: Wheat -->
+          <div class="dial-card">
+            <div class="dial-svg-chassis">
+              <svg class="vector-track" viewBox="0 0 100 100">
+                <circle class="dial-svg-ring" cx="50" cy="50" r="40"/>
+                <circle class="dial-svg-fill" id="fill-silo1" cx="50" cy="50" r="40" stroke-dasharray="251.2" stroke-dashoffset="62.8"/>
+              </svg>
+              <div class="dial-readout" id="val-silo1">75%</div>
+            </div>
+            <div class="dial-lbl">Wheat Silo 1</div>
+            <div class="dial-subread" id="temp-silo1">Temp: 24°C</div>
+          </div>
+
+          <!-- Silo 2: Basmati Rice -->
+          <div class="dial-card">
+            <div class="dial-svg-chassis">
+              <svg class="vector-track" viewBox="0 0 100 100">
+                <circle class="dial-svg-ring" cx="50" cy="50" r="40"/>
+                <circle class="dial-svg-fill blue" id="fill-silo2" cx="50" cy="50" r="40" stroke-dasharray="251.2" stroke-dashoffset="100.5"/>
+              </svg>
+              <div class="dial-readout" id="val-silo2">60%</div>
+            </div>
+            <div class="dial-lbl">Rice Silo 2</div>
+            <div class="dial-subread" id="temp-silo2">Moisture: 12.8%</div>
+          </div>
+
+          <!-- Silo 3: Cotton -->
+          <div class="dial-card">
+            <div class="dial-svg-chassis">
+              <svg class="vector-track" viewBox="0 0 100 100">
+                <circle class="dial-svg-ring" cx="50" cy="50" r="40"/>
+                <circle class="dial-svg-fill" id="fill-silo3" cx="50" cy="50" r="40" stroke-dasharray="251.2" stroke-dashoffset="150.7"/>
+              </svg>
+              <div class="dial-readout" id="val-silo3">40%</div>
+            </div>
+            <div class="dial-lbl">Cotton Bay 3</div>
+            <div class="dial-subread" id="temp-silo3">Temp: 18°C</div>
+          </div>
+
+          <!-- Silo 4: Maize -->
+          <div class="dial-card">
+            <div class="dial-svg-chassis">
+              <svg class="vector-track" viewBox="0 0 100 100">
+                <circle class="dial-svg-ring" cx="50" cy="50" r="40"/>
+                <circle class="dial-svg-fill blue" id="fill-silo4" cx="50" cy="50" r="40" stroke-dasharray="251.2" stroke-dashoffset="88"/>
+              </svg>
+              <div class="dial-readout" id="val-silo4">65%</div>
+            </div>
+            <div class="dial-lbl">Maize Silo 4</div>
+            <div class="dial-subread" id="temp-silo4">Moisture: 11.4%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Trade Ledger & invoice sizer -->
+      <div class="right-ledger">
+        <div class="panel-title">
+          <span>📦 Commodity Trade Cargo Ledger</span>
+          <span style="color: var(--ismmart-amber); font-size: 0.7rem;">Invoice Sizer</span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Commodity Type</label>
+            <select class="custom-select" id="commodity-select" onchange="calculateTrade()">
+              <option value="wheat">Wheat (Punjab Premium)</option>
+              <option value="rice">Super Basmati Rice</option>
+              <option value="cotton">Raw Upland Cotton</option>
+              <option value="maize">High-Yield Maize</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Volume (Metric Tons)</label>
+            <input type="number" class="custom-input" id="commodity-volume" value="25" min="1" step="1" oninput="calculateTrade()">
+          </div>
+        </div>
+
+        <!-- Ledger invoice output details -->
+        <div class="manifest-box">
+          <div class="manifest-row">
+            <span class="manifest-lbl">Base Price per Ton</span>
+            <span class="manifest-val" id="inv-base-rate">Rs 95,000</span>
+          </div>
+          <div class="manifest-row">
+            <span class="manifest-lbl">Calculated Cargo Subtotal</span>
+            <span class="manifest-val" id="inv-subtotal">Rs 2,375,000</span>
+          </div>
+          <div class="manifest-row">
+            <span class="manifest-lbl">Logistics Shipping Surcharge (3%)</span>
+            <span class="manifest-val" id="inv-surcharge">Rs 71,250</span>
+          </div>
+          <div class="manifest-row manifest-total">
+            <span class="manifest-lbl" style="color: var(--ismmart-amber);">Total Invoice Amount</span>
+            <span class="manifest-val" id="inv-total">Rs 2,446,250</span>
+          </div>
+        </div>
+
+        <button class="btn" onclick="commitTrade()">Commit Trade Contract</button>
+      </div>
+
+    </div>
+
+    <!-- Bottom: Animated cargo route transit tracking map -->
+    <div class="bottom-map">
+      <div class="panel-title" style="margin-bottom: 0.5rem; border-bottom: none; padding-bottom: 0;">
+        <span>🚚 Active Cargo Fleet Logistics Route Transit Tracking</span>
+      </div>
+
+      <div class="map-canvas-container">
+        <!-- SVG connecting route line -->
+        <svg style="width:100%; height:100%; position:absolute; top:0; left:0;">
+          <line x1="10%" y1="50%" x2="90%" y2="50%" style="stroke:var(--border-color); stroke-width:3; stroke-dasharray:6;"></line>
+        </svg>
+
+        <!-- Route Nodes -->
+        <div class="route-node" style="left: 10%;">
+          <div class="node-dot"></div>
+          <div class="node-lbl">Karachi Port</div>
+        </div>
+        <div class="route-node" style="left: 50%;">
+          <div class="node-dot amber"></div>
+          <div class="node-lbl">Multan Hub</div>
+        </div>
+        <div class="route-node" style="left: 90%;">
+          <div class="node-dot"></div>
+          <div class="node-lbl">Lahore HQ</div>
+        </div>
+
+        <!-- CSS Animated truck indicator -->
+        <div class="truck-transit" id="truck-indicator"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // Mock commodity price catalog (Per Ton)
+    const commodityPrices = {
+      wheat: 95000,
+      rice: 185000,
+      cotton: 165000,
+      maize: 88000
+    };
+
+    window.onload = function() {
+      calculateTrade();
+      startTelemetrySimulators();
+    };
+
+    function calculateTrade() {
+      const type = document.getElementById('commodity-select').value;
+      const volume = parseFloat(document.getElementById('commodity-volume').value) || 0;
+      
+      const rate = commodityPrices[type];
+      const subtotal = rate * volume;
+      const surcharge = Math.round(subtotal * 0.03);
+      const total = subtotal + surcharge;
+      
+      document.getElementById('inv-base-rate').innerText = `Rs ${rate.toLocaleString()}`;
+      document.getElementById('inv-subtotal').innerText = `Rs ${subtotal.toLocaleString()}`;
+      document.getElementById('inv-surcharge').innerText = `Rs ${surcharge.toLocaleString()}`;
+      document.getElementById('inv-total').innerText = `Rs ${total.toLocaleString()}`;
+    }
+
+    function commitTrade() {
+      const type = document.getElementById('commodity-select').value.toUpperCase();
+      const volume = document.getElementById('commodity-volume').value;
+      const total = document.getElementById('inv-total').innerText;
+      
+      alert(`Trade contract committed successfully:\nCommodity: ${type}\nVolume: ${volume} Tons\nInvoice Total: ${total}`);
+    }
+
+    function startTelemetrySimulators() {
+      // Simulate slight fluctuations in silo readouts
+      setInterval(() => {
+        // Silo 1 (Wheat)
+        const s1Val = Math.floor(Math.random() * 4) + 73;
+        document.getElementById('val-silo1').innerText = `${s1Val}%`;
+        updateRingOffset('fill-silo1', s1Val);
+        
+        // Silo 3 (Cotton)
+        const s3Val = Math.floor(Math.random() * 2) + 39;
+        document.getElementById('val-silo3').innerText = `${s3Val}%`;
+        updateRingOffset('fill-silo3', s3Val);
+      }, 5000);
+    }
+
+    function updateRingOffset(elementId, val) {
+      const circle = document.getElementById(elementId);
+      if (!circle) return;
+      const r = 40;
+      const c = 2 * Math.PI * r; // 251.2
+      const offset = c - (val / 100 * c);
+      circle.style.strokeDashoffset = offset;
+    }
+  </script>
+</body>
+</html>

@@ -274,6 +274,7 @@
   </style>
 </head>
 <body>
+<div id="scroll-progress"></div>
 
 <!-- NAV -->
 <nav class="nav" id="main-nav">
@@ -290,9 +291,10 @@
       <a href="testimonials.html"   class="nav__link">Testimonials</a>
     </div>
     <div style="display: flex; gap: 0.5rem; align-items: center;">
-      <a href="Lokesh_Kumar_Resume.pdf" class="nav__cta" download style="background: transparent; color: var(--clr-accent); border: 1px solid var(--clr-accent);">Download CV</a>
+      <a href="assets/Lokesh_Kumar_Resume.pdf" class="nav__cta" download style="background: transparent; color: var(--clr-accent); border: 1px solid var(--clr-accent);">Resume (PDF)</a>
       <a href="contact.html" class="nav__cta">Hire Me →</a>
     </div>
+    <button class="dark-toggle" id="dark-toggle" title="Toggle dark mode (or press D)" aria-label="Toggle dark mode"><span class="dark-toggle__knob"></span></button>
     <button class="nav__hamburger" id="hamburger" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
@@ -307,7 +309,7 @@
     <a href="education.html"      class="nav__link">Education</a>
     <a href="certifications.html" class="nav__link">Certifications</a>
     <a href="testimonials.html"   class="nav__link">Testimonials</a>
-    <a href="Lokesh_Kumar_Resume.pdf" class="nav__link" download style="color: var(--clr-accent); font-weight: bold;">Download CV</a>
+    <a href="assets/Lokesh_Kumar_Resume.pdf" class="nav__link" download style="color: var(--clr-accent); font-weight: bold;">Resume (PDF)</a>
     <a href="contact.html"        class="nav__cta btn btn-primary">Hire Me →</a>
   </div>
 </nav>
@@ -321,11 +323,15 @@
           <span class="hero__label-dot"></span>
           <span class="label">Available for Opportunities</span>
         </div>
+        <div class="building-pill animate-fade-up">
+          <span class="building-pill__dot"></span>
+          🔨 Currently building: IoT Agri Thesis &amp; Internship Applications
+        </div>
         <h1 class="hero__name animate-fade-up delay-1">
           Lokesh<br><span>Kumar</span>
         </h1>
         <p class="hero__role animate-fade-up delay-2">Software Engineer &amp; Data Systems Architect</p>
-        <p class="hero__bio animate-fade-up delay-3">
+        <p class="hero__bio hero__bio-glow animate-fade-up delay-3">
           Final-year Software Engineering student specializing in supply chain routing, interactive telematics dashboards, and operational data pipelines. I transform complex operational, geographic, and transport data into secure, elegant Python-based web applications.
         </p>
         <div class="hero__actions animate-fade-up delay-4">
@@ -347,7 +353,7 @@
         </div>
         <div class="hero__stats animate-fade-up delay-5">
           <div>
-            <div class="hero__stat-n">54</div>
+            <div class="hero__stat-n">56</div>
             <div class="hero__stat-l">Live Projects</div>
           </div>
           <div>
@@ -367,31 +373,58 @@
           <span class="dot"></span>
           Open to Internships &amp; Roles
         </div>
-        <div class="hero__avatar-tech">🚀 54 Live Projects</div>
+        <div class="hero__avatar-tech">🚀 56 Live Projects</div>
       </div>
-      
-    <!-- Tech Stack Strip -->
+    </div><!-- end hero__grid -->
+
+    <!-- Tech Stack Marquee (full width below the grid) -->
     <div class="tech-strip reveal">
       <p class="tech-strip__label">Tech Stack &amp; Tools</p>
-      <div class="tech-strip__items">
-        <span class="tech-pill">🐍 Python</span>
-        <span class="tech-pill">🗄️ SQL</span>
-        <span class="tech-pill">⚡ JavaScript ES6+</span>
-        <span class="tech-pill">🌐 HTML5 / CSS3</span>
-        <span class="tech-pill">🐼 Pandas</span>
-        <span class="tech-pill">🔢 NumPy</span>
-        <span class="tech-pill">📡 NetworkX</span>
-        <span class="tech-pill">🚀 Streamlit</span>
-        <span class="tech-pill">🗺️ Folium / Leaflet</span>
-        <span class="tech-pill">🤖 NLP / RAG</span>
-        <span class="tech-pill">🌀 WebSockets</span>
-        <span class="tech-pill">🐙 Git / GitHub</span>
-        <span class="tech-pill">📊 MS Excel</span>
-        <span class="tech-pill">🌍 WordPress</span>
+      <div class="marquee-wrapper">
+        <div class="marquee-track" id="marquee-track">
+          <span class="tech-pill">🐍 Python</span>
+          <span class="tech-pill">🗄️ SQL</span>
+          <span class="tech-pill">⚡ JavaScript ES6+</span>
+          <span class="tech-pill">🌐 HTML5 / CSS3</span>
+          <span class="tech-pill">🐼 Pandas</span>
+          <span class="tech-pill">🔢 NumPy</span>
+          <span class="tech-pill">📡 NetworkX</span>
+          <span class="tech-pill">🚀 Streamlit</span>
+          <span class="tech-pill">🗺️ Folium / Leaflet</span>
+          <span class="tech-pill">🤖 NLP / RAG</span>
+          <span class="tech-pill">🌀 WebSockets</span>
+          <span class="tech-pill">🐙 Git / GitHub</span>
+          <span class="tech-pill">📊 MS Excel</span>
+          <span class="tech-pill">🌍 WordPress</span>
+          <span class="tech-pill">☁️ GCP / Streamlit Cloud</span>
+          <span class="tech-pill">▲ Vercel</span>
+          <span class="tech-pill">🔵 Netlify</span>
+          <span class="tech-pill">📐 Figma</span>
+          <!-- Duplicate for seamless loop -->
+          <span class="tech-pill">🐍 Python</span>
+          <span class="tech-pill">🗄️ SQL</span>
+          <span class="tech-pill">⚡ JavaScript ES6+</span>
+          <span class="tech-pill">🌐 HTML5 / CSS3</span>
+          <span class="tech-pill">🐼 Pandas</span>
+          <span class="tech-pill">🔢 NumPy</span>
+          <span class="tech-pill">📡 NetworkX</span>
+          <span class="tech-pill">🚀 Streamlit</span>
+          <span class="tech-pill">🗺️ Folium / Leaflet</span>
+          <span class="tech-pill">🤖 NLP / RAG</span>
+          <span class="tech-pill">🌀 WebSockets</span>
+          <span class="tech-pill">🐙 Git / GitHub</span>
+          <span class="tech-pill">📊 MS Excel</span>
+          <span class="tech-pill">🌍 WordPress</span>
+          <span class="tech-pill">☁️ GCP / Streamlit Cloud</span>
+          <span class="tech-pill">▲ Vercel</span>
+          <span class="tech-pill">🔵 Netlify</span>
+          <span class="tech-pill">📐 Figma</span>
+        </div>
       </div>
     </div>
   </div>
 </section>
+
 
 <!-- FEATURED PAGES PREVIEW -->
 <section class="featured">
@@ -1055,6 +1088,46 @@
       </div>
     </div>
 
+<!-- Flagship Showcase Block 33: ISMMART-AgroSync -->
+    <div class="flagship-showcase reveal" style="background: linear-gradient(135deg, #070a13 0%, #151d38 100%); border-color: #f59e0b; box-shadow: 0 0 30px rgba(245, 158, 11, 0.15), inset 0 0 20px rgba(245, 158, 11, 0.05); margin-top: 2rem;">
+      <div class="flagship-showcase__content">
+        <span class="flagship-showcase__tag" style="background: rgba(245, 158, 11, 0.1); border-color: #f59e0b; color: #fbbf24;">🚜 Commodities &amp; Logistics Special Release</span>
+        <h3 class="flagship-showcase__title" style="color: #f9fafb;">ISMMART-AgroSync: Commodity Exchange &amp; Logistics Sorter</h3>
+        <p class="flagship-showcase__desc" style="color: #94a3b8;">
+          An industrial radial dial dashboard for commodity trading and cargo storage audits. Integrates circular SVG capacity telemetry (Wheat/Rice/Maize levels, temperatures, moisture indicators) with trade invoicing ledgers and animated transport route maps. Built for ISMMART Group of Industries.
+        </p>
+        <div class="flagship-showcase__badges">
+          <span class="badge" style="color: #fbbf24; background: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.25);">🎯 Radial Telemetry Hub</span>
+          <span class="badge" style="color: #fbbf24; background: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.25);">📦 Cargo Ledger</span>
+          <span class="badge" style="color: #fbbf24; background: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.25);">🚚 Animated Route Transit</span>
+          <span class="badge" style="color: #fbbf24; background: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.25);">🧾 Invoice Sizer</span>
+        </div>
+        <a href="https://ismmart-agrosync.vercel.app/" target="_blank" class="flagship-showcase__btn" style="background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%); box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); color: #fff; font-weight: 700;">
+          🚜 Launch ISMMART-AgroSync →
+        </a>
+      </div>
+    </div>
+
+<!-- Flagship Showcase Block 34: Pasha-Connect -->
+    <div class="flagship-showcase reveal" style="background: linear-gradient(135deg, #090d16 0%, #151d33 100%); border-color: #e11d48; box-shadow: 0 0 30px rgba(225, 29, 72, 0.15), inset 0 0 20px rgba(225, 29, 72, 0.05); margin-top: 2rem;">
+      <div class="flagship-showcase__content">
+        <span class="flagship-showcase__tag" style="background: rgba(225, 29, 72, 0.1); border-color: #e11d48; color: #fb7185;">📋 Project Coordination Special Release</span>
+        <h3 class="flagship-showcase__title" style="color: #f9fafb;">Pasha-Connect: IT Export Sizer &amp; Member Coordination Portal</h3>
+        <p class="flagship-showcase__desc" style="color: #94a3b8;">
+          An event and member coordination dashboard using an interactive 3-column Kanban workspace. Features modular modal analytics tracking IT export sizer metrics via Chart.js, search-filterable directories of P@SHA member companies, outreach email rates, and seat planners. Built for Pakistan IT Industry Association.
+        </p>
+        <div class="flagship-showcase__badges">
+          <span class="badge" style="color: #fb7185; background: rgba(225, 29, 72, 0.05); border-color: rgba(225, 29, 72, 0.25);">📋 Kanban Swimlanes</span>
+          <span class="badge" style="color: #fb7185; background: rgba(225, 29, 72, 0.05); border-color: rgba(225, 29, 72, 0.25);">📈 Export Sizers</span>
+          <span class="badge" style="color: #fb7185; background: rgba(225, 29, 72, 0.05); border-color: rgba(225, 29, 72, 0.25);">🔍 Member Search Sync</span>
+          <span class="badge" style="color: #fb7185; background: rgba(225, 29, 72, 0.05); border-color: rgba(225, 29, 72, 0.25);">🎟️ RSVP Seat Planners</span>
+        </div>
+        <a href="https://pasha-connect.vercel.app/" target="_blank" class="flagship-showcase__btn" style="background: linear-gradient(135deg, #e11d48 0%, #be123c 100%); box-shadow: 0 0 15px rgba(225, 29, 72, 0.4); color: #fff; font-weight: 700;">
+          📋 Launch Pasha-Connect →
+        </a>
+      </div>
+    </div>
+
 <!-- Flagship Showcase Block 17: Baykar AeroFlight -->
     <div class="flagship-showcase reveal" style="background: linear-gradient(135deg, #15090a 0%, #060203 100%); border-color: #c8162a; box-shadow: 0 0 30px rgba(200, 22, 42, 0.15), inset 0 0 20px rgba(200, 22, 42, 0.05); margin-top: 2rem;">
       <div class="flagship-showcase__content">
@@ -1191,7 +1264,14 @@
           <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
         </a>
       </div>
-      <p class="footer__copy">© 2026 Lokesh Kumar. Crafted with care.</p>
+            <div class="footer__social">
+        <a href="https://github.com/lokeshsoni653-del" target="_blank" rel="noopener" class="footer__social-link">🐙 GitHub</a>
+        <a href="https://www.linkedin.com/in/lokesh-kumar-76060722a" target="_blank" rel="noopener" class="footer__social-link">💼 LinkedIn</a>
+        <a href="https://share.streamlit.io/user/lokeshsoni653-del" target="_blank" rel="noopener" class="footer__social-link">🚀 Streamlit</a>
+        <a href="https://vercel.com/lsoni1418-7207s-projects" target="_blank" rel="noopener" class="footer__social-link">▲ Vercel</a>
+        <a href="https://app.netlify.com/teams/lsoni1418/projects" target="_blank" rel="noopener" class="footer__social-link">🔵 Netlify</a>
+      </div>
+      <p class="footer__copy">© <span class="footer-year">2026</span> Lokesh Kumar. Crafted with care.</p>
     </div>
   </div>
 </footer>
@@ -1217,5 +1297,341 @@
   }, { threshold: 0.12 });
   reveals.forEach(r => observer.observe(r));
 </script>
+
+<script>
+/* ── Typewriter Role Animation ── */
+(function() {
+  var roles = [
+    'Software Engineer & Data Systems Architect',
+    'Python Web Application Developer',
+    'AI & NLP Applications Builder',
+    'Supply Chain Data Engineer'
+  ];
+  var el = document.querySelector('.hero__role');
+  if (!el) return;
+  el.classList.add('hero__role-typed');
+  var ri = 0, ci = 0, deleting = false, pause = false;
+  function tick() {
+    var r = roles[ri];
+    if (pause) { pause = false; setTimeout(tick, 1800); return; }
+    if (!deleting) {
+      el.textContent = r.slice(0, ++ci);
+      if (ci === r.length) { deleting = true; pause = true; }
+      setTimeout(tick, 75);
+    } else {
+      el.textContent = r.slice(0, --ci);
+      if (ci === 0) { deleting = false; ri = (ri + 1) % roles.length; }
+      setTimeout(tick, 38);
+    }
+  }
+  tick();
+})();
+
+/* ── Count-Up Stats Animation ── */
+document.querySelectorAll('.hero__stat-n').forEach(function(el) {
+  var raw = el.textContent.trim();
+  var target = parseFloat(raw);
+  var isDecimal = raw.includes('.');
+  var suffix = raw.replace(/[\d.]/g, '');
+  var started = false;
+  var obs = new IntersectionObserver(function(entries) {
+    if (!entries[0].isIntersecting || started) return;
+    started = true;
+    obs.unobserve(el);
+    var t0 = null, dur = 1500;
+    function step(ts) {
+      if (!t0) t0 = ts;
+      var p = Math.min((ts - t0) / dur, 1);
+      var ease = 1 - Math.pow(1 - p, 3);
+      el.textContent = isDecimal ? (ease * target).toFixed(2) + suffix : Math.floor(ease * target) + suffix;
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }, { threshold: 0.6 });
+  obs.observe(el);
+});
+
+/* ── Staggered Reveals for Feature Cards ── */
+document.querySelectorAll('.featured__cards .feat-card').forEach(function(card, i) {
+  card.style.transitionDelay = (i * 0.1) + 's';
+});
+</script>
+
+<button class="back-top" id="back-top" aria-label="Back to top">↑</button>
+
+<a class="resume-cta-fixed" href="assets/Lokesh_Kumar_Resume.pdf" download title="Download Resume">⬇ Resume</a>
+  <script>
+    /* Dark Mode: apply before paint */
+    (function(){
+      var s = localStorage.getItem('lk-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', s);
+    })();
+    document.addEventListener('DOMContentLoaded', function() {
+      /* Dark Toggle */
+      var toggle = document.getElementById('dark-toggle');
+      if (toggle) {
+        toggle.addEventListener('click', function() {
+          var curr = document.documentElement.getAttribute('data-theme');
+          var next = curr === 'dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', next);
+          localStorage.setItem('lk-theme', next);
+        });
+      }
+      /* Back to Top */
+      var bt = document.getElementById('back-top');
+      if (bt) {
+        window.addEventListener('scroll', function() { bt.classList.toggle('show', window.scrollY > 400); }, { passive: true });
+        bt.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+      }
+    });
+  </script>
+  <script>
+    /* ── Scroll Progress Bar ── */
+    (function() {
+      var bar = document.getElementById('scroll-progress');
+      if (!bar) return;
+      function updateProgress() {
+        var scrollTop = window.scrollY;
+        var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        var pct = docHeight > 0 ? scrollTop / docHeight : 0;
+        bar.style.transform = 'scaleX(' + pct + ')';
+      }
+      window.addEventListener('scroll', updateProgress, { passive: true });
+      updateProgress();
+    })();
+
+    /* ── OS dark mode auto-detect (only on first visit) ── */
+    (function() {
+      if (!localStorage.getItem('lk-theme')) {
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = prefersDark ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('lk-theme', theme);
+      }
+    })();
+
+    /* ── Keyboard shortcut: press D to toggle dark mode ── */
+    document.addEventListener('keydown', function(e) {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.key === 'd' || e.key === 'D') {
+        var curr = document.documentElement.getAttribute('data-theme');
+        var next = curr === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('lk-theme', next);
+      }
+    });
+
+    /* ── Page exit fade ── */
+    document.querySelectorAll('a[href]').forEach(function(a) {
+      var href = a.getAttribute('href');
+      if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('mailto') || href.startsWith('tel') || a.download) return;
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.body.style.opacity = '0';
+        document.body.style.transition = 'opacity 0.2s';
+        setTimeout(function() { window.location.href = href; }, 200);
+      });
+    });
+
+    /* ── Auto copyright year ── */
+    var yr = document.querySelector('.footer-year');
+    if (yr) yr.textContent = new Date().getFullYear();
+  </script>
+
+<!-- ═══════════════ LK CHATBOT WIDGET ═══════════════ -->
+<div class="lk-chat" id="lk-chat">
+
+  <!-- Toggle Button -->
+  <button class="lk-chat__toggle" id="lk-chat-toggle" aria-label="Open AI assistant" aria-expanded="false">
+    <span class="lk-chat__toggle-icon" id="lk-chat-icon">💬</span>
+    <span class="lk-chat__toggle-label">Ask me about Lokesh</span>
+  </button>
+
+  <!-- Chat Panel -->
+  <div class="lk-chat__panel" id="lk-chat-panel" aria-hidden="true" role="dialog" aria-label="Portfolio AI assistant">
+
+    <!-- Header -->
+    <div class="lk-chat__header">
+      <div class="lk-chat__bot-avatar">🤖</div>
+      <div class="lk-chat__bot-info">
+        <div class="lk-chat__bot-name">Lokesh's AI Assistant</div>
+        <div class="lk-chat__bot-status">
+          <span class="lk-chat__status-dot"></span>
+          Online — Ask me anything!
+        </div>
+      </div>
+      <button class="lk-chat__header-close" id="lk-chat-close" aria-label="Close chat">✕</button>
+    </div>
+
+    <!-- Messages -->
+    <div class="lk-chat__messages" id="lk-chat-messages"></div>
+
+    <!-- Quick Reply Chips -->
+    <div class="lk-chat__chips" id="lk-chat-chips">
+      <button class="lk-chip" data-q="What are Lokesh's best projects?">🚀 Best projects?</button>
+      <button class="lk-chip" data-q="What Python skills does Lokesh have?">🐍 Python skills?</button>
+      <button class="lk-chip" data-q="Is Lokesh open to internships or full-time roles?">💼 Available for hire?</button>
+      <button class="lk-chip" data-q="Tell me about Lokesh's education and background.">🎓 Education?</button>
+      <button class="lk-chip" data-q="How can I contact Lokesh Kumar?">📧 Contact info?</button>
+    </div>
+
+    <!-- Input -->
+    <div class="lk-chat__input-row">
+      <input class="lk-chat__input" id="lk-chat-input" type="text"
+             placeholder="Ask about Lokesh's projects, skills..."
+             maxlength="500" autocomplete="off" aria-label="Chat message" />
+      <button class="lk-chat__send" id="lk-chat-send" aria-label="Send">↑</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function() {
+  // ── CONFIG — update CHAT_API_URL after deploying Vercel function ──
+  var CHAT_API_URL = 'https://lokesh-portfolio-bot.vercel.app/api/chat';
+
+  var GREETING = "Hi! I'm Lokesh's AI assistant. I know everything about his 56+ projects, skills, experience, and availability. What would you like to know? 🚀";
+
+  // ── State ──────────────────────────────────────────────────────
+  var isOpen       = false;
+  var isLoading    = false;
+  var history      = [];
+  var chipsShown   = true;
+
+  // ── Elements ───────────────────────────────────────────────────
+  var toggle   = document.getElementById('lk-chat-toggle');
+  var closeBtn = document.getElementById('lk-chat-close');
+  var panel    = document.getElementById('lk-chat-panel');
+  var messages = document.getElementById('lk-chat-messages');
+  var input    = document.getElementById('lk-chat-input');
+  var sendBtn  = document.getElementById('lk-chat-send');
+  var chips    = document.getElementById('lk-chat-chips');
+  var icon     = document.getElementById('lk-chat-icon');
+
+  if (!toggle) return; // safety guard
+
+  // ── Helpers ────────────────────────────────────────────────────
+  function addMessage(text, role) {
+    var div = document.createElement('div');
+    div.className = 'lk-msg lk-msg--' + role;
+    div.textContent = text;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+    return div;
+  }
+
+  function showTyping() {
+    var t = document.createElement('div');
+    t.className = 'lk-typing'; t.id = 'lk-typing';
+    t.innerHTML = '<span></span><span></span><span></span>';
+    messages.appendChild(t);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function hideTyping() {
+    var t = document.getElementById('lk-typing');
+    if (t) t.remove();
+  }
+
+  function hideChips() {
+    if (chips && chipsShown) { chips.style.display = 'none'; chipsShown = false; }
+  }
+
+  function setLoading(state) {
+    isLoading = state;
+    sendBtn.disabled = state;
+    input.disabled   = state;
+    if (state) showTyping(); else hideTyping();
+  }
+
+  // ── Open/Close ─────────────────────────────────────────────────
+  function openChat() {
+    isOpen = true;
+    panel.classList.add('open');
+    panel.setAttribute('aria-hidden', 'false');
+    toggle.setAttribute('aria-expanded', 'true');
+    icon.textContent = '✕';
+    input.focus();
+    // Show greeting if first time
+    if (messages.children.length === 0) {
+      addMessage(GREETING, 'bot');
+    }
+  }
+
+  function closeChat() {
+    isOpen = false;
+    panel.classList.remove('open');
+    panel.setAttribute('aria-hidden', 'true');
+    toggle.setAttribute('aria-expanded', 'false');
+    icon.textContent = '💬';
+  }
+
+  toggle.addEventListener('click', function() { isOpen ? closeChat() : openChat(); });
+  closeBtn.addEventListener('click', closeChat);
+
+  // Close on outside click
+  document.addEventListener('click', function(e) {
+    if (isOpen && !document.getElementById('lk-chat').contains(e.target)) closeChat();
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && isOpen) closeChat();
+  });
+
+  // ── Send Message ───────────────────────────────────────────────
+  function sendMessage(text) {
+    text = (text || input.value || '').trim();
+    if (!text || isLoading) return;
+    input.value = '';
+    hideChips();
+
+    addMessage(text, 'user');
+    setLoading(true);
+
+    // Keep last 10 history items for context
+    var recentHistory = history.slice(-10);
+
+    fetch(CHAT_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text, history: recentHistory }),
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      setLoading(false);
+      var answer = data.answer || data.error || 'Something went wrong. Please try again!';
+      addMessage(answer, 'bot');
+      history.push({ role: 'user', text: text });
+      history.push({ role: 'bot',  text: answer });
+      // Trim history to last 20 items
+      if (history.length > 20) history = history.slice(-20);
+    })
+    .catch(function() {
+      setLoading(false);
+      addMessage('Network error. Please check your connection and try again!', 'bot');
+    });
+  }
+
+  sendBtn.addEventListener('click', function() { sendMessage(); });
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+
+  // ── Quick Reply Chips ──────────────────────────────────────────
+  if (chips) {
+    chips.querySelectorAll('.lk-chip').forEach(function(chip) {
+      chip.addEventListener('click', function() {
+        var q = this.getAttribute('data-q');
+        if (q) { openChat(); sendMessage(q); }
+      });
+    });
+  }
+
+})();
+</script>
+<!-- ════════════ END LK CHATBOT WIDGET ════════════ -->
+
 </body>
 </html>

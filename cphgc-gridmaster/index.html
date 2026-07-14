@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CPHGC-GridMaster — 1,320 MW Power Plant HUD</title>
+  <!-- Google Fonts: Share Tech Mono & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-dark: #0b0f17;
+      --bg-panel: #111827;
+      --bg-node: #1f2937;
+      --border-color: #374151;
+      --text-primary: #f3f4f6;
+      --text-secondary: #9ca3af;
+      --coal-orange: #f97316;
+      --coal-orange-glow: rgba(249, 115, 22, 0.25);
+      --grid-green: #10b981;
+      --grid-green-glow: rgba(16, 185, 129, 0.25);
+      --alert-red: #ef4444;
+      --alert-red-glow: rgba(239, 68, 68, 0.25);
+      --neon-cyan: #06b6d4;
+      --neon-cyan-glow: rgba(6, 182, 212, 0.25);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* TOP HEADER (Industrial HUD Style) */
+    .hud-header {
+      height: 65px;
+      background: #0d131f;
+      border-bottom: 2px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      flex-shrink: 0;
+    }
+
+    .hud-title-block {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .hud-logo {
+      font-family: 'Share Tech Mono', monospace;
+      font-weight: 700;
+      font-size: 1.35rem;
+      letter-spacing: 0.05em;
+      color: var(--text-primary);
+    }
+
+    .hud-logo span {
+      color: var(--coal-orange);
+      text-shadow: 0 0 10px var(--coal-orange-glow);
+    }
+
+    .hud-tag {
+      background: rgba(249, 115, 22, 0.1);
+      border: 1px solid var(--coal-orange);
+      color: var(--coal-orange);
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .hud-meta {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .meta-stat {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--grid-green);
+      box-shadow: 0 0 8px var(--grid-green-glow);
+    }
+
+    .status-dot.pulse {
+      animation: blink-green 2s infinite;
+    }
+
+    @keyframes blink-green {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* SPLIT-SCREEN WORKSPACE */
+    .hud-workspace {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    /* LEFT SCREEN: 2D Interactive Generation Schematic */
+    .left-screen {
+      width: 50%;
+      height: 100%;
+      border-right: 2px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      background-image: radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.015) 0%, transparent 70%);
+      position: relative;
+    }
+
+    .screen-header {
+      padding: 1.25rem 2rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      color: var(--text-secondary);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .schematic-canvas {
+      flex: 1;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      position: relative;
+    }
+
+    /* Generation Sequence Nodes styling */
+    .schematic-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .connector-line {
+      position: absolute;
+      top: 50%;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: repeating-linear-gradient(90deg, var(--border-color), var(--border-color) 10px, transparent 10px, transparent 20px);
+      z-index: 1;
+    }
+
+    .connector-line.active {
+      background: repeating-linear-gradient(90deg, var(--coal-orange), var(--coal-orange) 10px, transparent 10px, transparent 20px);
+      animation: dash 20s linear infinite;
+    }
+
+    @keyframes dash {
+      to { background-position: 1000px 0; }
+    }
+
+    .schematic-node {
+      width: 140px;
+      background: var(--bg-node);
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+      position: relative;
+      z-index: 3;
+    }
+
+    .schematic-node:hover {
+      border-color: var(--coal-orange);
+      box-shadow: 0 0 15px var(--coal-orange-glow);
+      transform: translateY(-2px);
+    }
+
+    .schematic-node.selected {
+      background: rgba(249, 115, 22, 0.15);
+      border-color: var(--coal-orange);
+      box-shadow: 0 0 15px var(--coal-orange-glow);
+    }
+
+    .node-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.25rem;
+    }
+
+    .schematic-node.selected .node-title {
+      color: var(--text-primary);
+    }
+
+    .node-val {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1rem;
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    /* RIGHT SCREEN: Telemetry Dashboard */
+    .right-screen {
+      width: 50%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: #090d16;
+    }
+
+    .right-screen-content {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .col-span-2 {
+      grid-column: span 2;
+    }
+
+    /* HUD CARDS */
+    .hud-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    .card-title {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      padding-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .badge {
+      font-size: 0.65rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .badge-orange {
+      background: rgba(249, 115, 22, 0.15);
+      color: var(--coal-orange);
+      border: 1px solid rgba(249, 115, 22, 0.3);
+    }
+
+    .badge-green {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--grid-green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .badge-cyan {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--neon-cyan);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+
+    /* TELEMETRY READOUTS */
+    .telemetry-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .telemetry-item {
+      background: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem;
+      text-align: center;
+    }
+
+    .telemetry-val {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--neon-cyan);
+    }
+
+    .telemetry-val.orange {
+      color: var(--coal-orange);
+    }
+
+    .telemetry-lbl {
+      font-size: 0.68rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      margin-top: 0.15rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* EMISSION BAR MONITOR */
+    .emission-meter-group {
+      margin-bottom: 0.85rem;
+    }
+
+    .emission-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.25rem;
+      text-transform: uppercase;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 3px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: var(--grid-green);
+      width: 35%;
+      transition: width 0.5s;
+    }
+
+    .progress-bar-fill.warning {
+      background: var(--accent-gold);
+    }
+
+    .progress-bar-fill.critical {
+      background: var(--alert-red);
+      animation: pulse-red 1.5s infinite;
+    }
+
+    @keyframes pulse-red {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* GRID FREQUENCY SYNC PANEL */
+    .sync-slider-block {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .sync-slider-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .sync-slider {
+      width: 100%;
+      height: 6px;
+      background: #1f2937;
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .sync-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--coal-orange);
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--coal-orange-glow);
+    }
+
+    .sync-outcome-box {
+      text-align: center;
+      background: rgba(16, 185, 129, 0.05);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--grid-green);
+    }
+
+    .sync-outcome-box.unsynced {
+      background: rgba(239, 68, 68, 0.05);
+      border-color: rgba(239, 68, 68, 0.2);
+      color: var(--alert-red);
+    }
+
+    /* MODE TOGGLE CONTROLS */
+    .mode-switch-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .mode-btn-group {
+      display: flex;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 2px;
+    }
+
+    .mode-btn {
+      padding: 0.4rem 1rem;
+      border-radius: 4px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.3s;
+    }
+
+    .mode-btn.active {
+      background: var(--coal-orange);
+      color: white;
+    }
+
+    /* SAAS OPTIMIZER CALCULATORS */
+    .saas-calc-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .saas-select {
+      width: 100%;
+      background: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      color: white;
+      font-size: 0.8rem;
+    }
+
+    .saas-val-readout {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.4rem;
+      color: var(--grid-green);
+      font-weight: 900;
+      text-align: center;
+      margin-top: 0.5rem;
+      text-shadow: 0 0 10px var(--grid-green-glow);
+    }
+
+    /* CONSOLE DIAGNOSTICS LOG */
+    .console-box {
+      margin-top: 1.5rem;
+    }
+
+    .log-viewport {
+      background: #04060b;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--coal-orange);
+      height: 120px;
+      overflow-y: auto;
+    }
+
+    /* Active Details Panel */
+    .details-inspector {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HUD TOP HEADER -->
+  <header class="hud-header">
+    <div class="hud-title-block">
+      <div class="hud-logo"><span>CPHGC</span>-GridMaster</div>
+      <div class="hud-tag">Trainee OS v1.0</div>
+    </div>
+    <div class="hud-meta">
+      <div class="meta-stat">
+        <span class="status-dot pulse"></span>
+        Plant: <span style="color: white; font-weight: 600;">Hub, Balochistan (1,320 MW)</span>
+      </div>
+      <div class="meta-stat">
+        Grid Sync: <span style="color: var(--grid-green); font-weight: 600;" id="grid-sync-text">SYNCHRONIZED (50.0 Hz)</span>
+      </div>
+      <div class="meta-stat">
+        Active load: <span style="color: var(--neon-cyan); font-weight: 600;">1,240 MW</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- SPLIT-SCREEN HUD WORKSPACE -->
+  <div class="hud-workspace">
+
+    <!-- LEFT SCREEN: Interactive Schematic -->
+    <div class="left-screen">
+      <div class="screen-header">
+        <span>⚙️ Power Generation Schematic Flow (Ground Control)</span>
+        <span style="color: var(--coal-orange);">Click Node to Inspect</span>
+      </div>
+
+      <div class="schematic-canvas">
+        <div class="connector-line active"></div>
+
+        <!-- Row 1: Coal Sizing & Boiler Combustion -->
+        <div class="schematic-row">
+          <div class="schematic-node selected" id="node-pulverizer" onclick="selectNode('pulverizer')">
+            <div class="node-title">1. Coal Pulverizer</div>
+            <div class="node-val" id="val-pulverizer">180 t/h</div>
+          </div>
+          
+          <div class="schematic-node" id="node-boiler" onclick="selectNode('boiler')">
+            <div class="node-title">2. Steam Boiler</div>
+            <div class="node-val" id="val-boiler">540°C</div>
+          </div>
+        </div>
+
+        <!-- Row 2: Steam Turbines & Grid Distribution -->
+        <div class="schematic-row">
+          <div class="schematic-node" id="node-turbine" onclick="selectNode('turbine')">
+            <div class="node-title">3. Steam Turbine</div>
+            <div class="node-val" id="val-turbine">3000 RPM</div>
+          </div>
+
+          <div class="schematic-node" id="node-generator" onclick="selectNode('generator')">
+            <div class="node-title">4. Generator Grid</div>
+            <div class="node-val" id="val-generator">1,240 MW</div>
+          </div>
+        </div>
+
+        <!-- Row 3: Exhaust Stack & Flue FGD scrubbing -->
+        <div class="schematic-row" style="justify-content: center;">
+          <div class="schematic-node" id="node-exhaust" onclick="selectNode('exhaust')">
+            <div class="node-title">5. FGD Exhaust Stack</div>
+            <div class="node-val" id="val-exhaust">22 ppm SOx</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT SCREEN: Telemetry Panel -->
+    <div class="right-screen">
+      <div class="screen-header">
+        <span>📊 Plant Telemetry &amp; Diagnostics</span>
+        <div class="mode-btn-group">
+          <button class="mode-btn active" id="btn-mode-a" onclick="switchMode('A')">Mode A: Trainee HUD</button>
+          <button class="mode-btn" id="btn-mode-b" onclick="switchMode('B')">Mode B: VoltGrid AI</button>
+        </div>
+      </div>
+
+      <div class="right-screen-content">
+
+        <!-- Node details dynamic inspector -->
+        <div class="details-inspector">
+          <div style="font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--coal-orange); text-transform: uppercase; margin-bottom: 0.4rem;">Inspection Node Details</div>
+          <div style="font-weight: 700; font-size: 1.1rem; color: white;" id="detail-node-name">Coal Pulverizer Unit A</div>
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.35rem;" id="detail-node-desc">Grinds raw coal feedstock into micro-powder to optimize boiler combustion efficiency.</p>
+        </div>
+
+        <!-- ==================== MODE A: TRAINEE HUD PANEL ==================== -->
+        <div class="hud-panel-mode" id="panel-mode-a">
+          <div class="dashboard-grid">
+            
+            <!-- Boiler & turbine telemetry -->
+            <div class="hud-card">
+              <div class="card-title">Steam Telemetry <span class="badge badge-orange">Thermal</span></div>
+              <div class="telemetry-row">
+                <div class="telemetry-item">
+                  <div class="telemetry-val" id="tel-steam-temp">540 °C</div>
+                  <div class="telemetry-lbl">Main Steam Temp</div>
+                </div>
+                <div class="telemetry-item">
+                  <div class="telemetry-val" id="tel-steam-press">25.4 MPa</div>
+                  <div class="telemetry-lbl">Steam Pressure</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- HSE Emission Monitor -->
+            <div class="hud-card">
+              <div class="card-title">FGD Emission Monitor <span class="badge badge-cyan">HSE Safeguard</span></div>
+              
+              <div class="emission-meter-group">
+                <div class="emission-meta">
+                  <span>SOx Emissions (Limit: 50ppm)</span>
+                  <span id="em-sox">22 ppm</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar-fill" id="bar-sox" style="width: 44%;"></div>
+                </div>
+              </div>
+              <div class="emission-meter-group" style="margin-bottom: 0;">
+                <div class="emission-meta">
+                  <span>Particulate Matter (Limit: 30mg)</span>
+                  <span id="em-pm">12 mg/Nm³</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar-fill" id="bar-pm" style="width: 40%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Frequency synchronization -->
+            <div class="hud-card col-span-2">
+              <div class="card-title">National Grid Frequency Synchronizer <span class="badge badge-green">Grid Sync</span></div>
+              
+              <div class="sync-slider-block">
+                <div class="sync-slider-row">
+                  <span>Manual Turbine Speed Adjust</span>
+                  <span id="freq-val-lbl" style="font-family: 'Share Tech Mono', monospace; font-weight: 700; color: white;">50.0 Hz</span>
+                </div>
+                <input type="range" min="48.0" max="52.0" value="50.0" step="0.1" class="sync-slider" id="freqSlider" oninput="adjustFrequency()">
+                <div class="sync-outcome-box" id="sync-outcome">🟢 FREQUENCY SYNCHRONIZED: Connected to grid lines safely.</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ==================== MODE B: VOLTGRID AI PANEL ==================== -->
+        <div class="hud-panel-mode" style="display: none;" id="panel-mode-b">
+          <div class="dashboard-grid">
+            
+            <!-- Predictive Maintenance estimator -->
+            <div class="hud-card">
+              <div class="card-title">Turbine Bearing Wear Analyzer <span class="badge badge-cyan">AI Projections</span></div>
+              <div class="saas-calc-group">
+                <div>
+                  <label class="form-label">Turbine Shaft Vibration</label>
+                  <select class="saas-select" id="shaft-vib" onchange="calculateBearingLife()">
+                    <option value="normal">0.02 mm/s (Normal Range)</option>
+                    <option value="elevated">0.08 mm/s (Elevated wear)</option>
+                    <option value="critical">0.18 mm/s (Critical anomaly warning)</option>
+                  </select>
+                </div>
+                <div>
+                  <div class="form-label">Bearing Life Lifespan Estimate</div>
+                  <div class="saas-val-readout" id="bearing-readout">8,240 Hours</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Coal Calorific Calculator -->
+            <div class="hud-card">
+              <div class="card-title">Coal Feedstock efficiency calculator <span class="badge badge-green">Efficiency</span></div>
+              
+              <div class="saas-calc-group">
+                <div>
+                  <label class="form-label">Coal Grade Feedstock</label>
+                  <select class="saas-select" id="coal-grade" onchange="calculateCoalEfficiency()">
+                    <option value="bituminous">Bituminous Grade (6,500 kcal/kg)</option>
+                    <option value="subbituminous">Sub-Bituminous Grade (5,200 kcal/kg)</option>
+                    <option value="lignite">Lignite Grade (3,800 kcal/kg)</option>
+                  </select>
+                </div>
+                <div>
+                  <div class="form-label">Projected Curing Plant Net Efficiency</div>
+                  <div class="saas-val-readout" id="efficiency-readout" style="color: var(--neon-cyan);">41.2% Net</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Vibration chart -->
+          <div class="hud-card col-span-2" style="height: 180px; margin-bottom: 1.5rem;">
+            <div class="card-title">Turbine Shaft Vibration Telemetry Logs (mm/s)</div>
+            <div style="height: 120px;">
+              <canvas id="vibrationChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- SYSTEM DIAGNOSTIC CONSOLE -->
+        <div class="hud-card console-box col-span-2">
+          <div class="card-title">Ground Operations Console Log</div>
+          <div class="log-viewport" id="console-logs">
+            <div class="log-line">
+              <span class="log-time">[18:56:02]</span>
+              <span class="log-tag">SYS</span>
+              <span>CPHGC-GridMaster Trainee kernel initialized. Secure sockets linked.</span>
+            </div>
+            <div class="log-line">
+              <span class="log-time">[18:56:06]</span>
+              <span class="log-tag sec">NET</span>
+              <span>Modbus connection established with Unit A Generator (1,240 MW grid nodes).</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JAVASCRIPT OPERATIONS -->
+  <script>
+    let activeMode = 'A';
+    let selectedNodeId = 'pulverizer';
+    let vibrationChartInstance = null;
+
+    // Node metadata
+    const nodeDetails = {
+      pulverizer: {
+        name: "Coal Pulverizer Unit A",
+        desc: "Grinds raw coal feedstock into micro-powder to optimize boiler combustion efficiency.",
+        val: "180 t/h"
+      },
+      boiler: {
+        name: "Supercritical Steam Boiler Unit B",
+        desc: "Superheats feedwater under extreme pressure (25.4 MPa) to produce high-energy steam (540°C).",
+        val: "540°C"
+      },
+      turbine: {
+        name: "Steam Turbine Generator Shaft",
+        desc: "Converts high-pressure thermal steam energy into rotational kinetic force (rotating at 3000 RPM).",
+        val: "3000 RPM"
+      },
+      generator: {
+        name: "1,320 MW Main Generator Hub",
+        desc: "Generates electrical power (1,240 MW active load) synchronized with the national grid.",
+        val: "1,240 MW"
+      },
+      exhaust: {
+        name: "FGD Stack Exhaust & Emission Scrubber",
+        desc: "Scrubs exhaust gases using Flue Gas Desulfurization (FGD) filters to minimize SOx/NOx emissions (22 ppm SOx).",
+        val: "22 ppm SOx"
+      }
+    };
+
+    window.onload = function() {
+      initCharts();
+      startSimulators();
+      calculateBearingLife();
+      calculateCoalEfficiency();
+    };
+
+    function switchMode(modeId) {
+      document.querySelectorAll('.hud-panel-mode').forEach(p => p.style.display = 'none');
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+      
+      document.getElementById('panel-mode-' + modeId.toLowerCase()).style.display = 'block';
+      document.getElementById('btn-mode-' + modeId.toLowerCase()).classList.add('active');
+      activeMode = modeId;
+      appendLog('SYS', `Switched HUD diagnostics pane to: MODE ${modeId}`);
+    }
+
+    function appendLog(tag, msg, isError = false) {
+      const logs = document.getElementById('console-logs');
+      const now = new Date();
+      const timeStr = `[${now.toTimeString().split(' ')[0]}]`;
+      
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      
+      let tagClass = 'log-tag';
+      if (tag === 'NET' || tag === 'SaaS') tagClass += ' sec';
+      if (isError) tagClass += ' err';
+      
+      line.innerHTML = `<span class="log-time">${timeStr}</span><span class="${tagClass}">${tag}</span><span>${msg}</span>`;
+      logs.appendChild(line);
+      logs.scrollTop = logs.scrollHeight;
+    }
+
+    // Node selection
+    function selectNode(nodeId) {
+      if (selectedNodeId) {
+        document.getElementById(`node-${selectedNodeId}`).classList.remove('selected');
+      }
+      selectedNodeId = nodeId;
+      document.getElementById(`node-${nodeId}`).classList.add('selected');
+      
+      // Update inspector
+      const details = nodeDetails[nodeId];
+      document.getElementById('detail-node-name').innerText = details.name;
+      document.getElementById('detail-node-desc').innerText = details.desc;
+      
+      appendLog('SYS', `Selected process schematic node: ${details.name}`);
+    }
+
+    // Frequency synchronizer
+    function adjustFrequency() {
+      const freqVal = parseFloat(document.getElementById('freqSlider').value);
+      const freqLbl = document.getElementById('freq-val-lbl');
+      const outcome = document.getElementById('sync-outcome');
+      const syncText = document.getElementById('grid-sync-text');
+      
+      freqLbl.innerText = `${freqVal.toFixed(1)} Hz`;
+      
+      if (freqVal === 50.0) {
+        outcome.className = "sync-outcome-box";
+        outcome.innerText = "🟢 FREQUENCY SYNCHRONIZED: Connected to grid lines safely.";
+        syncText.innerText = "SYNCHRONIZED (50.0 Hz)";
+        syncText.style.color = "var(--grid-green)";
+        appendLog('SYS', 'Turbine speed frequency normalized at 50.0 Hz. Grid connection secure.');
+      } else {
+        outcome.className = "sync-outcome-box unsynced";
+        outcome.innerText = "🔴 WARNING: Frequency deviation detected. Generator sync grid mismatch!";
+        syncText.innerText = `UNSYNCED (${freqVal.toFixed(1)} Hz)`;
+        syncText.style.color = "var(--alert-red)";
+        appendLog('SYS', `ALERT: Grid frequency out of bounds (${freqVal.toFixed(1)} Hz). Adjusting turbine speed!`, true);
+      }
+    }
+
+    // Mode B: SaaS estimators
+    function calculateBearingLife() {
+      const vib = document.getElementById('shaft-vib').value;
+      const readout = document.getElementById('bearing-readout');
+      
+      if (vib === 'normal') {
+        readout.innerText = "8,240 Hours";
+        readout.style.color = "var(--grid-green)";
+      } else if (vib === 'elevated') {
+        readout.innerText = "2,150 Hours";
+        readout.style.color = "var(--coal-orange)";
+        appendLog('SaaS', 'AI Prognostics: Bearing wear lifespan forecast dropped to warning levels.');
+      } else {
+        readout.innerText = "380 Hours (Critical)";
+        readout.style.color = "var(--alert-red)";
+        appendLog('SaaS', 'AI Prognostics ALERT: Schedule turbine bearing replacement immediately!', true);
+      }
+    }
+
+    function calculateCoalEfficiency() {
+      const grade = document.getElementById('coal-grade').value;
+      const readout = document.getElementById('efficiency-readout');
+      
+      if (grade === 'bituminous') {
+        readout.innerText = "41.2% Net";
+      } else if (grade === 'subbituminous') {
+        readout.innerText = "36.8% Net";
+      } else {
+        readout.innerText = "31.4% Net";
+      }
+      appendLog('SaaS', `Recalculated coal combustion parameters for grade feedstock: ${grade.toUpperCase()}`);
+    }
+
+    // Chart
+    function initCharts() {
+      const vCtx = document.getElementById('vibrationChart').getContext('2d');
+      vibrationChartInstance = new Chart(vCtx, {
+        type: 'line',
+        data: {
+          labels: ['18:50', '18:51', '18:52', '18:53', '18:54', '18:55'],
+          datasets: [
+            {
+              label: 'Vibration Amplitude (mm/s)',
+              data: [0.02, 0.03, 0.02, 0.02, 0.03, 0.02],
+              borderColor: '#06b6d4',
+              backgroundColor: 'transparent',
+              tension: 0.1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#9ca3af' }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#9ca3af' }
+            }
+          }
+        }
+      });
+    }
+
+    function startSimulators() {
+      setInterval(() => {
+        // Fluctuate details
+        const details = [
+          { tag: 'SYS', msg: 'Boiler feedwater pump diagnostic cycles optimal.' },
+          { tag: 'NET', msg: 'Exhaust Scrubber: FGD filter status registered.' },
+          { tag: 'SaaS', msg: 'Vibration log: Shaft stability metrics synced.' },
+          { tag: 'SYS', msg: 'Coal conveyor speed matched pulverizer load limits.' }
+        ];
+        const log = details[Math.floor(Math.random() * details.length)];
+        appendLog(log.tag, log.msg);
+
+        // Fluctuate vibration chart
+        if (vibrationChartInstance) {
+          const len = vibrationChartInstance.data.datasets[0].data.length;
+          vibrationChartInstance.data.datasets[0].data.shift();
+          
+          const shaftVal = document.getElementById('shaft-vib').value;
+          let nextVal = 0.02;
+          if (shaftVal === 'elevated') nextVal = (Math.random() * 0.04 + 0.06).toFixed(2);
+          else if (shaftVal === 'critical') nextVal = (Math.random() * 0.08 + 0.15).toFixed(2);
+          else nextVal = (Math.random() * 0.02 + 0.01).toFixed(2);
+          
+          vibrationChartInstance.data.datasets[0].data.push(nextVal);
+          
+          const lastTime = vibrationChartInstance.data.labels[len - 1];
+          const [h, m] = lastTime.split(':').map(Number);
+          let nextM = m + 1;
+          let nextH = h;
+          if (nextM >= 60) { nextM = 0; nextH++; }
+          const nextLabel = `${String(nextH).padStart(2, '0')}:${String(nextM).padStart(2, '0')}`;
+          
+          vibrationChartInstance.data.labels.shift();
+          vibrationChartInstance.data.labels.push(nextLabel);
+          
+          vibrationChartInstance.update();
+        }
+      }, 6000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nestle-Lytix — Supply Chain &amp; Shelf-Life Telemetry Dashboard</title>
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-dark: #f0f4f8;
+      --bg-panel: #ffffff;
+      --bg-input: #f8fafc;
+      --border-color: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --nestle-blue: #0c2340;
+      --nestle-cyan: #00a3e0;
+      --nestle-cyan-glow: rgba(0, 163, 224, 0.15);
+      --alert-red: #ef4444;
+      --alert-green: #10b981;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      padding: 2rem;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-dark);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--nestle-cyan);
+    }
+
+    /* HEADER */
+    .hud-header {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .brand-block {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--nestle-blue);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .brand-title span {
+      color: var(--nestle-cyan);
+    }
+
+    .brand-sub {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-top: 0.2rem;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .profile-card {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .profile-info {
+      text-align: right;
+    }
+
+    .profile-name {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--nestle-blue);
+    }
+
+    .profile-role {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .profile-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--nestle-blue);
+      color: white;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* BENTO GRID WORKSPACE */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .bento-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.75rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+
+    .bento-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+      border-color: var(--nestle-cyan);
+    }
+
+    /* Sizes */
+    .col-8 { grid-column: span 8; }
+    .col-4 { grid-column: span 4; }
+    .col-6 { grid-column: span 6; }
+    .col-12 { grid-column: span 12; }
+
+    @media (max-width: 1000px) {
+      .col-8, .col-4, .col-6 { grid-column: span 12; }
+    }
+
+    /* CARD COMPONENTS */
+    .card-header-block {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 0.75rem;
+    }
+
+    .card-title-text {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--nestle-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .badge-blue {
+      background: rgba(12, 35, 64, 0.05);
+      color: var(--nestle-blue);
+      border: 1px solid rgba(12, 35, 64, 0.15);
+    }
+
+    .badge-cyan {
+      background: rgba(0, 163, 224, 0.05);
+      color: var(--nestle-cyan);
+      border: 1px solid rgba(0, 163, 224, 0.15);
+    }
+
+    /* SHELF LIFE MONITOR */
+    .selector-row {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-select {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .form-select:focus {
+      border-color: var(--nestle-cyan);
+    }
+
+    .batch-details-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .detail-item {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .detail-lbl {
+      font-size: 0.68rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.25rem;
+    }
+
+    .detail-val {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--nestle-blue);
+    }
+
+    .shelf-progress-container {
+      margin-bottom: 1.5rem;
+    }
+
+    .shelf-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    .shelf-progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .shelf-progress-fill {
+      height: 100%;
+      background: var(--nestle-cyan);
+      border-radius: 4px;
+      width: 75%;
+      transition: width 0.5s;
+    }
+
+    .shelf-progress-fill.warning {
+      background: #eab308;
+    }
+
+    .shelf-progress-fill.danger {
+      background: var(--alert-red);
+    }
+
+    /* TELEMETRY READOUT */
+    .tele-card-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .tele-display {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .tele-val {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--nestle-cyan);
+    }
+
+    .tele-lbl {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      margin-top: 0.2rem;
+    }
+
+    .alert-banner {
+      width: 100%;
+      background: rgba(16, 185, 129, 0.05);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 8px;
+      padding: 0.75rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--alert-green);
+      font-weight: 700;
+      margin-top: 1rem;
+    }
+
+    .alert-banner.active {
+      background: rgba(239, 68, 68, 0.05);
+      border-color: rgba(239, 68, 68, 0.2);
+      color: var(--alert-red);
+      animation: flash-red 2s infinite;
+    }
+
+    @keyframes flash-red {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    /* DISTRIBUTOR LOAD BALANCER */
+    .load-balancer-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .routing-graph {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .routing-node {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      text-align: center;
+      z-index: 2;
+    }
+
+    .routing-node.active {
+      border-color: var(--nestle-cyan);
+      box-shadow: 0 0 10px var(--nestle-cyan-glow);
+    }
+
+    .node-title {
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .node-lbl {
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: var(--nestle-blue);
+    }
+
+    .routing-link {
+      flex: 1;
+      height: 2px;
+      background: repeating-linear-gradient(90deg, var(--border-color), var(--border-color) 4px, transparent 4px, transparent 8px);
+      margin: 0 0.5rem;
+      position: relative;
+    }
+
+    .routing-link.active {
+      background: repeating-linear-gradient(90deg, var(--nestle-cyan), var(--nestle-cyan) 4px, transparent 4px, transparent 8px);
+      animation: move-dash 15s linear infinite;
+    }
+
+    @keyframes move-dash {
+      to { background-position: 500px 0; }
+    }
+
+    .slider-group {
+      margin-top: 1rem;
+    }
+
+    .slider-lbl-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      color: var(--text-secondary);
+    }
+
+    .custom-slider {
+      width: 100%;
+      height: 5px;
+      background: #cbd5e1;
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .custom-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: var(--nestle-cyan);
+      cursor: pointer;
+    }
+
+    /* DEMAND CHART CARD */
+    .chart-container {
+      height: 200px;
+      position: relative;
+    }
+
+    /* SMART CLIMATE CONTROLS */
+    .toggle-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .toggle-card {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .toggle-lbl {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    /* Switch styling */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #cbd5e1;
+      transition: .4s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--nestle-cyan);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    /* DIAGNOSTICS LOG CONSOLE */
+    .diagnostics-console {
+      background: #090d16;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 1.25rem;
+      font-family: monospace;
+      font-size: 0.72rem;
+      color: #94a3b8;
+      height: 130px;
+      overflow-y: auto;
+    }
+
+    .log-line {
+      margin-bottom: 0.4rem;
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .log-time {
+      color: var(--nestle-cyan);
+    }
+
+    .log-tag {
+      font-weight: bold;
+      color: var(--nestle-cyan);
+    }
+
+    .log-tag.sec { color: var(--alert-green); }
+    .log-tag.err { color: var(--alert-red); }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="hud-header">
+    <div class="brand-block">
+      <div class="brand-title"><span>Nestle</span>-Lytix</div>
+      <div class="brand-sub">Supply Chain &amp; Shelf-Life Telemetry OS</div>
+    </div>
+    
+    <div class="header-meta">
+      <div class="profile-card">
+        <div class="profile-info">
+          <div class="profile-name">Lokesh Kumar</div>
+          <div class="profile-role">Trainee Candidate</div>
+        </div>
+        <div class="profile-avatar">LK</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- BENTO GRID -->
+  <main class="bento-grid">
+    
+    <!-- BENTO 1: Product Batch Shelf-Life Telemetry (Large Card) -->
+    <div class="bento-card col-8">
+      <div class="card-header-block">
+        <div class="card-title-text">📦 Product Batch Shelf-Life Telemetry</div>
+        <span class="card-badge badge-blue">QA Dashboard</span>
+      </div>
+
+      <div class="selector-row">
+        <label style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; display: block; margin-bottom: 0.35rem;">Active Inventory Batch</label>
+        <select class="form-select" id="batchSelect" onchange="loadBatchData()">
+          <option value="M-102">NESTLÉ MILKPAK 1-Litre (Batch M-102)</option>
+          <option value="C-245">NESTLÉ CERELAC wheat (Batch C-245)</option>
+          <option value="MIL-09">NESTLÉ MILO RTD Drink (Batch MIL-09)</option>
+          <option value="NES-88">NESCAFÉ CLASSIC Jar (Batch NES-88)</option>
+        </select>
+      </div>
+
+      <div class="batch-details-grid">
+        <div class="detail-item">
+          <div class="detail-lbl">Batch ID</div>
+          <div class="detail-val" id="det-id">M-102</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-lbl">Date Packed</div>
+          <div class="detail-val" id="det-packed">2026-06-15</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-lbl">Expiry Date</div>
+          <div class="detail-val" id="det-expiry">2026-09-15</div>
+        </div>
+      </div>
+
+      <div class="shelf-progress-container">
+        <div class="shelf-meta">
+          <span>Remaining Freshness Days</span>
+          <span id="shelf-days-lbl">76 Days Left</span>
+        </div>
+        <div class="shelf-progress-bar">
+          <div class="shelf-progress-fill" id="shelf-progress-bar-fill" style="width: 84%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BENTO 2: Telemetry Display (Small Card) -->
+    <div class="bento-card col-4">
+      <div class="card-header-block">
+        <div class="card-title-text">🌡️ Storage Climate Telemetry</div>
+        <span class="card-badge badge-cyan">IoT Sensors</span>
+      </div>
+
+      <div class="tele-card-row">
+        <div class="tele-display">
+          <div class="tele-val" id="tel-temp">4.2 °C</div>
+          <div class="tele-lbl">Ambient Temp</div>
+        </div>
+        <div class="tele-display">
+          <div class="tele-val" id="tel-humid">62%</div>
+          <div class="tele-lbl">Humidity</div>
+        </div>
+      </div>
+
+      <div class="alert-banner" id="storage-alert">
+        🟢 Storage climate matches quality guidelines.
+      </div>
+    </div>
+
+    <!-- BENTO 3: Factory-to-Distributor Load Balancer (Medium Card) -->
+    <div class="bento-card col-6">
+      <div class="card-header-block">
+        <div class="card-title-text">🚚 Kabirwala-to-Lahore Load Balancer</div>
+        <span class="card-badge badge-cyan">Logistics Grid</span>
+      </div>
+
+      <div class="load-balancer-container">
+        <div class="routing-graph">
+          <div class="routing-node active">
+            <div class="node-title">Factory</div>
+            <div class="node-lbl">Kabirwala</div>
+          </div>
+          <div class="routing-link active"></div>
+          <div class="routing-node active">
+            <div class="node-title">Transit</div>
+            <div class="node-lbl" style="color: var(--nestle-cyan);">In-Transit</div>
+          </div>
+          <div class="routing-link"></div>
+          <div class="routing-node">
+            <div class="node-title">Hub</div>
+            <div class="node-lbl">Lahore Dist.</div>
+          </div>
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-lbl-row">
+            <span>Truck Payload Dispatch Weight</span>
+            <span id="load-payload-lbl" style="color: var(--nestle-blue); font-weight:700;">22 Tons</span>
+          </div>
+          <input type="range" min="5" max="30" value="22" class="custom-slider" id="payloadSlider" oninput="calculateLogistics()">
+        </div>
+
+        <div class="batch-details-grid" style="margin-bottom: 0;">
+          <div class="detail-item" style="padding: 0.75rem;">
+            <div class="detail-lbl">Estimated ETA</div>
+            <div class="detail-val" id="lbl-eta" style="font-size: 0.95rem;">3.8 Hours</div>
+          </div>
+          <div class="detail-item" style="padding: 0.75rem;">
+            <div class="detail-lbl">CO2 Emissions</div>
+            <div class="detail-val" id="lbl-co2" style="font-size: 0.95rem; color: #eab308;">164 kg</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BENTO 4: Consumer Demand & Stockout Predictor (Medium Card) -->
+    <div class="bento-card col-6">
+      <div class="card-header-block">
+        <div class="card-title-text">📈 Consumer Demand &amp; Stockout Predictor</div>
+        <span class="card-badge badge-blue">VoltStore AI</span>
+      </div>
+
+      <div class="slider-group" style="margin-top: 0; margin-bottom: 1rem;">
+        <div class="slider-lbl-row">
+          <span>Seasonal Temperature Climate Factor</span>
+          <span id="temp-factor-lbl" style="color: var(--nestle-cyan); font-weight:700;">38 °C (Summer Spike)</span>
+        </div>
+        <input type="range" min="10" max="45" value="38" class="custom-slider" id="tempFactorSlider" oninput="calculateDemandForecast()">
+      </div>
+
+      <div class="chart-container">
+        <canvas id="demandChart"></canvas>
+      </div>
+    </div>
+
+    <!-- BENTO 5: Smart Climate controls (Medium Card) -->
+    <div class="bento-card col-6">
+      <div class="card-header-block">
+        <div class="card-title-text">⚡ Smart Warehouse Climate Control</div>
+        <span class="card-badge badge-cyan">Climate Actuators</span>
+      </div>
+
+      <div class="toggle-grid">
+        <div class="toggle-card">
+          <div class="toggle-lbl">Ventilation Fan Core</div>
+          <label class="switch">
+            <input type="checkbox" checked id="toggle-vent" onchange="toggleControl('Ventilation Fans')">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="toggle-card">
+          <div class="toggle-lbl">Dehumidifier Core</div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-dehumid" onchange="toggleControl('Dehumidifier Core')">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- BENTO 6: System console (Medium Card) -->
+    <div class="bento-card col-6">
+      <div class="card-header-block">
+        <div class="card-title-text">💻 Ground System Log Console</div>
+        <span class="card-badge badge-blue">Audit Grid</span>
+      </div>
+
+      <div class="diagnostics-console" id="console-logs">
+        <div class="log-line">
+          <span class="log-time">[19:35:01]</span>
+          <span class="log-tag">SYS</span>
+          <span>Nestle-Lytix Supply Chain Kernal initialized. Linking Kabirwala factories.</span>
+        </div>
+        <div class="log-line">
+          <span class="log-time">[19:35:05]</span>
+          <span class="log-tag sec">QA</span>
+          <span>Cold storage sensors verified. Milkpak batch M-102 temperature logged at 4.2°C.</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- JAVASCRIPT CODE -->
+  <script>
+    let demandChartInstance = null;
+
+    // Batch database
+    const batchDb = {
+      'M-102': { name: 'NESTLÉ MILKPAK 1-Litre', packed: '2026-06-15', expiry: '2026-09-15', remaining: 76, percent: 84, temp: 4.2, humid: 62, status: 'normal' },
+      'C-245': { name: 'NESTLÉ CERELAC wheat', packed: '2026-04-01', expiry: '2026-10-01', remaining: 92, percent: 50, temp: 22.8, humid: 41, status: 'warning' },
+      'MIL-09': { name: 'NESTLÉ MILO RTD Drink', packed: '2026-06-25', expiry: '2026-08-25', remaining: 55, percent: 91, temp: 5.1, humid: 60, status: 'normal' },
+      'NES-88': { name: 'NESCAFÉ CLASSIC Jar', packed: '2026-01-10', expiry: '2027-01-10', remaining: 194, percent: 53, temp: 24.1, humid: 38, status: 'normal' }
+    };
+
+    window.onload = function() {
+      initCharts();
+      loadBatchData();
+      calculateLogistics();
+      startSimulators();
+    };
+
+    function appendLog(tag, msg, isError = false) {
+      const logs = document.getElementById('console-logs');
+      const now = new Date();
+      const timeStr = `[${now.toTimeString().split(' ')[0]}]`;
+      
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      
+      let tagClass = 'log-tag';
+      if (tag === 'QA' || tag === 'LOG') tagClass += ' sec';
+      if (isError) tagClass += ' err';
+      
+      line.innerHTML = `<span class="log-time">${timeStr}</span><span class="${tagClass}">${tag}</span><span>${msg}</span>`;
+      logs.appendChild(line);
+      logs.scrollTop = logs.scrollHeight;
+    }
+
+    function loadBatchData() {
+      const val = document.getElementById('batchSelect').value;
+      const data = batchDb[val];
+      
+      document.getElementById('det-id').innerText = val;
+      document.getElementById('det-packed').innerText = data.packed;
+      document.getElementById('det-expiry').innerText = data.expiry;
+      
+      document.getElementById('shelf-days-lbl').innerText = `${data.remaining} Days Left`;
+      
+      const fill = document.getElementById('shelf-progress-bar-fill');
+      fill.style.width = `${data.percent}%`;
+      
+      if (data.percent < 40) {
+        fill.className = 'shelf-progress-fill danger';
+      } else if (data.percent < 60) {
+        fill.className = 'shelf-progress-fill warning';
+      } else {
+        fill.className = 'shelf-progress-fill';
+      }
+      
+      document.getElementById('tel-temp').innerText = `${data.temp} °C`;
+      document.getElementById('tel-humid').innerText = `${data.humid}%`;
+      
+      const banner = document.getElementById('storage-alert');
+      if (data.temp > 20.0 && val === 'M-102') {
+        banner.className = 'alert-banner active';
+        banner.innerText = '🔴 STORAGE WARNING: Milkpak requires low ambient temperature cooling!';
+        appendLog('QA', 'ALERT: Batch M-102 ambient temperature exceeds safe storage limits!', true);
+      } else {
+        banner.className = 'alert-banner';
+        banner.innerText = '🟢 Storage climate matches quality guidelines.';
+      }
+      
+      appendLog('SYS', `Loaded product batch dataset for batch: ${val} (${data.name})`);
+    }
+
+    // Logistics balancer
+    function calculateLogistics() {
+      const payload = parseInt(document.getElementById('payloadSlider').value);
+      document.getElementById('load-payload-lbl').innerText = `${payload} Tons`;
+      
+      const baseEta = 3.0;
+      const extraEta = (payload / 10).toFixed(1);
+      const totalEta = parseFloat(baseEta) + parseFloat(extraEta);
+      
+      const co2 = payload * 7.5;
+      
+      document.getElementById('lbl-eta').innerText = `${totalEta.toFixed(1)} Hours`;
+      document.getElementById('lbl-co2').innerText = `${Math.round(co2)} kg`;
+      
+      appendLog('LOG', `Calculated dispatch routing parameters for ${payload} ton payload.`);
+    }
+
+    // Climate toggles
+    function toggleControl(name) {
+      appendLog('SYS', `Climate Control: Toggled ${name} state.`);
+    }
+
+    // Demand calculator
+    function calculateDemandForecast() {
+      const temp = parseInt(document.getElementById('tempFactorSlider').value);
+      document.getElementById('temp-factor-lbl').innerText = `${temp} °C (${temp > 30 ? 'Summer Spike' : 'Winter baseline'})`;
+      
+      // Update chart values
+      let baseVal = 1000;
+      if (temp > 30) {
+        baseVal = Math.round(1000 + (temp - 30) * 150);
+      }
+      
+      if (demandChartInstance) {
+        demandChartInstance.data.datasets[0].data = [baseVal, baseVal * 1.1, baseVal * 1.3, baseVal * 1.5, baseVal * 1.2];
+        demandChartInstance.update();
+      }
+      appendLog('SYS', `Demand model recalculated for climate factor: ${temp}°C`);
+    }
+
+    // Charting setup
+    function initCharts() {
+      const dCtx = document.getElementById('demandChart').getContext('2d');
+      demandChartInstance = new Chart(dCtx, {
+        type: 'line',
+        data: {
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+          datasets: [
+            {
+              label: 'Forecast Demand (units)',
+              data: [2200, 2400, 2800, 3250, 2600],
+              borderColor: '#00a3e0',
+              backgroundColor: 'rgba(0, 163, 224, 0.05)',
+              tension: 0.3,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: {
+              grid: { color: 'rgba(0, 0, 0, 0.05)' },
+              ticks: { color: '#475569' }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#475569' }
+            }
+          }
+        }
+      });
+    }
+
+    function startSimulators() {
+      setInterval(() => {
+        // Fluctuate telemetry values slightly
+        const val = document.getElementById('batchSelect').value;
+        const data = batchDb[val];
+        
+        const tempOffset = (Math.random() * 0.4 - 0.2).toFixed(1);
+        const humidOffset = Math.floor(Math.random() * 3) - 1;
+        
+        const nextTemp = (parseFloat(data.temp) + parseFloat(tempOffset)).toFixed(1);
+        const nextHumid = data.humid + humidOffset;
+        
+        document.getElementById('tel-temp').innerText = `${nextTemp} °C`;
+        document.getElementById('tel-humid').innerText = `${nextHumid}%`;
+
+        // Fluctuate console logs
+        const logData = [
+          { tag: 'SYS', msg: 'Active route Kabirwala-Lahore shipping transit updated.' },
+          { tag: 'QA', msg: 'Warehouse sector D dehumidifier settings optimal.' },
+          { tag: 'LOG', msg: 'Nestle Sheikhupura dispatch dispatch lines synchronized.' },
+          { tag: 'QA', msg: 'RFID tag sensors report Milkpak batch integrity secure.' }
+        ];
+        const log = logData[Math.floor(Math.random() * logData.length)];
+        appendLog(log.tag, log.msg);
+      }, 7000);
+    }
+  </script>
+</body>
+</html>

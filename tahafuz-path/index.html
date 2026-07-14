@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tahafuz-Path — Foster Child Welfare &amp; Case Telemetry Portal</title>
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-dark: #090f1c;
+      --bg-panel: #0f172a;
+      --bg-input: #1e293b;
+      --border-color: #334155;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --welfare-teal: #0d9488;
+      --welfare-teal-glow: rgba(13, 148, 136, 0.25);
+      --welfare-teal-hover: #0f766e;
+      --alert-amber: #eab308;
+      --alert-red: #ef4444;
+      --alert-green: #10b981;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* HEADER */
+    .hud-header {
+      height: 70px;
+      background: #090e1a;
+      border-bottom: 2px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2.5rem;
+      flex-shrink: 0;
+    }
+
+    .brand-logo {
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .brand-logo span {
+      color: var(--welfare-teal);
+      text-shadow: 0 0 10px var(--welfare-teal-glow);
+    }
+
+    .brand-sub {
+      background: rgba(13, 148, 136, 0.1);
+      border: 1px solid var(--welfare-teal);
+      color: var(--welfare-teal);
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .meta-status {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--welfare-teal);
+      box-shadow: 0 0 8px var(--welfare-teal-glow);
+      animation: pulse-teal 2s infinite;
+    }
+
+    @keyframes pulse-teal {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* WORKSPACE */
+    .hud-workspace {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    /* LEFT SCREEN: Chronological Case Feed */
+    .left-feed {
+      width: 45%;
+      height: 100%;
+      border-right: 2px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      background-image: radial-gradient(circle at 50% 50%, rgba(13, 148, 136, 0.015) 0%, transparent 70%);
+    }
+
+    .feed-header {
+      padding: 1.25rem 2rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .feed-scrollable {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      position: relative;
+    }
+
+    /* Timeline spine */
+    .feed-scrollable::before {
+      content: '';
+      position: absolute;
+      top: 2rem;
+      bottom: 2rem;
+      left: 3.5rem;
+      width: 2px;
+      background: var(--border-color);
+    }
+
+    .timeline-node {
+      display: flex;
+      gap: 1.5rem;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .node-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--bg-dark);
+      border: 2px solid var(--border-color);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      z-index: 2;
+      transition: all 0.3s;
+      flex-shrink: 0;
+    }
+
+    .timeline-node.selected .node-icon {
+      border-color: var(--welfare-teal);
+      background: var(--welfare-teal);
+      color: white;
+      box-shadow: 0 0 10px var(--welfare-teal-glow);
+    }
+
+    .node-content {
+      flex: 1;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      transition: all 0.3s;
+    }
+
+    .timeline-node:hover .node-content {
+      border-color: var(--welfare-teal);
+    }
+
+    .timeline-node.selected .node-content {
+      border-color: var(--welfare-teal);
+      background: rgba(13, 148, 136, 0.08);
+      box-shadow: 0 4px 15px var(--welfare-teal-glow);
+    }
+
+    .node-time {
+      font-size: 0.68rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    .node-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .node-desc {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 0.2rem;
+    }
+
+    /* RIGHT SCREEN: Case Inspector */
+    .right-inspector {
+      width: 55%;
+      height: 100%;
+      background: #070b13;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .inspector-content {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .col-span-2 {
+      grid-column: span 2;
+    }
+
+    .hud-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+
+    .card-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      padding-bottom: 0.4rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .card-badge {
+      font-size: 0.65rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .badge-teal {
+      background: rgba(13, 148, 136, 0.1);
+      color: var(--welfare-teal);
+      border: 1px solid rgba(13, 148, 136, 0.2);
+    }
+
+    .badge-amber {
+      background: rgba(234, 179, 8, 0.1);
+      color: var(--alert-amber);
+      border: 1px solid rgba(234, 179, 8, 0.2);
+    }
+
+    /* TELEMETRY VITALS READOUTS */
+    .telemetry-bar-group {
+      margin-bottom: 0.85rem;
+    }
+
+    .telemetry-bar-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .telemetry-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 0.25rem;
+      text-transform: uppercase;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 3px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: var(--welfare-teal);
+      width: 75%;
+      transition: width 0.5s;
+    }
+
+    .progress-bar-fill.warning {
+      background: var(--alert-amber);
+    }
+
+    /* COUNSELOR LOGGER */
+    .counselor-textbox {
+      width: 100%;
+      height: 70px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: white;
+      padding: 0.75rem;
+      font-size: 0.82rem;
+      outline: none;
+      resize: none;
+      margin-bottom: 0.75rem;
+    }
+
+    .counselor-textbox:focus {
+      border-color: var(--welfare-teal);
+    }
+
+    .btn {
+      padding: 0.5rem 1.25rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--welfare-teal), var(--welfare-teal-hover));
+      color: white;
+      box-shadow: 0 4px 10px var(--welfare-teal-glow);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    /* VETTING PLACEMENT SLIDERS */
+    .slider-group {
+      margin-bottom: 1rem;
+    }
+
+    .slider-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .slider-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 0.3rem;
+      text-transform: uppercase;
+    }
+
+    .custom-slider {
+      width: 100%;
+      height: 5px;
+      background: #334155;
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .custom-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: var(--welfare-teal);
+      cursor: pointer;
+    }
+
+    /* INVENTORY TELEMETRY METER */
+    .inventory-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+    }
+
+    .inventory-item {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem;
+      text-align: center;
+    }
+
+    .inventory-val {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--welfare-teal);
+    }
+
+    .inventory-val.warning {
+      color: var(--alert-amber);
+    }
+
+    .inventory-lbl {
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      margin-top: 0.15rem;
+    }
+
+    /* SYSTEM CONSOLE LOGS */
+    .console-logs {
+      background: #04060b;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem;
+      font-family: monospace;
+      font-size: 0.7rem;
+      color: var(--welfare-teal);
+      height: 120px;
+      overflow-y: auto;
+      margin-top: 1.5rem;
+    }
+
+    .log-line {
+      margin-bottom: 0.35rem;
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .log-time {
+      color: var(--text-secondary);
+    }
+
+    .log-tag {
+      font-weight: bold;
+      color: var(--alert-green);
+    }
+
+    .log-tag.sec { color: var(--alert-amber); }
+    .log-tag.err { color: var(--alert-red); }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="hud-header">
+    <div class="brand-logo"><span>TAHAFUZ</span>-Path</div>
+    <span class="brand-sub">Case Telemetry Console</span>
+    <div class="meta-status">
+      <div class="status-item">
+        <span class="status-dot"></span>
+        Unit: <span style="color: white; font-weight: 600;">TMFH Lahore (Punjab Police)</span>
+      </div>
+      <div class="status-item">
+        Active Cases: <span style="color: var(--welfare-teal); font-weight: 600;">14</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- WORKSPACE -->
+  <div class="hud-workspace">
+
+    <!-- LEFT Screen: Chronological Case Feed -->
+    <div class="left-feed">
+      <div class="feed-header">
+        <span>📋 Chronological Case Activity Log</span>
+        <span style="color: var(--welfare-teal);">Recent Actions</span>
+      </div>
+      
+      <div class="feed-scrollable" id="case-feed">
+        <!-- Node 1 -->
+        <div class="timeline-node selected" id="node-G-102" onclick="selectCase('G-102')">
+          <div class="node-icon">1</div>
+          <div class="node-content">
+            <div class="node-time">Today, 11:30 am</div>
+            <div class="node-title">Case G-102: Annual Health Audit</div>
+            <p class="node-desc">Scheduled checkup at foster clinic completed. Vitals logged.</p>
+          </div>
+        </div>
+
+        <!-- Node 2 -->
+        <div class="timeline-node" id="node-B-204" onclick="selectCase('B-204')">
+          <div class="node-icon">2</div>
+          <div class="node-content">
+            <div class="node-time">Yesterday, 4:15 pm</div>
+            <div class="node-title">Case B-204: School Enrollment Sync</div>
+            <p class="node-desc">Academic record matching for Lahore Model High School finalized.</p>
+          </div>
+        </div>
+
+        <!-- Node 3 -->
+        <div class="timeline-node" id="node-G-105" onclick="selectCase('G-105')">
+          <div class="node-icon">3</div>
+          <div class="node-content">
+            <div class="node-time">Jun 28, 2026</div>
+            <div class="node-title">Case G-105: Counselor Intake Review</div>
+            <p class="node-desc">First-round psychological adjustment evaluation documented.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT Screen: Case Inspector -->
+    <div class="right-inspector">
+      <div class="inspector-content">
+
+        <div class="card-grid">
+
+          <!-- Child details & metrics -->
+          <div class="hud-card col-span-2">
+            <div class="card-title"><span id="case-title-lbl">Case G-102: Ayesha Bibi</span> <span class="card-badge badge-teal">Child Vitals</span></div>
+            
+            <div class="telemetry-bar-group">
+              <div class="telemetry-meta">
+                <span>School Attendance Rate</span>
+                <span id="vit-attend">94%</span>
+              </div>
+              <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="bar-attend" style="width: 94%;"></div>
+              </div>
+            </div>
+
+            <div class="telemetry-bar-group">
+              <div class="telemetry-meta">
+                <span>Math &amp; Science Score</span>
+                <span id="vit-academic">82%</span>
+              </div>
+              <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="bar-academic" style="width: 82%;"></div>
+              </div>
+            </div>
+
+            <div class="telemetry-bar-group">
+              <div class="telemetry-meta">
+                <span>General Health &amp; Vitals Assessment</span>
+                <span id="vit-health" style="color: var(--alert-green);">98% (Safe)</span>
+              </div>
+              <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="bar-health" style="width: 98%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Counselor log registry -->
+          <div class="hud-card col-span-2">
+            <div class="card-title">Case Counselor Activity Log <span class="card-badge badge-teal">Counselor Registry</span></div>
+            <textarea class="counselor-textbox" id="counselor-text" placeholder="Type counselor observations here..."></textarea>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span id="counselor-status-lbl" style="font-size: 0.72rem; color: var(--text-secondary);">Last updated: Today, 11:32 am by Admin</span>
+              <button class="btn btn-primary" onclick="saveCounselorLog()">Save Counselor Entry</button>
+            </div>
+          </div>
+
+          <!-- Foster vetting simulator -->
+          <div class="hud-card">
+            <div class="card-title">Foster Parent Vetting score <span class="card-badge badge-amber">Vetting Engine</span></div>
+            
+            <div class="slider-group">
+              <div class="slider-label-row">
+                <span>Income Bracket</span>
+                <span id="lbl-income">Rs 150k</span>
+              </div>
+              <input type="range" min="50" max="300" value="150" class="custom-slider" id="slider-income" oninput="calculateVetting()">
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-label-row">
+                <span>Vetting Score Outcome</span>
+                <span id="lbl-vetting-score" style="color: var(--alert-green); font-weight:700;">88% Match</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Inventory tracking -->
+          <div class="hud-card">
+            <div class="card-title">Foster Home Supply Stocks <span class="card-badge badge-teal">Inventory</span></div>
+            
+            <div class="inventory-grid">
+              <div class="inventory-item">
+                <div class="inventory-val">42 kg</div>
+                <div class="inventory-lbl">Rations</div>
+              </div>
+              <div class="inventory-item">
+                <div class="inventory-val warning" id="inv-diapers">8 packs</div>
+                <div class="inventory-lbl">Diapers</div>
+              </div>
+              <div class="inventory-item">
+                <div class="inventory-val">34 pcs</div>
+                <div class="inventory-lbl">Books</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Ground Console Logs -->
+        <div class="hud-card console-logs col-span-2">
+          <div class="card-title" style="margin-bottom: 0.5rem; padding-bottom: 0.25rem;">TMFH System Operations Audit log</div>
+          <div id="logs-viewport">
+            <div class="log-line">
+              <span class="log-time">[12:22:02]</span>
+              <span class="log-tag">SYS</span>
+              <span>Tahafuz-Path case registry kernel initiated. Sockets secured.</span>
+            </div>
+            <div class="log-line">
+              <span class="log-time">[12:22:06]</span>
+              <span class="log-tag sec">AUDIT</span>
+              <span>Foster Home inventory database sync completed successfully.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    let activeCaseId = 'G-102';
+
+    // Mock case dataset
+    const caseData = {
+      'G-102': { name: 'Ayesha Bibi', attendance: 94, academic: 82, health: '98% (Safe)', healthVal: 98, note: 'Ayesha shows excellent progress in classroom attendance. Clinic checkup verifies good physical growth metrics.', logTime: 'Today, 11:32 am by Admin' },
+      'B-204': { name: 'Zeeshan Ali', attendance: 88, academic: 75, health: '92% (Normal)', healthVal: 92, note: 'School enrollment completed. Classroom adjustments checked. Social worker to follow up on textbook allocation.', logTime: 'Yesterday, 4:15 pm by Social worker' },
+      'G-105': { name: 'Mariam Khan', attendance: 91, academic: 68, health: '82% (Monitor)', healthVal: 82, note: 'First counseling intake assessment completed. Focus on structural language coaching and math tutor aids.', logTime: 'Jun 28, 2026 by Counselor' }
+    };
+
+    function selectCase(caseId) {
+      document.querySelectorAll('.timeline-node').forEach(n => n.classList.remove('selected'));
+      document.getElementById('node-' + caseId).classList.add('selected');
+      activeCaseId = caseId;
+
+      const data = caseData[caseId];
+      document.getElementById('case-title-lbl').innerText = `Case ${caseId}: ${data.name}`;
+      
+      document.getElementById('vit-attend').innerText = `${data.attendance}%`;
+      document.getElementById('bar-attend').style.width = `${data.attendance}%`;
+      
+      document.getElementById('vit-academic').innerText = `${data.academic}%`;
+      document.getElementById('bar-academic').style.width = `${data.academic}%`;
+      
+      document.getElementById('vit-health').innerText = data.health;
+      document.getElementById('bar-health').style.width = `${data.healthVal}%`;
+      
+      const healthFill = document.getElementById('bar-health');
+      if (data.healthVal < 85) {
+        healthFill.className = 'progress-bar-fill warning';
+        document.getElementById('vit-health').style.color = 'var(--alert-amber)';
+      } else {
+        healthFill.className = 'progress-bar-fill';
+        document.getElementById('vit-health').style.color = 'var(--alert-green)';
+      }
+
+      document.getElementById('counselor-text').value = data.note;
+      document.getElementById('counselor-status-lbl').innerText = `Last updated: ${data.logTime}`;
+      
+      appendLog('SYS', `Loaded child case file details: Case ${caseId} (${data.name})`);
+    }
+
+    function saveCounselorLog() {
+      const text = document.getElementById('counselor-text').value;
+      const data = caseData[activeCaseId];
+      data.note = text;
+      
+      const now = new Date();
+      const timeStr = `Today, ${now.toTimeString().split(' ')[0]} by Recruiter`;
+      data.logTime = timeStr;
+      
+      document.getElementById('counselor-status-lbl').innerText = `Last updated: ${timeStr}`;
+      appendLog('AUDIT', `Saved counselor note entry for Case ${activeCaseId} (${data.name}) successfully.`);
+      alert("Counselor log entry recorded.");
+    }
+
+    function calculateVetting() {
+      const income = parseInt(document.getElementById('slider-income').value);
+      document.getElementById('lbl-income').innerText = `Rs ${income}k`;
+      
+      let matchScore = 50;
+      if (income > 200) matchScore = 95;
+      else if (income > 100) matchScore = 88;
+      else matchScore = 65;
+      
+      const lbl = document.getElementById('lbl-vetting-score');
+      lbl.innerText = `${matchScore}% Match`;
+      
+      if (matchScore > 80) {
+        lbl.style.color = 'var(--alert-green)';
+      } else if (matchScore > 60) {
+        lbl.style.color = 'var(--alert-amber)';
+      } else {
+        lbl.style.color = 'var(--alert-red)';
+      }
+      
+      appendLog('SYS', `Recalculated foster parent vetting scorecard: ${matchScore}% matching probability.`);
+    }
+
+    function appendLog(tag, msg, isError = false) {
+      const logs = document.getElementById('logs-viewport');
+      const now = new Date();
+      const timeStr = `[${now.toTimeString().split(' ')[0]}]`;
+      
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      
+      let tagClass = 'log-tag';
+      if (tag === 'AUDIT') tagClass += ' sec';
+      if (isError) tagClass += ' err';
+      
+      line.innerHTML = `<span class="log-time">${timeStr}</span><span class="${tagClass}">${tag}</span><span>${msg}</span>`;
+      logs.appendChild(line);
+      logs.scrollTop = logs.scrollHeight;
+    }
+
+    function startSimulators() {
+      setInterval(() => {
+        // Fluctuate inventory diapers
+        const val = Math.floor(Math.random() * 4) + 6;
+        const inv = document.getElementById('inv-diapers');
+        inv.innerText = `${val} packs`;
+        
+        if (val < 8) {
+          inv.className = 'inventory-val warning';
+          appendLog('AUDIT', `Inventory Alert: Diapers stock level drops below safe thresholds (${val} packs).`, true);
+        } else {
+          inv.className = 'inventory-val';
+        }
+      }, 8000);
+    }
+  </script>
+</body>
+</html>

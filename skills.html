@@ -7,7 +7,7 @@
   <meta name="description" content="Lokesh Kumar's technical skills — Python, Pandas, NetworkX, Streamlit, NLP/RAG, SQL, JavaScript, and more."/>
   <link rel="stylesheet" href="style.css"/>
   <style>
-    .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+    .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; }
     .skills-cat { background: var(--clr-surface); border: 1px solid var(--clr-border); border-radius: var(--radius-lg); padding: 2rem; }
     .skills-cat__icon { font-size: 1.75rem; margin-bottom: 0.75rem; }
     .skills-cat__title { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.25rem; }
@@ -32,6 +32,7 @@
   </style>
 </head>
 <body>
+<div id="scroll-progress"></div>
 <nav class="nav" id="main-nav">
   <div class="nav__inner">
     <a href="index.html" class="nav__logo">Lokesh<span>.</span></a>
@@ -45,7 +46,11 @@
       <a href="certifications.html" class="nav__link">Certs</a>
       <a href="testimonials.html"   class="nav__link">Testimonials</a>
     </div>
-    <a href="contact.html" class="nav__cta">Hire Me →</a>
+    <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <a href="assets/Lokesh_Kumar_Resume.pdf" class="nav__cta" download style="background: transparent; color: var(--clr-accent); border: 1px solid var(--clr-accent);">Resume (PDF)</a>
+      <a href="contact.html" class="nav__cta">Hire Me →</a>
+    </div>
+    <button class="dark-toggle" id="dark-toggle" title="Toggle dark mode (or press D)" aria-label="Toggle dark mode"><span class="dark-toggle__knob"></span></button>
     <button class="nav__hamburger" id="hamburger"><span></span><span></span><span></span></button>
   </div>
   <div class="nav__mobile" id="mobile-menu">
@@ -57,7 +62,8 @@
     <a href="education.html" class="nav__link">Education</a>
     <a href="certifications.html" class="nav__link">Certifications</a>
     <a href="testimonials.html" class="nav__link">Testimonials</a>
-    <a href="contact.html" class="nav__cta btn btn-primary">Hire Me →</a>
+    <a href="assets/Lokesh_Kumar_Resume.pdf" class="nav__link" download style="color: var(--clr-accent); font-weight: bold;">Resume (PDF)</a>
+    <a href="contact.html"        class="nav__cta btn btn-primary">Hire Me →</a>
   </div>
 </nav>
 
@@ -134,9 +140,9 @@
 
     <div class="skills-grid">
       <div class="skills-cat reveal">
-        <div class="skills-cat__icon">🐍</div>
-        <div class="skills-cat__title">Languages &amp; Frontend</div>
-        <p class="skills-cat__sub">Building interfaces and writing the logic that powers them.</p>
+        <div class="skills-cat__icon">💻</div>
+        <div class="skills-cat__title">Languages</div>
+        <p class="skills-cat__sub">Writing clean backend logic, querying databases, and constructing user interfaces.</p>
         <div class="tags-row">
           <span class="tag accent">Python</span>
           <span class="tag accent">SQL</span>
@@ -147,43 +153,28 @@
       </div>
       <div class="skills-cat reveal delay-1">
         <div class="skills-cat__icon">📊</div>
-        <div class="skills-cat__title">Data &amp; AI Stack</div>
-        <p class="skills-cat__sub">Processing, analyzing, and visualizing complex datasets.</p>
+        <div class="skills-cat__title">Frameworks &amp; Libraries</div>
+        <p class="skills-cat__sub">Developing interactive web tools, computing analytics, and engineering intelligent NLP pipelines.</p>
         <div class="tags-row">
+          <span class="tag accent">Streamlit</span>
           <span class="tag accent">Pandas</span>
           <span class="tag accent">NumPy</span>
-          <span class="tag accent">NetworkX</span>
-          <span class="tag accent">Streamlit</span>
+          <span class="tag accent">NetworkX (Graph Alg.)</span>
+          <span class="tag">NLP / RAG Pipelines</span>
           <span class="tag">Folium / Leaflet</span>
-          <span class="tag">WebSockets</span>
-          <span class="tag">NLP</span>
-          <span class="tag">RAG Pipelines</span>
         </div>
       </div>
       <div class="skills-cat reveal delay-2">
         <div class="skills-cat__icon">🛠️</div>
-        <div class="skills-cat__title">Platforms &amp; Tools</div>
-        <p class="skills-cat__sub">Managing projects, deployments, and digital presence.</p>
+        <div class="skills-cat__title">Cloud &amp; Tools</div>
+        <p class="skills-cat__sub">Deploying scalable systems, orchestrating version control, and managing digital assets.</p>
         <div class="tags-row">
-          <span class="tag">Git</span>
-          <span class="tag">GitHub</span>
-          <span class="tag">WordPress</span>
-          <span class="tag">Elementor</span>
+          <span class="tag accent">Git &amp; GitHub</span>
+          <span class="tag accent">GCP (Google Cloud)</span>
+          <span class="tag">Docker / Deployment</span>
+          <span class="tag">WebSockets &amp; REST APIs</span>
+          <span class="tag">WordPress / CMS</span>
           <span class="tag">Google Search Console</span>
-          <span class="tag">MS Excel (Advanced)</span>
-        </div>
-      </div>
-      <div class="skills-cat reveal delay-3">
-        <div class="skills-cat__icon">🧠</div>
-        <div class="skills-cat__title">Domain Expertise</div>
-        <p class="skills-cat__sub">Real-world problem areas I've applied engineering to.</p>
-        <div class="tags-row">
-          <span class="tag green">Supply Chain Routing</span>
-          <span class="tag green">Telematics Dashboards</span>
-          <span class="tag green">Data Pipelines</span>
-          <span class="tag green">Geospatial Mapping</span>
-          <span class="tag green">Community Data Systems</span>
-          <span class="tag green">Report Automation</span>
         </div>
       </div>
     </div>
@@ -221,7 +212,14 @@
         <a href="projects.html" class="footer__link">Projects</a>
         <a href="contact.html" class="footer__link">Contact</a>
       </nav>
-      <p class="footer__copy">© 2026 Lokesh Kumar.</p>
+            <div class="footer__social">
+        <a href="https://github.com/lokeshsoni653-del" target="_blank" rel="noopener" class="footer__social-link">🐙 GitHub</a>
+        <a href="https://www.linkedin.com/in/lokesh-kumar-76060722a" target="_blank" rel="noopener" class="footer__social-link">💼 LinkedIn</a>
+        <a href="https://share.streamlit.io/user/lokeshsoni653-del" target="_blank" rel="noopener" class="footer__social-link">🚀 Streamlit</a>
+        <a href="https://vercel.com/lsoni1418-7207s-projects" target="_blank" rel="noopener" class="footer__social-link">▲ Vercel</a>
+        <a href="https://app.netlify.com/teams/lsoni1418/projects" target="_blank" rel="noopener" class="footer__social-link">🔵 Netlify</a>
+      </div>
+      <p class="footer__copy">© <span class="footer-year">2026</span> Lokesh Kumar.</p>
     </div>
   </div>
 </footer>
@@ -246,5 +244,282 @@
   const observer=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('visible');observer.unobserve(x.target)}}),{threshold:0.1});
   document.querySelectorAll('.reveal').forEach(r=>observer.observe(r));
 </script>
+
+<button class="back-top" id="back-top" aria-label="Back to top">↑</button>
+
+<a class="resume-cta-fixed" href="assets/Lokesh_Kumar_Resume.pdf" download title="Download Resume">⬇ Resume</a>
+  <script>
+    /* Dark Mode: apply before paint */
+    (function(){
+      var s = localStorage.getItem('lk-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', s);
+    })();
+    document.addEventListener('DOMContentLoaded', function() {
+      /* Dark Toggle */
+      var toggle = document.getElementById('dark-toggle');
+      if (toggle) {
+        toggle.addEventListener('click', function() {
+          var curr = document.documentElement.getAttribute('data-theme');
+          var next = curr === 'dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', next);
+          localStorage.setItem('lk-theme', next);
+        });
+      }
+      /* Back to Top */
+      var bt = document.getElementById('back-top');
+      if (bt) {
+        window.addEventListener('scroll', function() { bt.classList.toggle('show', window.scrollY > 400); }, { passive: true });
+        bt.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+      }
+    });
+  </script>
+  <script>
+    /* ── Scroll Progress Bar ── */
+    (function() {
+      var bar = document.getElementById('scroll-progress');
+      if (!bar) return;
+      function updateProgress() {
+        var scrollTop = window.scrollY;
+        var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        var pct = docHeight > 0 ? scrollTop / docHeight : 0;
+        bar.style.transform = 'scaleX(' + pct + ')';
+      }
+      window.addEventListener('scroll', updateProgress, { passive: true });
+      updateProgress();
+    })();
+
+    /* ── OS dark mode auto-detect (only on first visit) ── */
+    (function() {
+      if (!localStorage.getItem('lk-theme')) {
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = prefersDark ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('lk-theme', theme);
+      }
+    })();
+
+    /* ── Keyboard shortcut: press D to toggle dark mode ── */
+    document.addEventListener('keydown', function(e) {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.key === 'd' || e.key === 'D') {
+        var curr = document.documentElement.getAttribute('data-theme');
+        var next = curr === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('lk-theme', next);
+      }
+    });
+
+    /* ── Page exit fade ── */
+    document.querySelectorAll('a[href]').forEach(function(a) {
+      var href = a.getAttribute('href');
+      if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('mailto') || href.startsWith('tel') || a.download) return;
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.body.style.opacity = '0';
+        document.body.style.transition = 'opacity 0.2s';
+        setTimeout(function() { window.location.href = href; }, 200);
+      });
+    });
+
+    /* ── Auto copyright year ── */
+    var yr = document.querySelector('.footer-year');
+    if (yr) yr.textContent = new Date().getFullYear();
+  </script>
+
+<!-- ═══════════════ LK CHATBOT WIDGET ═══════════════ -->
+<div class="lk-chat" id="lk-chat">
+
+  <!-- Toggle Button -->
+  <button class="lk-chat__toggle" id="lk-chat-toggle" aria-label="Open AI assistant" aria-expanded="false">
+    <span class="lk-chat__toggle-icon" id="lk-chat-icon">💬</span>
+    <span class="lk-chat__toggle-label">Ask me about Lokesh</span>
+  </button>
+
+  <!-- Chat Panel -->
+  <div class="lk-chat__panel" id="lk-chat-panel" aria-hidden="true" role="dialog" aria-label="Portfolio AI assistant">
+
+    <!-- Header -->
+    <div class="lk-chat__header">
+      <div class="lk-chat__bot-avatar">🤖</div>
+      <div class="lk-chat__bot-info">
+        <div class="lk-chat__bot-name">Lokesh's AI Assistant</div>
+        <div class="lk-chat__bot-status">
+          <span class="lk-chat__status-dot"></span>
+          Online — Ask me anything!
+        </div>
+      </div>
+      <button class="lk-chat__header-close" id="lk-chat-close" aria-label="Close chat">✕</button>
+    </div>
+
+    <!-- Messages -->
+    <div class="lk-chat__messages" id="lk-chat-messages"></div>
+
+    <!-- Quick Reply Chips -->
+    <div class="lk-chat__chips" id="lk-chat-chips">
+      <button class="lk-chip" data-q="What are Lokesh's best projects?">🚀 Best projects?</button>
+      <button class="lk-chip" data-q="What Python skills does Lokesh have?">🐍 Python skills?</button>
+      <button class="lk-chip" data-q="Is Lokesh open to internships or full-time roles?">💼 Available for hire?</button>
+      <button class="lk-chip" data-q="Tell me about Lokesh's education and background.">🎓 Education?</button>
+      <button class="lk-chip" data-q="How can I contact Lokesh Kumar?">📧 Contact info?</button>
+    </div>
+
+    <!-- Input -->
+    <div class="lk-chat__input-row">
+      <input class="lk-chat__input" id="lk-chat-input" type="text"
+             placeholder="Ask about Lokesh's projects, skills..."
+             maxlength="500" autocomplete="off" aria-label="Chat message" />
+      <button class="lk-chat__send" id="lk-chat-send" aria-label="Send">↑</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function() {
+  // ── CONFIG — update CHAT_API_URL after deploying Vercel function ──
+  var CHAT_API_URL = 'https://lokesh-portfolio-bot.vercel.app/api/chat';
+
+  var GREETING = "Hi! I'm Lokesh's AI assistant. I know everything about his 56+ projects, skills, experience, and availability. What would you like to know? 🚀";
+
+  // ── State ──────────────────────────────────────────────────────
+  var isOpen       = false;
+  var isLoading    = false;
+  var history      = [];
+  var chipsShown   = true;
+
+  // ── Elements ───────────────────────────────────────────────────
+  var toggle   = document.getElementById('lk-chat-toggle');
+  var closeBtn = document.getElementById('lk-chat-close');
+  var panel    = document.getElementById('lk-chat-panel');
+  var messages = document.getElementById('lk-chat-messages');
+  var input    = document.getElementById('lk-chat-input');
+  var sendBtn  = document.getElementById('lk-chat-send');
+  var chips    = document.getElementById('lk-chat-chips');
+  var icon     = document.getElementById('lk-chat-icon');
+
+  if (!toggle) return; // safety guard
+
+  // ── Helpers ────────────────────────────────────────────────────
+  function addMessage(text, role) {
+    var div = document.createElement('div');
+    div.className = 'lk-msg lk-msg--' + role;
+    div.textContent = text;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+    return div;
+  }
+
+  function showTyping() {
+    var t = document.createElement('div');
+    t.className = 'lk-typing'; t.id = 'lk-typing';
+    t.innerHTML = '<span></span><span></span><span></span>';
+    messages.appendChild(t);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function hideTyping() {
+    var t = document.getElementById('lk-typing');
+    if (t) t.remove();
+  }
+
+  function hideChips() {
+    if (chips && chipsShown) { chips.style.display = 'none'; chipsShown = false; }
+  }
+
+  function setLoading(state) {
+    isLoading = state;
+    sendBtn.disabled = state;
+    input.disabled   = state;
+    if (state) showTyping(); else hideTyping();
+  }
+
+  // ── Open/Close ─────────────────────────────────────────────────
+  function openChat() {
+    isOpen = true;
+    panel.classList.add('open');
+    panel.setAttribute('aria-hidden', 'false');
+    toggle.setAttribute('aria-expanded', 'true');
+    icon.textContent = '✕';
+    input.focus();
+    // Show greeting if first time
+    if (messages.children.length === 0) {
+      addMessage(GREETING, 'bot');
+    }
+  }
+
+  function closeChat() {
+    isOpen = false;
+    panel.classList.remove('open');
+    panel.setAttribute('aria-hidden', 'true');
+    toggle.setAttribute('aria-expanded', 'false');
+    icon.textContent = '💬';
+  }
+
+  toggle.addEventListener('click', function() { isOpen ? closeChat() : openChat(); });
+  closeBtn.addEventListener('click', closeChat);
+
+  // Close on outside click
+  document.addEventListener('click', function(e) {
+    if (isOpen && !document.getElementById('lk-chat').contains(e.target)) closeChat();
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && isOpen) closeChat();
+  });
+
+  // ── Send Message ───────────────────────────────────────────────
+  function sendMessage(text) {
+    text = (text || input.value || '').trim();
+    if (!text || isLoading) return;
+    input.value = '';
+    hideChips();
+
+    addMessage(text, 'user');
+    setLoading(true);
+
+    // Keep last 10 history items for context
+    var recentHistory = history.slice(-10);
+
+    fetch(CHAT_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text, history: recentHistory }),
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      setLoading(false);
+      var answer = data.answer || data.error || 'Something went wrong. Please try again!';
+      addMessage(answer, 'bot');
+      history.push({ role: 'user', text: text });
+      history.push({ role: 'bot',  text: answer });
+      // Trim history to last 20 items
+      if (history.length > 20) history = history.slice(-20);
+    })
+    .catch(function() {
+      setLoading(false);
+      addMessage('Network error. Please check your connection and try again!', 'bot');
+    });
+  }
+
+  sendBtn.addEventListener('click', function() { sendMessage(); });
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+
+  // ── Quick Reply Chips ──────────────────────────────────────────
+  if (chips) {
+    chips.querySelectorAll('.lk-chip').forEach(function(chip) {
+      chip.addEventListener('click', function() {
+        var q = this.getAttribute('data-q');
+        if (q) { openChat(); sendMessage(q); }
+      });
+    });
+  }
+
+})();
+</script>
+<!-- ════════════ END LK CHATBOT WIDGET ════════════ -->
+
 </body>
 </html>

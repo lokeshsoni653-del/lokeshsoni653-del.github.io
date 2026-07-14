@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GigaSpace-Optima — Commercial Real Estate &amp; Mall Space Yield Optimizer</title>
+  <!-- Google Fonts: Orbitron & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-dark: #07090e;
+      --bg-card: #0f131f;
+      --bg-input: #171d2f;
+      --border-color: #232d47;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent-gold: #d97706;
+      --accent-gold-glow: rgba(217, 119, 6, 0.25);
+      --accent-gold-hover: #b45309;
+      --accent-platinum: #e2e8f0;
+      --accent-green: #10b981;
+      --accent-green-glow: rgba(16, 185, 129, 0.25);
+      --accent-cyan: #06b6d4;
+      --accent-cyan-glow: rgba(6, 182, 212, 0.25);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-dark);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-gold);
+    }
+
+    /* TOP NAVBAR */
+    .top-navbar {
+      height: 80px;
+      background: #0b0e16;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 3rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand-section {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 1.4rem;
+      letter-spacing: 0.1em;
+      color: var(--text-primary);
+    }
+
+    .brand-logo span {
+      color: var(--accent-gold);
+      text-shadow: 0 0 10px var(--accent-gold-glow);
+    }
+
+    .brand-logo-sub {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      color: var(--text-secondary);
+      margin-top: 0.15rem;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 1.5rem;
+      height: 100%;
+      align-items: center;
+    }
+
+    .nav-tab {
+      padding: 0.6rem 1.25rem;
+      border-radius: 20px;
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 1px solid transparent;
+    }
+
+    .nav-tab:hover {
+      color: var(--text-primary);
+      border-color: rgba(217, 119, 6, 0.3);
+    }
+
+    .nav-tab.active {
+      color: var(--text-primary);
+      background: rgba(217, 119, 6, 0.12);
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 15px rgba(217, 119, 6, 0.15);
+    }
+
+    .nav-profile {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .nav-profile-info {
+      text-align: right;
+    }
+
+    .profile-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .profile-role {
+      font-size: 0.72rem;
+      color: var(--accent-gold);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .profile-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-gold), #b45309);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+      box-shadow: 0 0 15px rgba(217, 119, 6, 0.3);
+    }
+
+    /* MAIN VIEWPORT */
+    .viewport-content {
+      padding: 3rem;
+      flex: 1;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .dashboard-panel {
+      display: none;
+    }
+
+    .dashboard-panel.active {
+      display: block;
+    }
+
+    /* GRID LAYOUT */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .col-12 { grid-column: span 12; }
+    .col-8 { grid-column: span 8; }
+    .col-4 { grid-column: span 4; }
+    .col-6 { grid-column: span 6; }
+
+    @media (max-width: 1100px) {
+      .col-8, .col-4, .col-6 { grid-column: span 12; }
+    }
+
+    /* CARDS */
+    .panel-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      transition: border-color 0.3s;
+    }
+
+    .panel-card:hover {
+      border-color: rgba(217, 119, 6, 0.3);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 1rem;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-family: 'Orbitron', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .card-badge {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.25rem 0.75rem;
+      border-radius: 30px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-gold {
+      background: rgba(217, 119, 6, 0.15);
+      color: #fde047;
+      border: 1px solid rgba(217, 119, 6, 0.3);
+    }
+
+    .badge-cyan {
+      background: rgba(6, 182, 212, 0.15);
+      color: #22d3ee;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+
+    .badge-green {
+      background: rgba(16, 185, 129, 0.15);
+      color: #a7f3d0;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    /* INTERACTIVE FLOOR PLAN GRID */
+    .floor-plan-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .floor-grid {
+      background: var(--bg-input);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 12px;
+      min-height: 250px;
+    }
+
+    .floor-shop {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1rem;
+      transition: all 0.3s;
+    }
+
+    .floor-shop:hover {
+      border-color: var(--accent-gold);
+      background: rgba(217, 119, 6, 0.05);
+      transform: translateY(-2px);
+    }
+
+    .floor-shop.selected {
+      background: rgba(217, 119, 6, 0.18);
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 15px var(--accent-gold-glow);
+    }
+
+    .shop-num {
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.25rem;
+    }
+
+    .shop-tenant {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+    }
+
+    .shop-footfall {
+      font-size: 0.7rem;
+      color: var(--accent-cyan);
+      margin-top: 0.25rem;
+      font-weight: 500;
+    }
+
+    /* INSPECTOR PANEL */
+    .inspector-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .inspector-header {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 0.75rem;
+    }
+
+    .inspector-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--accent-gold);
+      text-shadow: 0 0 10px var(--accent-gold-glow);
+    }
+
+    .inspector-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      padding-bottom: 0.5rem;
+    }
+
+    .inspector-lbl {
+      color: var(--text-secondary);
+    }
+
+    .inspector-val {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .recommendation-box {
+      background: rgba(16, 185, 129, 0.05);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 8px;
+      padding: 1rem;
+      font-size: 0.82rem;
+      color: #a7f3d0;
+      line-height: 1.4;
+    }
+
+    /* LEASE ANALYTICS SLIDERS */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .form-control {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: white;
+      font-size: 0.88rem;
+      transition: border-color 0.3s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--accent-gold);
+    }
+
+    .slider-input {
+      width: 100%;
+      height: 6px;
+      background: #232d47;
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .slider-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent-gold);
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--accent-gold-glow);
+    }
+
+    .btn {
+      padding: 0.75rem 1.75rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-gold), #b45309);
+      color: white;
+      box-shadow: 0 4px 15px var(--accent-gold-glow);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--bg-input);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: #242c42;
+    }
+
+    /* LEASE LEDGER COMPARISON */
+    .ledger-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+
+    .ledger-table th {
+      text-align: left;
+      padding: 0.75rem;
+      background: rgba(255, 255, 255, 0.02);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-secondary);
+    }
+
+    .ledger-table td {
+      padding: 1rem 0.75rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .highlight-val {
+      font-weight: 700;
+      color: var(--accent-green);
+    }
+
+    /* B2B SMART FACILITY SaaS */
+    .meter-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .meter-card {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+
+    .meter-val {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--accent-gold);
+      text-shadow: 0 0 10px var(--accent-gold-glow);
+      margin-bottom: 0.25rem;
+    }
+
+    .meter-val.green {
+      color: var(--accent-green);
+      text-shadow: 0 0 10px var(--accent-green-glow);
+    }
+
+    .meter-val.cyan {
+      color: var(--accent-cyan);
+      text-shadow: 0 0 10px var(--accent-cyan-glow);
+    }
+
+    .meter-lbl {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* BILLBOARD BIDDING ENGINE */
+    .bidding-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+
+    .bid-input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .bid-result-box {
+      text-align: center;
+      background: rgba(6, 182, 212, 0.05);
+      border: 1px solid rgba(6, 182, 212, 0.2);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+
+    .bid-val {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--accent-cyan);
+      text-shadow: 0 0 10px var(--accent-cyan-glow);
+    }
+
+    /* SYSTEM CONSOLE LOGS */
+    .console-section {
+      margin-top: 2rem;
+    }
+
+    .console-log-box {
+      background: #04060b;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.25rem;
+      font-family: monospace;
+      font-size: 0.72rem;
+      color: var(--accent-gold);
+      height: 140px;
+      overflow-y: auto;
+    }
+
+    .log-line {
+      margin-bottom: 0.4rem;
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .log-time {
+      color: var(--text-secondary);
+    }
+
+    .log-tag {
+      font-weight: bold;
+      color: var(--accent-cyan);
+    }
+
+    .log-tag.sec { color: var(--accent-gold); }
+    .log-tag.err { color: #f87171; }
+  </style>
+</head>
+<body>
+
+  <!-- TOP WORKSPACE NAVBAR -->
+  <header class="top-navbar">
+    <div class="brand-section">
+      <div class="brand-logo"><span>GIGA</span>Space</div>
+      <div class="brand-logo-sub">Space Yield OS v1.0</div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+      <div class="nav-tab active" id="tab-floor" onclick="switchTab('floor')">🏢 Giga Mall Floorplan</div>
+      <div class="nav-tab" id="tab-yield" onclick="switchTab('yield')">📊 Yield Analytics</div>
+      <div class="nav-tab" id="tab-saas" onclick="switchTab('saas')">⚡ VoltSpace AI SaaS</div>
+    </div>
+
+    <!-- Profile section -->
+    <div class="nav-profile">
+      <div class="nav-profile-info">
+        <div class="profile-name">Lokesh Kumar</div>
+        <div class="profile-role">Web Developer Intern</div>
+      </div>
+      <div class="profile-avatar">LK</div>
+    </div>
+  </header>
+
+  <!-- VIEWPORT CONTENT -->
+  <main class="viewport-content">
+
+    <!-- ==================== TAB 1: FLOORPLAN OPTIMIZER ==================== -->
+    <div class="dashboard-panel active" id="panel-floor">
+      <div class="dashboard-grid">
+        
+        <!-- Floor plan visual map -->
+        <div class="panel-card col-8">
+          <div class="card-header">
+            <div class="card-title">
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color: var(--accent-gold);">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+              </svg>
+              Giga Mall — Retail Space Floorplan Map (Ground Floor)
+            </div>
+            <span class="card-badge badge-gold">Leasing Sizer</span>
+          </div>
+
+          <div class="floor-plan-container">
+            <div class="floor-grid" id="floor-plan-grid">
+              <!-- Dynamically rendered by JS -->
+            </div>
+            <div style="font-size: 0.72rem; color: var(--text-secondary); text-align: center;">
+              💡 Click on any retail cell above to load active tenant parameters into the Inspector Panel.
+            </div>
+          </div>
+        </div>
+
+        <!-- Space inspector panel -->
+        <div class="panel-card col-4">
+          <div class="card-header">
+            <div class="card-title">Zone Inspector Panel</div>
+            <span class="card-badge badge-cyan">AI Sorter Output</span>
+          </div>
+          
+          <div class="inspector-box" id="inspector-content">
+            <div class="inspector-header">
+              <div class="inspector-title" id="insp-tenant">Select Shop</div>
+              <span style="font-size: 0.72rem; color: var(--text-secondary);" id="insp-id">Zone ID: --</span>
+            </div>
+            
+            <div class="inspector-row">
+              <span class="inspector-lbl">Floor Area Size</span>
+              <span class="inspector-val" id="insp-area">-- sq. ft.</span>
+            </div>
+            <div class="inspector-row">
+              <span class="inspector-lbl">Current Monthly Rent</span>
+              <span class="inspector-val" id="insp-rent">Rs --</span>
+            </div>
+            <div class="inspector-row">
+              <span class="inspector-lbl">Average Daily Footfall</span>
+              <span class="inspector-val" id="insp-footfall" style="color: var(--accent-cyan);">--</span>
+            </div>
+
+            <div class="recommendation-box" id="insp-recom">
+              Please click on a shop in the floorplan grid to inspect active lease metrics and get AI rental suggestions.
+            </div>
+
+            <button class="btn btn-primary" onclick="lockLeaseAgreement()" style="width: 100%; justify-content: center;">Approve AI Rent Update</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== TAB 2: YIELD ANALYTICS ==================== -->
+    <div class="dashboard-panel" id="panel-yield">
+      <div class="dashboard-grid">
+        
+        <!-- Agreement parameters slider -->
+        <div class="panel-card col-6">
+          <div class="card-header">
+            <div class="card-title">Hybrid Agreement Pricing Sizer</div>
+            <span class="card-badge badge-gold">Yield Controls</span>
+          </div>
+
+          <div class="saas-calc-block">
+            <div class="form-group">
+              <label class="form-label">Base Rent Markup (PKR / sq. ft.)</label>
+              <input type="range" min="100" max="1500" value="450" step="50" class="slider-input" id="baseRentInput" oninput="calculateYieldComparison()">
+              <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-secondary); margin-top:0.25rem;">
+                <span>Rs 100 Base</span>
+                <span id="base-rent-lbl" style="font-weight: 700; color: white;">Rs 450</span>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Tenant Sales Commission (%)</label>
+              <input type="range" min="0" max="15" value="5" step="0.5" class="slider-input" id="commissionInput" oninput="calculateYieldComparison()">
+              <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-secondary); margin-top:0.25rem;">
+                <span>0% (Flat Rate)</span>
+                <span id="commission-lbl" style="font-weight: 700; color: white;">5% Comm.</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+            <button class="btn btn-primary" onclick="dispatchYieldSizing()" style="flex:1; justify-content:center;">Lock Agreement Sizing</button>
+            <button class="btn btn-secondary" onclick="resetYieldInputs()" style="flex:1; justify-content:center;">Reset Pricing</button>
+          </div>
+        </div>
+
+        <!-- Profitability comparison ledger -->
+        <div class="panel-card col-6">
+          <div class="card-header">
+            <div class="card-title">Agreement Sizer Comparison Ledger</div>
+            <span class="card-badge badge-green">Revenue Ledger</span>
+          </div>
+
+          <div style="overflow-x: auto;">
+            <table class="ledger-table">
+              <thead>
+                <tr>
+                  <th>Rent Sizing Model</th>
+                  <th>Monthly Fixed Income</th>
+                  <th>Estimated Revenue Share</th>
+                  <th>Projected Space Yield</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight: 600;">Flat-Rate Leasing</td>
+                  <td id="flat-fixed">Rs 900,000</td>
+                  <td>Rs 0 (Flat)</td>
+                  <td class="highlight-val" id="flat-yield">Rs 900,000</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 600;">Hybrid Profit Sharing</td>
+                  <td id="hybrid-fixed">Rs 450,000</td>
+                  <td id="hybrid-comm">Rs 650,000</td>
+                  <td class="highlight-val" id="hybrid-yield" style="color: var(--accent-cyan);">Rs 1,100,000</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Monthly yield projections chart -->
+        <div class="panel-card col-12">
+          <div class="card-header">
+            <div class="card-title">Projected space yield comparison (Flat vs Hybrid)</div>
+            <span class="card-badge badge-cyan">Yield Projections</span>
+          </div>
+          <div style="height: 250px;">
+            <canvas id="yieldChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 3: VOLTSPACE AI SaaS ==================== -->
+    <div class="dashboard-panel" id="panel-saas">
+      <div class="dashboard-grid">
+        
+        <!-- Smart facility IoT monitor -->
+        <div class="panel-card col-6">
+          <div class="card-header">
+            <div class="card-title">Smart Mall Facility IoT Monitoring</div>
+            <span class="card-badge badge-cyan">Facility Telemetry</span>
+          </div>
+          
+          <div class="meter-grid">
+            <div class="meter-card">
+              <div class="meter-val" id="meter-hvac">21.8°C</div>
+              <div class="meter-lbl">HVAC Central Temp</div>
+            </div>
+            <div class="meter-card">
+              <div class="meter-val green" id="meter-parking">78%</div>
+              <div class="meter-lbl">Parking Occupancy</div>
+            </div>
+            <div class="meter-card">
+              <div class="meter-val cyan" id="meter-power">412 kW</div>
+              <div class="meter-lbl">Grid Power Intake</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LED screen bidding engine -->
+        <div class="panel-card col-6">
+          <div class="card-header">
+            <div class="card-title">Giga Mall LED Screens Bidding Engine</div>
+            <span class="card-badge badge-cyan">Crowd Bidding SaaS</span>
+          </div>
+
+          <div class="bidding-box">
+            <div class="bid-input-row">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Real-Time Crowd Density</label>
+                <select class="form-control" id="crowd-select" onchange="calculateLEDBids()">
+                  <option value="low">Standard Morning (Low Crowd)</option>
+                  <option value="medium">Afternoon Traffic (Medium Crowd)</option>
+                  <option value="high">Weekend Rush Hour (Peak Crowd)</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">LED Screen Location</label>
+                <select class="form-control" id="screen-select" onchange="calculateLEDBids()">
+                  <option value="atrium">Central Atrium Mega Screen</option>
+                  <option value="entrance">Main Entrance Lobby LED</option>
+                  <option value="parking">Parking Level Escalator Screens</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="bid-result-box">
+              <div style="font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">Automated LED Ad Spot Rate</div>
+              <div class="bid-val" id="led-bid-price">Rs 14,000 / Min</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SYSTEM DIAGNOSTICS LOG CONSOLE -->
+    <div class="console-section">
+      <div class="panel-card col-12">
+        <div class="card-header" style="margin-bottom: 0.75rem; padding-bottom: 0.5rem;">
+          <div class="card-title" style="font-size: 0.8rem; letter-spacing: 0.1em; color: var(--accent-gold);">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            System Console Diagnostics Log
+          </div>
+          <span class="card-badge badge-gold">Active System Audit</span>
+        </div>
+        <div class="console-log-box" id="console-logs">
+          <div class="log-line">
+            <span class="log-time">[18:32:02]</span>
+            <span class="log-tag">SYS</span>
+            <span>GigaSpace-Optima space leasing core initialized. Syncing with Giga Mall database.</span>
+          </div>
+          <div class="log-line">
+            <span class="log-time">[18:32:06]</span>
+            <span class="log-tag sec">NET</span>
+            <span>Handshake secure: Connection established with Islamabad WTC datacenter.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- JAVASCRIPT CODE -->
+  <script>
+    let activeTab = 'floor';
+    let selectedShopId = null;
+    let yieldChartInstance = null;
+
+    // Floor plan data
+    const shopList = [
+      { id: 'G-01', tenant: 'Subway Franchise', area: 1200, rent: 450000, footfall: 1400, type: 'food' },
+      { id: 'G-02', tenant: 'J. Junaid Jamshed', area: 2400, rent: 850000, footfall: 2200, type: 'apparel' },
+      { id: 'G-03', tenant: 'SAMSUNG Flagship', area: 1800, rent: 900000, footfall: 3100, type: 'electronics' },
+      { id: 'G-04', tenant: 'Hyperstar Anchor', area: 12000, rent: 3500000, footfall: 9500, type: 'anchor' },
+      { id: 'G-05', tenant: 'Miniso Lifestyle', area: 2200, rent: 750000, footfall: 1800, type: 'convenience' },
+      { id: 'G-06', tenant: 'KFC Express', area: 1500, rent: 600000, footfall: 2800, type: 'food' },
+      { id: 'G-07', tenant: 'Outfitters Store', area: 3000, rent: 1100000, footfall: 2400, type: 'apparel' },
+      { id: 'G-08', tenant: 'Leasing Empty Slot', area: 1600, rent: 500000, footfall: 150, type: 'empty' }
+    ];
+
+    window.onload = function() {
+      generateFloorGrid();
+      initCharts();
+      startSimulators();
+      calculateYieldComparison();
+      calculateLEDBids();
+    };
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.dashboard-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      
+      document.getElementById('panel-' + tabId).classList.add('active');
+      document.getElementById('tab-' + tabId).classList.add('active');
+      activeTab = tabId;
+      
+      appendLog('SYS', `Switched workspace panel tab view to: ${tabId.toUpperCase()}`);
+    }
+
+    function appendLog(tag, msg, isError = false) {
+      const logs = document.getElementById('console-logs');
+      const now = new Date();
+      const timeStr = `[${now.toTimeString().split(' ')[0]}]`;
+      
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      
+      let tagClass = 'log-tag';
+      if (tag === 'NET' || tag === 'SaaS') tagClass += ' sec';
+      if (isError) tagClass += ' err';
+      
+      line.innerHTML = `<span class="log-time">${timeStr}</span><span class="${tagClass}">${tag}</span><span>${msg}</span>`;
+      logs.appendChild(line);
+      logs.scrollTop = logs.scrollHeight;
+    }
+
+    // Floor plan renderer
+    function generateFloorGrid() {
+      const grid = document.getElementById('floor-plan-grid');
+      grid.innerHTML = '';
+      
+      shopList.forEach(shop => {
+        const div = document.createElement('div');
+        div.className = 'floor-shop';
+        div.id = `shop-${shop.id}`;
+        
+        let subText = `${shop.area} sq.ft.`;
+        if (shop.type === 'empty') subText = 'AVAILABLE';
+        
+        div.innerHTML = `
+          <span class="shop-num">${shop.id}</span>
+          <span class="shop-tenant">${shop.tenant}</span>
+          <span class="shop-footfall">${subText}</span>
+        `;
+        
+        div.onclick = function() {
+          selectShop(shop.id);
+        };
+        
+        grid.appendChild(div);
+      });
+    }
+
+    function selectShop(shopId) {
+      if (selectedShopId) {
+        document.getElementById(`shop-${selectedShopId}`).classList.remove('selected');
+      }
+      
+      selectedShopId = shopId;
+      document.getElementById(`shop-${shopId}`).classList.add('selected');
+      
+      const shop = shopList.find(s => s.id === shopId);
+      
+      document.getElementById('insp-tenant').innerText = shop.tenant;
+      document.getElementById('insp-id').innerText = `Zone ID: ${shop.id} | Class: ${shop.type.toUpperCase()}`;
+      document.getElementById('insp-area').innerText = `${shop.area.toLocaleString()} sq. ft.`;
+      document.getElementById('insp-rent').innerText = `Rs ${shop.rent.toLocaleString()}`;
+      document.getElementById('insp-footfall').innerText = `${shop.footfall.toLocaleString()} visitors/day`;
+      
+      const recomBox = document.getElementById('insp-recom');
+      
+      // Smart algorithm suggestion
+      if (shop.type === 'empty') {
+        recomBox.className = 'recommendation-box';
+        recomBox.style.color = 'var(--accent-cyan)';
+        recomBox.style.borderColor = 'rgba(6,182,212,0.2)';
+        recomBox.style.background = 'rgba(6,182,212,0.05)';
+        recomBox.innerText = `💡 SPACE AVAILABLE: Suggested starting rent Rs ${(shop.area * 350).toLocaleString()} flat rate. High prospective demand forecast from apparel segment.`;
+      } else if (shop.footfall > 2500) {
+        recomBox.className = 'recommendation-box';
+        recomBox.style.color = '#a7f3d0';
+        recomBox.style.borderColor = 'rgba(16,185,129,0.2)';
+        recomBox.style.background = 'rgba(16,185,129,0.05)';
+        const suggested = Math.round(shop.rent * 1.15);
+        recomBox.innerText = `🟢 HIGH YIELD NODE: Daily footfall is exceptional. Recommend +15% lease adjustment to Rs ${suggested.toLocaleString()} or shifting to Hybrid revenue share.`;
+      } else {
+        recomBox.className = 'recommendation-box';
+        recomBox.style.color = '#fde047';
+        recomBox.style.borderColor = 'rgba(245,158,11,0.2)';
+        recomBox.style.background = 'rgba(245,158,11,0.05)';
+        recomBox.innerText = `🟡 STABLE YIELD NODE: Footfall metrics matching baseline profiles. Recommend flat rate lease renewal without adjustments.`;
+      }
+      
+      appendLog('SYS', `Selected retail shop ${shopId} (${shop.tenant}) for lease inspection.`);
+    }
+
+    function lockLeaseAgreement() {
+      if (!selectedShopId) {
+        alert("Please select a Giga Mall retail shop cell on the Floorplan Map first!");
+        return;
+      }
+      const shop = shopList.find(s => s.id === selectedShopId);
+      appendLog('SYS', `Approved AI Rental Update parameters for shop ${shop.id} (${shop.tenant}). Dispatched terms to Giga Leasing HQ.`);
+      alert("Lease update approved and dispatched to Giga Group Leasing division.");
+    }
+
+    // Tab 2: Yield calculations
+    function calculateYieldComparison() {
+      const baseRent = parseInt(document.getElementById('baseRentInput').value);
+      const commission = parseFloat(document.getElementById('commissionInput').value);
+      
+      document.getElementById('base-rent-lbl').innerText = `Rs ${baseRent} / sq.ft.`;
+      document.getElementById('commission-lbl').innerText = `${commission}% Commission`;
+      
+      // Calculate yield comparison for J. store (2400 sq.ft, typical sales Rs 12M / mo)
+      const shopArea = 2400;
+      const flatFixedVal = 450 * shopArea; // current base
+      const hybridFixedVal = baseRent * shopArea;
+      
+      const estCommRevenue = 15000000 * (commission / 100);
+      const hybridTotalYield = hybridFixedVal + estCommRevenue;
+      
+      document.getElementById('flat-fixed').innerText = `Rs ${flatFixedVal.toLocaleString()}`;
+      document.getElementById('flat-yield').innerText = `Rs ${flatFixedVal.toLocaleString()}`;
+      
+      document.getElementById('hybrid-fixed').innerText = `Rs ${hybridFixedVal.toLocaleString()}`;
+      document.getElementById('hybrid-comm').innerText = `Rs ${estCommRevenue.toLocaleString()}`;
+      document.getElementById('hybrid-yield').innerText = `Rs ${hybridTotalYield.toLocaleString()}`;
+      
+      // Update chart if loaded
+      if (yieldChartInstance) {
+        yieldChartInstance.data.datasets[0].data = [flatFixedVal, flatFixedVal, flatFixedVal, flatFixedVal];
+        yieldChartInstance.data.datasets[1].data = [hybridTotalYield, hybridTotalYield * 0.9, hybridTotalYield * 1.15, hybridTotalYield * 1.3];
+        yieldChartInstance.update();
+      }
+    }
+
+    function resetYieldInputs() {
+      document.getElementById('baseRentInput').value = 450;
+      document.getElementById('commissionInput').value = 5.0;
+      calculateYieldComparison();
+      appendLog('SYS', 'Yield sizing inputs reset to default levels.');
+    }
+
+    function dispatchYieldSizing() {
+      appendLog('SYS', 'Yield sizing parameters saved to space planning forecast ledger.');
+      alert("Yield sizing parameters logged successfully.");
+    }
+
+    // Tab 3: SaaS LED Screen Ad bidding optimizer
+    function calculateLEDBids() {
+      const crowd = document.getElementById('crowd-select').value;
+      const location = document.getElementById('screen-select').value;
+      
+      let baseRate = 8000;
+      
+      if (crowd === 'high') baseRate += 12000;
+      else if (crowd === 'medium') baseRate += 5000;
+      
+      if (location === 'atrium') baseRate += 5000;
+      else if (location === 'entrance') baseRate += 2000;
+      
+      document.getElementById('led-bid-price').innerText = `Rs ${baseRate.toLocaleString()} / Min`;
+      appendLog('SaaS', `Automated LED Bid Bidding Engine recalculated price for ${location.toUpperCase()}: Rs ${baseRate.toLocaleString()}/Min`);
+    }
+
+    // Charting setup
+    function initCharts() {
+      const yCtx = document.getElementById('yieldChart').getContext('2d');
+      yieldChartInstance = new Chart(yCtx, {
+        type: 'line',
+        data: {
+          labels: ['Q1 Autumn', 'Q2 Winter', 'Q3 Spring', 'Q4 Summer'],
+          datasets: [
+            {
+              label: 'Flat-Rate Yield Projections',
+              data: [1080000, 1080000, 1080000, 1080000],
+              borderColor: '#e2e8f0',
+              backgroundColor: 'transparent',
+              borderDash: [5, 5],
+              tension: 0.1
+            },
+            {
+              label: 'Hybrid Profit-Sharing Projections',
+              data: [1200000, 1080000, 1380000, 1560000],
+              borderColor: '#d97706',
+              backgroundColor: 'rgba(217, 119, 6, 0.05)',
+              tension: 0.3,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#94a3b8' } }
+          },
+          scales: {
+            y: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#94a3b8' }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#94a3b8' }
+            }
+          }
+        }
+      });
+    }
+
+    function startSimulators() {
+      setInterval(() => {
+        // Fluctuate HVAC Temp / Parking Spot telemetry
+        const tempVal = (Math.random() * 1.5 + 21.0).toFixed(1);
+        const parkVal = Math.floor(Math.random() * 8) + 74;
+        
+        document.getElementById('meter-hvac').innerText = `${tempVal}°C`;
+        document.getElementById('meter-parking').innerText = `${parkVal}%`;
+
+        // Fluctuate logs
+        const logData = [
+          { tag: 'SYS', msg: 'Giga Mall Ground Floor HVAC zoning optimized.' },
+          { tag: 'NET', msg: 'Parking Sensors: Parking block L3 verified status.' },
+          { tag: 'SaaS', msg: 'LED Screen billing engine: Auto-ad Bid refresh triggered.' },
+          { tag: 'SYS', msg: 'Leasing Sorter: Space J-02 footfall telemetry synced.' }
+        ];
+        const log = logData[Math.floor(Math.random() * logData.length)];
+        appendLog(log.tag, log.msg);
+      }, 6000);
+    }
+  </script>
+</body>
+</html>

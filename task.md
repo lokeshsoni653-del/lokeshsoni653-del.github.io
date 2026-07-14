@@ -1,0 +1,21 @@
+# Task List: Pasha-Connect & P@SHA Internship Deployment
+
+- `[/]` Phase 1: Project Engineering (Pasha-Connect Standalone App)
+  - `[ ]` Design responsive HTML/CSS layout (Kanban Swimlane columns, deep crimson red theme, premium card styling)
+  - `[ ]` Implement Column 1: Pending Sizing (Interactive IT Export Sizer with Chart.js, Member Directory filter)
+  - `[ ]` Implement Column 2: Active Outreach (Campaign progress tracking, VIP RSVP progress rings, interactive scheduler)
+  - `[ ]` Implement Column 3: Confirmed RSVP (Roster visualizers)
+  - `[ ]` Add interactive card transitions, modal detail views, and premium micro-animations
+- `[ ]` Phase 2: Live Deployment & URL Acquisition
+  - `[ ]` Hand over files to the user for manual deployment
+  - `[ ]` Await user's deployment Vercel/Netlify URL
+- `[ ]` Phase 3: Customized Resume Generation (P@SHA Script)
+  - `[ ]` Create `create_pasha_resume.py` and run it to generate `resume-pasha.html` (no student IDs)
+  - `[ ]` Create `launch_pasha_resume.py` helper script
+- `[ ]` Phase 4: Portfolio Integration & Resumes Hub Update
+  - `[ ]` Register the P@SHA Card (Card 46) in `resumes.html`
+  - `[ ]` Update project counter to 56 in `index.html` and `projects.html`
+  - `[ ]` Add `Pasha-Connect` card pointing to the live URL in `index.html` and `projects.html`
+- `[ ]` Phase 5: Final Packaging
+  - `[ ]` Create deployment package ZIP (`pasha-connect.zip`)
+  - `[ ]` Write cover letter/email draft to `email-pasha.txt`

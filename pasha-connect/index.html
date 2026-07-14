@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pasha-Connect — IT Export Sizer &amp; Member Coordination Portal</title>
+  <!-- Google Fonts: Space Grotesk & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-dark: #050811;
+      --bg-panel: #0d1222;
+      --bg-input: #151d33;
+      --border-color: #1e2a4a;
+      --text-primary: #f8fafc;
+      --text-secondary: #64748b;
+      --pasha-red: #e11d48;
+      --pasha-red-glow: rgba(225, 29, 72, 0.25);
+      --pasha-red-hover: #be123c;
+      --neon-cyan: #06b6d4;
+      --neon-cyan-glow: rgba(6, 182, 212, 0.15);
+      --success-green: #10b981;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 1.5rem;
+    }
+
+    /* HEADER */
+    .hud-header {
+      height: 70px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2.5rem;
+      margin-bottom: 1.5rem;
+      flex-shrink: 0;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .brand-logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 1.4rem;
+      letter-spacing: 0.05em;
+    }
+
+    .brand-logo span {
+      color: var(--pasha-red);
+      text-shadow: 0 0 10px var(--pasha-red-glow);
+    }
+
+    .brand-tag {
+      background: rgba(225, 29, 72, 0.1);
+      border: 1px solid var(--pasha-red);
+      color: var(--pasha-red);
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .meta-status {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--pasha-red);
+      box-shadow: 0 0 8px var(--pasha-red-glow);
+      animation: pulse-red 2s infinite;
+    }
+
+    @keyframes pulse-red {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* KANBAN BOARD SYSTEM */
+    .kanban-board {
+      flex: 1;
+      display: flex;
+      gap: 1.5rem;
+      min-height: 0;
+    }
+
+    .kanban-column {
+      flex: 1;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+      min-height: 0;
+    }
+
+    .column-header {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 0.75rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .column-badge {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 6px;
+    }
+
+    .cards-container {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      padding-right: 0.25rem;
+    }
+
+    /* KANBAN CARDS */
+    .kanban-card {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.25rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .kanban-card:hover {
+      border-color: var(--pasha-red);
+      box-shadow: 0 4px 20px var(--pasha-red-glow);
+      transform: translateY(-2px);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-tag {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--neon-cyan);
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .card-desc {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+      margin-bottom: 1rem;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      padding-top: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    .card-meta {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+    }
+
+    .btn-action {
+      background: rgba(225, 29, 72, 0.1);
+      border: 1px solid var(--pasha-red);
+      color: var(--pasha-red);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-action:hover {
+      background: var(--pasha-red);
+      color: white;
+      box-shadow: 0 0 10px var(--pasha-red-glow);
+    }
+
+    /* DETAILED MODAL OVERLAYS */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(5, 8, 17, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-chassis {
+      background: var(--bg-panel);
+      border: 2px solid var(--border-color);
+      border-radius: 16px;
+      width: 650px;
+      max-width: 90%;
+      padding: 2.5rem;
+      position: relative;
+      animation: modalSlide 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    @keyframes modalSlide {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .modal-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.4rem;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 0.5rem;
+    }
+
+    /* MODAL METRICS & FORM */
+    .metric-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .metric-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .custom-slider {
+      width: 100%;
+      height: 6px;
+      background: #1e2a4a;
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .custom-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--pasha-red);
+      cursor: pointer;
+    }
+
+    /* DIRECTORY FILTER ROW */
+    .filter-row {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .filter-input {
+      flex: 1;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: white;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.82rem;
+      outline: none;
+    }
+
+    .directory-list {
+      max-height: 200px;
+      overflow-y: auto;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem;
+    }
+
+    .dir-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+
+    .dir-item:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="hud-header">
+    <div class="brand-logo"><span>P@SHA</span> Connect</div>
+    <span class="brand-tag">Project Coordinator HUD</span>
+    <div class="meta-status">
+      <div class="status-item">
+        <span class="status-dot"></span>
+        Economy outreach: <span style="color: white; font-weight: 600;">ACTIVE</span>
+      </div>
+      <div class="status-item">
+        Campaign status: <span style="color: var(--neon-cyan); font-weight: 600;">92% Target</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- KANBAN BOARD -->
+  <div class="kanban-board">
+
+    <!-- Column 1: Pending Sizing -->
+    <div class="kanban-column" id="col-pending">
+      <div class="column-header">
+        <span>📋 Pending Sizing</span>
+        <span class="column-badge" id="badge-pending">2</span>
+      </div>
+      <div class="cards-container" id="container-pending">
+        
+        <!-- Card 1: IT Export Sizer -->
+        <div class="kanban-card" id="card-export" onclick="openModal('modal-export')">
+          <div class="card-top">
+            <span class="card-tag">Economic Telemetry</span>
+          </div>
+          <h3 class="card-title">Pakistan IT Export Sizer</h3>
+          <p class="card-desc">Interactive sizer analyzing technology export revenue projections by sector. Tailored coordination dashboard with the Economy Coordinator.</p>
+          <div class="card-footer">
+            <span class="card-meta">Estimating values...</span>
+            <button class="btn-action" onclick="moveCard('card-export', 'col-outreach'); event.stopPropagation();">Start Campaign</button>
+          </div>
+        </div>
+
+        <!-- Card 2: Member Directory Sync -->
+        <div class="kanban-card" id="card-members" onclick="openModal('modal-members')">
+          <div class="card-top">
+            <span class="card-tag">Database Sync</span>
+          </div>
+          <h3 class="card-title">Member Directory Sorter</h3>
+          <p class="card-desc">Active search and mapping system for P@SHA IT member firms. Synchronize directories by tech stack, size, and location.</p>
+          <div class="card-footer">
+            <span class="card-meta">Ready to sync</span>
+            <button class="btn-action" onclick="moveCard('card-members', 'col-outreach'); event.stopPropagation();">Start Sync</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Column 2: Active Outreach -->
+    <div class="kanban-column" id="col-outreach">
+      <div class="column-header">
+        <span>🚀 Active Outreach</span>
+        <span class="column-badge" id="badge-outreach">1</span>
+      </div>
+      <div class="cards-container" id="container-outreach">
+
+        <!-- Card 3: Outreach Campaign Analytics -->
+        <div class="kanban-card" id="card-outreach" onclick="openModal('modal-outreach')">
+          <div class="card-top">
+            <span class="card-tag">Outreach Campaign</span>
+          </div>
+          <h3 class="card-title">Event Outreach Tracker</h3>
+          <p class="card-desc">Live campaign metrics monitoring email opens, VIP responses, and social scheduling templates across channels.</p>
+          <div class="card-footer">
+            <span class="card-meta">45% Completed</span>
+            <button class="btn-action" onclick="moveCard('card-outreach', 'col-rsvp'); event.stopPropagation();">Finalize Campaign</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Column 3: Confirmed RSVP -->
+    <div class="kanban-column" id="col-rsvp">
+      <div class="column-header">
+        <span>🏆 Confirmed RSVP</span>
+        <span class="column-badge" id="badge-rsvp">1</span>
+      </div>
+      <div class="cards-container" id="container-rsvp">
+
+        <!-- Card 4: ICT Awards Scheduler -->
+        <div class="kanban-card" id="card-awards" onclick="openModal('modal-awards')">
+          <div class="card-top">
+            <span class="card-tag" style="color: var(--success-green);">Completed</span>
+          </div>
+          <h3 class="card-title">ICT Awards Planner</h3>
+          <p class="card-desc">Completed logistics seat planner. Confirmed VIP invitation rosters and session schedules mapped successfully.</p>
+          <div class="card-footer">
+            <span class="card-meta" style="color: var(--success-green);">120 VIPs RSVP'd</span>
+            <button class="btn-action" onclick="moveCard('card-awards', 'col-pending'); event.stopPropagation();">Reset Cycle</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL 1: Export Sizer -->
+  <div class="modal-overlay" id="modal-export">
+    <div class="modal-chassis">
+      <button class="modal-close" onclick="closeModal('modal-export')">&times;</button>
+      <h3 class="modal-title">Pakistan IT Export Sizer (Projected Revenue)</h3>
+      
+      <div class="metric-group">
+        <div class="metric-label-row">
+          <span>Target Export Growth (%)</span>
+          <span id="lbl-growth">25% Increase</span>
+        </div>
+        <input type="range" min="5" max="100" value="25" class="custom-slider" id="slider-growth" oninput="calculateExports()">
+      </div>
+
+      <div style="height: 180px; margin-top: 1.5rem;">
+        <canvas id="exportChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Member Directory Sorter -->
+  <div class="modal-overlay" id="modal-members">
+    <div class="modal-chassis">
+      <button class="modal-close" onclick="closeModal('modal-members')">&times;</button>
+      <h3 class="modal-title">P@SHA Member Directory Sorter</h3>
+      
+      <div class="filter-row">
+        <input type="text" class="filter-input" id="search-member" placeholder="Search member company..." onkeyup="filterMembers()">
+        <select class="custom-select" id="filter-city" onchange="filterMembers()" style="padding:0.4rem 0.6rem;">
+          <option value="all">All Cities</option>
+          <option value="Karachi">Karachi</option>
+          <option value="Islamabad">Islamabad</option>
+          <option value="Lahore">Lahore</option>
+        </select>
+      </div>
+
+      <div class="directory-list" id="member-list">
+        <!-- Dynamically populated -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Outreach Campaign Analytics -->
+  <div class="modal-overlay" id="modal-outreach">
+    <div class="modal-chassis">
+      <button class="modal-close" onclick="closeModal('modal-outreach')">&times;</button>
+      <h3 class="modal-title">Event Outreach Campaign Analytics</h3>
+      
+      <div class="metric-group">
+        <div class="metric-label-row">
+          <span>Outreach Email Open Rate</span>
+          <span style="color: var(--neon-cyan); font-weight:700;">68%</span>
+        </div>
+        <div style="width:100%; height:6px; background:#1e2a4a; border-radius:3px;">
+          <div style="width:68%; height:100%; background:var(--neon-cyan); border-radius:3px;"></div>
+        </div>
+      </div>
+
+      <div class="metric-group">
+        <div class="metric-label-row">
+          <span>VIP Coordinator Sync Complete</span>
+          <span style="color: var(--success-green); font-weight:700;">85%</span>
+        </div>
+        <div style="width:100%; height:6px; background:#1e2a4a; border-radius:3px;">
+          <div style="width:85%; height:100%; background:var(--success-green); border-radius:3px;"></div>
+        </div>
+      </div>
+
+      <p style="font-size:0.82rem; color:var(--text-secondary); line-height:1.4; border-top:1px solid rgba(255,255,255,0.05); padding-top:1rem;">
+        Coordination campaign run alongside the Economy Coordinator. Actively targets 300+ local IT organizations for registration drives.
+      </p>
+    </div>
+  </div>
+
+  <!-- MODAL 4: ICT Awards Planner -->
+  <div class="modal-overlay" id="modal-awards">
+    <div class="modal-chassis">
+      <button class="modal-close" onclick="closeModal('modal-awards')">&times;</button>
+      <h3 class="modal-title">P@SHA ICT Awards Logistics Seat Planner</h3>
+      
+      <div class="metric-group">
+        <div class="metric-label-row">
+          <span>Seating Capacity (VIP Section)</span>
+          <span id="lbl-seating">150 / 250 Seats</span>
+        </div>
+        <input type="range" min="50" max="250" value="150" class="custom-slider" id="slider-seating" oninput="calculateSeating()">
+      </div>
+
+      <div style="background:var(--bg-input); border:1px solid var(--border-color); border-radius:8px; padding:1rem; font-size:0.82rem;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+          <span style="color:var(--text-secondary);">Confirmed VIP Guests:</span>
+          <span style="font-weight:700;" id="val-conf-vip">120 Attendees</span>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:var(--text-secondary);">Remaining Seats:</span>
+          <span style="font-weight:700; color:var(--pasha-red);" id="val-rem-seats">100 Seats</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    let exportChartInstance = null;
+
+    // Mock member database
+    const members = [
+      { name: "Systems Limited", city: "Lahore", stack: "Enterprise SaaS" },
+      { name: "NetSol Technologies", city: "Lahore", stack: "Automotive Fintech" },
+      { name: "10Pearls", city: "Karachi", stack: "Agile Software Dev" },
+      { name: "Contour Software", city: "Karachi", stack: "Constellation Utilities" },
+      { name: "S&P Global Pakistan", city: "Islamabad", stack: "Financial Analytics" },
+      { name: "Tkxel", city: "Lahore", stack: "AI &amp; Cloud Systems" }
+    ];
+
+    window.onload = function() {
+      initExportChart();
+      populateMembers();
+      updateColumnBadges();
+    };
+
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.add('active');
+      if (modalId === 'modal-export') {
+        // Redraw chart to fit modal size
+        setTimeout(() => {
+          if (exportChartInstance) exportChartInstance.resize();
+        }, 100);
+      }
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+
+    function moveCard(cardId, targetColId) {
+      const card = document.getElementById(cardId);
+      const targetContainer = document.querySelector(`#${targetColId} .cards-container`);
+      
+      // Update action button label and function
+      const btn = card.querySelector('.btn-action');
+      const meta = card.querySelector('.card-meta');
+      const tag = card.querySelector('.card-tag');
+      
+      if (targetColId === 'col-outreach') {
+        btn.innerText = "Finalize Campaign";
+        btn.setAttribute('onclick', `moveCard('${cardId}', 'col-rsvp'); event.stopPropagation();`);
+        meta.innerText = "45% Completed";
+        tag.style.color = "var(--neon-cyan)";
+      } else if (targetColId === 'col-rsvp') {
+        btn.innerText = "Reset Cycle";
+        btn.setAttribute('onclick', `moveCard('${cardId}', 'col-pending'); event.stopPropagation();`);
+        meta.innerText = "Completed & Verified";
+        meta.style.color = "var(--success-green)";
+        tag.style.color = "var(--success-green)";
+        tag.innerText = "Completed";
+      } else {
+        btn.innerText = "Start Campaign";
+        btn.setAttribute('onclick', `moveCard('${cardId}', 'col-outreach'); event.stopPropagation();`);
+        meta.innerText = "Ready to size";
+        meta.style.color = "var(--text-secondary)";
+        tag.style.color = "var(--neon-cyan)";
+        tag.innerText = cardId === 'card-export' ? 'Economic Telemetry' : 'Database Sync';
+      }
+      
+      targetContainer.appendChild(card);
+      updateColumnBadges();
+    }
+
+    function updateColumnBadges() {
+      document.getElementById('badge-pending').innerText = document.querySelector('#col-pending .cards-container').children.length;
+      document.getElementById('badge-outreach').innerText = document.querySelector('#col-outreach .cards-container').children.length;
+      document.getElementById('badge-rsvp').innerText = document.querySelector('#col-rsvp .cards-container').children.length;
+    }
+
+    // Modal 1: IT Export Calculator
+    function calculateExports() {
+      const growth = parseInt(document.getElementById('slider-growth').value);
+      document.getElementById('lbl-growth').innerText = `${growth}% Increase`;
+      
+      // Update chart dataset
+      if (exportChartInstance) {
+        const factor = 1 + (growth / 100);
+        exportChartInstance.data.datasets[1].data = [1.2 * factor, 0.8 * factor, 0.5 * factor];
+        exportChartInstance.update();
+      }
+    }
+
+    function initExportChart() {
+      const ctx = document.getElementById('exportChart').getContext('2d');
+      exportChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Software Dev', 'BPO / Call Centers', 'Fintech / ITES'],
+          datasets: [
+            {
+              label: 'Current ($ Billions)',
+              data: [1.2, 0.8, 0.5],
+              backgroundColor: '#1e2a4a',
+              borderColor: 'transparent',
+              borderWidth: 1
+            },
+            {
+              label: 'Projected ($ Billions)',
+              data: [1.5, 1.0, 0.62],
+              backgroundColor: '#e11d48',
+              borderColor: 'transparent',
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#64748b' } } },
+          scales: {
+            y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#64748b' } },
+            x: { grid: { display: false }, ticks: { color: '#64748b' } }
+          }
+        }
+      });
+    }
+
+    // Modal 2: Member Directory
+    function populateMembers() {
+      const container = document.getElementById('member-list');
+      container.innerHTML = '';
+      members.forEach(m => {
+        const div = document.createElement('div');
+        div.className = 'dir-item';
+        div.innerHTML = `
+          <div>
+            <div style="font-weight:700;">${m.name}</div>
+            <div style="font-size:0.7rem; color:var(--text-secondary);">${m.stack}</div>
+          </div>
+          <div style="color:var(--neon-cyan); font-weight:700; font-size:0.75rem;">${m.city}</div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function filterMembers() {
+      const search = document.getElementById('search-member').value.toLowerCase();
+      const city = document.getElementById('filter-city').value;
+      const container = document.getElementById('member-list');
+      container.innerHTML = '';
+      
+      members.forEach(m => {
+        const matchSearch = m.name.toLowerCase().includes(search) || m.stack.toLowerCase().includes(search);
+        const matchCity = city === 'all' || m.city === city;
+        
+        if (matchSearch && matchCity) {
+          const div = document.createElement('div');
+          div.className = 'dir-item';
+          div.innerHTML = `
+            <div>
+              <div style="font-weight:700;">${m.name}</div>
+              <div style="font-size:0.7rem; color:var(--text-secondary);">${m.stack}</div>
+            </div>
+            <div style="color:var(--neon-cyan); font-weight:700; font-size:0.75rem;">${m.city}</div>
+          `;
+          container.appendChild(div);
+        }
+      });
+    }
+
+    // Modal 4: Seating logistics
+    function calculateSeating() {
+      const capacity = parseInt(document.getElementById('slider-seating').value);
+      document.getElementById('lbl-seating').innerText = `${capacity} / 250 Seats`;
+      
+      const vips = 120;
+      const rem = Math.max(0, capacity - vips);
+      document.getElementById('val-rem-seats').innerText = `${rem} Seats`;
+    }
+  </script>
+</body>
+</html>

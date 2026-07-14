@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GTR-TreadLogix — Intelligent Tyre Manufacturing &amp; Supply Chain HUD</title>
+  <!-- Google Fonts: Orbitron & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-dark: #0a0c10;
+      --bg-card: #11141d;
+      --bg-input: #181d2a;
+      --border-color: #22293c;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent-red: #ef4444;
+      --accent-red-glow: rgba(239, 68, 68, 0.25);
+      --accent-cyan: #06b6d4;
+      --accent-cyan-glow: rgba(6, 182, 212, 0.25);
+      --accent-green: #10b981;
+      --accent-green-glow: rgba(16, 185, 129, 0.25);
+      --accent-gold: #f59e0b;
+      --accent-gold-glow: rgba(245, 158, 11, 0.25);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-dark);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-red);
+    }
+
+    /* Sidebar Layout */
+    .sidebar {
+      width: 280px;
+      background: #0d1017;
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 10;
+    }
+
+    .sidebar-header {
+      padding: 2rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .sidebar-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 1.35rem;
+      letter-spacing: 0.1em;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sidebar-logo span {
+      color: var(--accent-red);
+      text-shadow: 0 0 10px var(--accent-red-glow);
+    }
+
+    .sidebar-logo-sub {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    .user-profile {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(239, 68, 68, 0.02);
+    }
+
+    .user-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent-red), #991b1b);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+    }
+
+    .user-info {
+      flex: 1;
+    }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .user-role {
+      font-size: 0.72rem;
+      color: var(--accent-red);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .sidebar-menu {
+      padding: 1.5rem 1rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .menu-header {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+      padding-left: 0.5rem;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .menu-item:hover, .menu-item.active {
+      color: var(--text-primary);
+      background: rgba(239, 68, 68, 0.08);
+      border-left: 3px solid var(--accent-red);
+    }
+
+    .menu-item svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+    }
+
+    .mode-switch-container {
+      padding: 1.5rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .mode-switch-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+    }
+
+    .mode-switch-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .mode-switch-btn:hover {
+      border-color: var(--accent-red);
+    }
+
+    .mode-switch-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .mode-toggle-indicator {
+      width: 36px;
+      height: 20px;
+      background: #475569;
+      border-radius: 10px;
+      position: relative;
+      transition: background 0.3s;
+    }
+
+    .mode-toggle-indicator::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: white;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.3s;
+    }
+
+    .mode-switch-btn.active .mode-toggle-indicator {
+      background: var(--accent-red);
+    }
+
+    .mode-switch-btn.active .mode-toggle-indicator::after {
+      transform: translateX(16px);
+    }
+
+    /* Main Dashboard Layout */
+    .dashboard-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background-image: radial-gradient(circle at 10% 20%, rgba(239, 68, 68, 0.015) 0%, transparent 60%);
+    }
+
+    .top-bar {
+      height: 70px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      background: #0d1017;
+    }
+
+    .top-bar-title {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: 0.05em;
+    }
+
+    .top-bar-stats {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .top-stat {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .top-stat-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 8px var(--accent-green-glow);
+    }
+
+    .top-stat-dot.pulse {
+      animation: pulse-green 2s infinite;
+    }
+
+    @keyframes pulse-green {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* Content Area */
+    .dashboard-content {
+      padding: 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .dashboard-panel {
+      display: none;
+    }
+
+    .dashboard-panel.active {
+      display: block;
+    }
+
+    /* Grid System */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .col-12 { grid-column: span 12; }
+    .col-8 { grid-column: span 8; }
+    .col-4 { grid-column: span 4; }
+    .col-6 { grid-column: span 6; }
+
+    @media (max-width: 1024px) {
+      .col-8, .col-4, .col-6 { grid-column: span 12; }
+    }
+
+    /* Cards */
+    .panel-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      transition: border-color 0.3s;
+    }
+
+    .panel-card:hover {
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 0.75rem;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-family: 'Orbitron', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-badge {
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .badge-red {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .badge-cyan {
+      background: rgba(6, 182, 212, 0.15);
+      color: #22d3ee;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+
+    .badge-green {
+      background: rgba(16, 185, 129, 0.15);
+      color: #a7f3d0;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    /* Vulcanization Telemetry Panel */
+    .vulcan-area {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .vulcan-gauges {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .gauge-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.25rem 1rem;
+      text-align: center;
+    }
+
+    .gauge-val {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--accent-red);
+      text-shadow: 0 0 10px var(--accent-red-glow);
+      margin-bottom: 0.25rem;
+    }
+
+    .gauge-val.green {
+      color: var(--accent-green);
+      text-shadow: 0 0 10px var(--accent-green-glow);
+    }
+
+    .gauge-lbl {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .form-control {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.6rem 0.75rem;
+      color: white;
+      font-size: 0.82rem;
+      transition: border-color 0.3s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--accent-red);
+    }
+
+    .btn {
+      padding: 0.65rem 1.5rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-red), #991b1b);
+      color: white;
+      box-shadow: 0 4px 15px var(--accent-red-glow);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--bg-input);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: #232a3d;
+    }
+
+    /* Inventory Lists */
+    .inventory-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-height: 250px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+
+    .inventory-row {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+    }
+
+    .inventory-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .material-name {
+      font-weight: 600;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .material-spec {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+    }
+
+    .material-level {
+      text-align: right;
+    }
+
+    .level-pct {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      color: var(--accent-green);
+    }
+
+    .level-pct.critical {
+      color: var(--accent-red);
+      animation: flash-red 1.5s infinite;
+    }
+
+    @keyframes flash-red {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .progress-bar-container {
+      width: 100px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      margin-top: 0.25rem;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: var(--accent-green);
+      width: 75%;
+      transition: width 0.5s;
+    }
+
+    .progress-bar-fill.critical {
+      background: var(--accent-red);
+    }
+
+    /* Machine vision defect scanner visual */
+    .defect-scanner-visual {
+      background: #06090e;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      height: 180px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .scan-line {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--accent-red);
+      box-shadow: 0 0 10px var(--accent-red);
+      top: 0;
+      animation: scan-vertical 3s infinite linear;
+    }
+
+    @keyframes scan-vertical {
+      0% { top: 0; }
+      50% { top: 100%; }
+      100% { top: 0; }
+    }
+
+    .scanner-readout {
+      text-align: center;
+      z-index: 2;
+    }
+
+    .readout-lbl {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-secondary);
+      margin-bottom: 0.25rem;
+    }
+
+    .readout-status {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-green);
+    }
+
+    /* B2B Lifespan estimator styles */
+    .saas-calc-block {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+
+    .saas-slider-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .saas-slider-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.4rem;
+    }
+
+    .saas-slider {
+      width: 100%;
+      height: 6px;
+      background: #475569;
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .saas-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent-red);
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--accent-red-glow);
+    }
+
+    .estimated-result-box {
+      text-align: center;
+      background: rgba(16, 185, 129, 0.05);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+
+    .result-val {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--accent-green);
+      text-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+    }
+
+    /* TPMS sensor grid */
+    .tpms-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    .tpms-card {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem;
+      text-align: center;
+    }
+
+    .tpms-card.alert {
+      border-color: var(--accent-red);
+      background: rgba(239, 68, 68, 0.05);
+    }
+
+    .tpms-tire-name {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    .tpms-psi {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin: 0.25rem 0;
+      color: var(--accent-green);
+    }
+
+    .tpms-card.alert .tpms-psi {
+      color: var(--accent-red);
+    }
+
+    .tpms-temp {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+    }
+
+    /* Telemetry logs */
+    .telemetry-log-area {
+      background: #05060a;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: monospace;
+      font-size: 0.72rem;
+      color: var(--accent-red);
+      height: 150px;
+      overflow-y: auto;
+      margin-top: 0.5rem;
+    }
+
+    .log-line {
+      margin-bottom: 0.35rem;
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .log-time {
+      color: var(--text-secondary);
+    }
+
+    .log-tag {
+      font-weight: bold;
+      color: var(--accent-cyan);
+    }
+
+    .log-tag.sec { color: var(--accent-red); }
+    .log-tag.err { color: var(--accent-gold); }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <span>GTR</span>-Tread
+      </div>
+      <div class="sidebar-logo-sub">Production OS v1.0</div>
+    </div>
+
+    <!-- Candidate profile -->
+    <div class="user-profile">
+      <div class="user-avatar">LK</div>
+      <div class="user-info">
+        <div class="user-name">Lokesh Kumar</div>
+        <div class="user-role">ELP Candidate CS/IT</div>
+      </div>
+    </div>
+
+    <!-- Menu -->
+    <nav class="sidebar-menu">
+      <div class="menu-header">Modules</div>
+      <div class="menu-item active" id="menu-gtr" onclick="switchPanel('gtr')">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-1.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+        </svg>
+        Manufacturing &amp; Vulcanization
+      </div>
+      <div class="menu-item" id="menu-saas" onclick="switchPanel('saas')">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+        </svg>
+        VoltTread SaaS
+      </div>
+    </nav>
+
+    <!-- Operational Toggle -->
+    <div class="mode-switch-container">
+      <div class="mode-switch-title">Operational Mode</div>
+      <button class="mode-switch-btn" id="mode-selector" onclick="toggleOperationalMode()">
+        <span class="mode-switch-label" id="mode-text">Manufacturing HUD</span>
+        <div class="mode-toggle-indicator"></div>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="dashboard-main">
+    <header class="top-bar">
+      <div class="top-bar-title" id="dashboard-header-title">GTR Tyre Industrial Manufacturing Console</div>
+      <div class="top-bar-stats">
+        <div class="top-stat">
+          <span class="top-stat-dot pulse"></span>
+          Factory Line: <span style="color: white; font-weight: 600;">ACTIVE</span>
+        </div>
+        <div class="top-stat">
+          Ping: <span style="color: var(--accent-red); font-weight: 600;">14ms</span>
+        </div>
+        <div class="top-stat">
+          Active Press: <span style="color: var(--accent-cyan); font-weight: 600;">6/6 Nodes</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="dashboard-content">
+
+      <!-- ==================== MODE A: GTR MANUFACTURING HUD ==================== -->
+      <div class="dashboard-panel active" id="panel-gtr">
+        <div class="dashboard-grid">
+          
+          <!-- Vulcanization Telemetry -->
+          <div class="panel-card col-8">
+            <div class="card-header">
+              <div class="card-title">
+                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color: var(--accent-red);">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                </svg>
+                Tyre Vulcanization Telemetry Monitor
+              </div>
+              <span class="card-badge badge-red">IoT Curing Presses</span>
+            </div>
+
+            <div class="vulcan-area">
+              <div class="form-group">
+                <label class="form-label">Active Curing Press Line</label>
+                <select class="form-control" id="curing-select" onchange="adjustPressGauges()">
+                  <option value="car-01">Line 1: Car Tyres Press (GTR Sport-One)</option>
+                  <option value="truck-03">Line 3: Heavy Truck Tyres Press (GTR Cargo-Max)</option>
+                  <option value="tractor-02">Line 2: Agricultural Tractor Tyres Press (GTR Agri-Tread)</option>
+                </select>
+              </div>
+
+              <div class="vulcan-gauges">
+                <div class="gauge-box">
+                  <div class="gauge-val" id="gauge-temp">168°C</div>
+                  <div class="gauge-lbl">Curing Temp</div>
+                </div>
+                <div class="gauge-box">
+                  <div class="gauge-val" id="gauge-pressure">14.2 bar</div>
+                  <div class="gauge-lbl">Curing Pressure</div>
+                </div>
+                <div class="gauge-box">
+                  <div class="gauge-val green" id="gauge-timer">04:12</div>
+                  <div class="gauge-lbl">Cycle Timer</div>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                <button class="btn btn-primary" onclick="cycleCuringProcess()">Cycle Curing Process</button>
+                <button class="btn btn-secondary" onclick="emergencyPurge()">Emergency Purge Valve</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- QA Defect Scanner -->
+          <div class="panel-card col-4">
+            <div class="card-header">
+              <div class="card-title">QA Tread Scanner</div>
+              <span class="card-badge badge-cyan">Computer Vision</span>
+            </div>
+            <div class="defect-scanner-visual">
+              <div class="scan-line"></div>
+              <div class="scanner-readout">
+                <div class="readout-lbl">Groove Metrics Check</div>
+                <div class="readout-status" id="qa-status">TREAD METRICS STABLE</div>
+                <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.4rem;" id="qa-details">Depth: 8.2mm | Width Dev: 0%</div>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="triggerQAScan()" style="width: 100%; justify-content: center; margin-top: 1rem;">Perform Tread Alignment Scan</button>
+          </div>
+
+        </div>
+
+        <div class="dashboard-grid">
+          
+          <!-- Monthly Production output -->
+          <div class="panel-card col-6">
+            <div class="card-header">
+              <div class="card-title">Monthly Production Output (Tyre Units)</div>
+              <span class="card-badge badge-cyan">Production Volume</span>
+            </div>
+            <div style="height: 250px;">
+              <canvas id="productionChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Raw material stocks -->
+          <div class="panel-card col-6">
+            <div class="card-header">
+              <div class="card-title">Factory Raw Material Stock Levels</div>
+              <span class="card-badge badge-green">Supply Chain</span>
+            </div>
+            
+            <div class="inventory-list">
+              <div class="inventory-row">
+                <div class="inventory-meta">
+                  <span class="material-name">Natural Rubber Stocks</span>
+                  <span class="material-spec">Type: Premium RSS-3 Import | Depot Stock: 8,420 kg</span>
+                </div>
+                <div class="material-level">
+                  <span class="level-pct" id="rubber-pct">82% Stocked</span>
+                  <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="fill-rubber" style="width: 82%;"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="inventory-row">
+                <div class="inventory-meta">
+                  <span class="material-name">Steel Cord Reels</span>
+                  <span class="material-spec">Type: High-Tensile Radial | Depot Stock: 4,120 kg</span>
+                </div>
+                <div class="material-level">
+                  <span class="level-pct" id="steel-pct" style="color: var(--accent-cyan);">60% Stocked</span>
+                  <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="fill-steel" style="width: 60%; background: var(--accent-cyan);"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="inventory-row">
+                <div class="inventory-meta">
+                  <span class="material-name">Carbon Black N330 Additives</span>
+                  <span class="material-spec">Type: Reinforcing Filler | Depot Stock: 600 kg</span>
+                </div>
+                <div class="material-level">
+                  <span class="level-pct critical" id="carbon-pct">12% Critical</span>
+                  <div class="progress-bar-container">
+                    <div class="progress-bar-fill critical" id="fill-carbon" style="width: 12%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top: 1.25rem; display: flex; gap: 0.75rem;">
+              <button class="btn btn-primary" onclick="restockCarbonBlack()" style="flex: 1; justify-content: center;">Dispatch Carbon Black Tanker</button>
+              <button class="btn btn-secondary" onclick="restockAllMaterials()" style="flex: 1; justify-content: center;">Restock Supply Chain Grid</button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ==================== MODE B: VOLTTREAD SAAS PANEL ==================== -->
+      <div class="dashboard-panel" id="panel-saas">
+        <div class="dashboard-grid">
+          
+          <!-- TPMS Fleet Telemetry -->
+          <div class="panel-card col-12">
+            <div class="card-header">
+              <div class="card-title">Commercial Truck Axle TPMS Telemetry Monitor</div>
+              <span class="card-badge badge-green">VoltTread SaaS IoT</span>
+            </div>
+            
+            <div class="tpms-grid">
+              <div class="tpms-card">
+                <div class="tpms-tire-name">Front Left Tire</div>
+                <div class="tpms-psi" id="tpms-fl">102 PSI</div>
+                <div class="tpms-temp" id="temp-fl">65°C</div>
+              </div>
+              <div class="tpms-card">
+                <div class="tpms-tire-name">Front Right Tire</div>
+                <div class="tpms-psi" id="tpms-fr">104 PSI</div>
+                <div class="tpms-temp" id="temp-fr">66°C</div>
+              </div>
+              <div class="tpms-card alert">
+                <div class="tpms-tire-name">Rear Dual Inner Left</div>
+                <div class="tpms-psi" id="tpms-ril">84 PSI Low</div>
+                <div class="tpms-temp" id="temp-ril">78°C</div>
+              </div>
+              <div class="tpms-card">
+                <div class="tpms-tire-name">Rear Dual Outer Right</div>
+                <div class="tpms-psi" id="tpms-rior">101 PSI</div>
+                <div class="tpms-temp" id="temp-rior">62°C</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="dashboard-grid">
+          
+          <!-- Tread wear lifespan estimator -->
+          <div class="panel-card col-6">
+            <div class="card-header">
+              <div class="card-title">Predictive Tread Wear Lifecycle Estimator</div>
+              <span class="card-badge badge-red">AI Diagnostics</span>
+            </div>
+            
+            <div class="saas-calc-block">
+              <div class="saas-slider-group">
+                <div class="saas-slider-row">
+                  <span>Gross Cargo Weight Load (Tons)</span>
+                  <span id="load-label" style="font-weight: 700; color: white;">20 Tons</span>
+                </div>
+                <input type="range" min="5" max="45" value="20" step="1" class="saas-slider" id="cargoLoad" oninput="estimateTreadLife()">
+              </div>
+
+              <div class="saas-slider-group" style="margin-bottom: 0;">
+                <div class="saas-slider-row">
+                  <span>Accumulated Mileage Travel History</span>
+                  <span id="mileage-label" style="font-weight: 700; color: white;">40,000 km</span>
+                </div>
+                <input type="range" min="1000" max="120000" value="40000" step="2000" class="saas-slider" id="accumMileage" oninput="estimateTreadLife()">
+              </div>
+            </div>
+
+            <div class="estimated-result-box">
+              <div style="font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">Remaining Tread Lifespan Estimate</div>
+              <div class="result-val" id="lifespan-readout">45,200 km</div>
+            </div>
+          </div>
+
+          <!-- Replacement ROI Calculator -->
+          <div class="panel-card col-6">
+            <div class="card-header">
+              <div class="card-title">Fleet Replacement ROI Sizing Calculator</div>
+              <span class="card-badge badge-cyan">Cost Optimization</span>
+            </div>
+            
+            <div class="saas-calc-block" style="display: flex; flex-direction: column; gap: 0.85rem;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Total Commercial Fleet Trucks</label>
+                <select class="form-control" id="roi-trucks" onchange="calculateTyreROI()">
+                  <option value="5">5 Heavy-Duty Trucks</option>
+                  <option value="25">25 Heavy-Duty Trucks (Medium Logistics)</option>
+                  <option value="120">120 Heavy-Duty Trucks (National Fleet)</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Operating Conditions</label>
+                <select class="form-control" id="roi-conditions" onchange="calculateTyreROI()">
+                  <option value="highways">Mainly Highway Hauling (Low wear)</option>
+                  <option value="rough">Rough Construction Site Roads (High wear)</option>
+                </select>
+              </div>
+              <div class="estimated-result-box" style="margin-top: 0.25rem;">
+                <div style="font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.25rem;">Estimated Weekly Fleet Utility Saving</div>
+                <div class="result-val" style="color: var(--accent-cyan); text-shadow: 0 0 10px var(--accent-cyan-glow);" id="roi-savings-lbl">Rs 180,000 / Year</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- System Diagnostic Log Area -->
+      <div class="panel-card col-12" style="margin-top: 1.5rem;">
+        <div class="card-header" style="margin-bottom: 0.75rem; padding-bottom: 0.5rem;">
+          <div class="card-title" style="font-size: 0.8rem; letter-spacing: 0.1em;">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color: var(--accent-red);">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            Production Console Diagnostics Log
+          </div>
+          <span class="card-badge badge-red">Active System Audit</span>
+        </div>
+        <div class="telemetry-log-area" id="console-logs">
+          <div class="log-line">
+            <span class="log-time">[18:15:02]</span>
+            <span class="log-tag">SYS</span>
+            <span>GTR TreadLogix platform initialized. Connected to Karachi Factory database.</span>
+          </div>
+          <div class="log-line">
+            <span class="log-time">[18:15:06]</span>
+            <span class="log-tag sec">NET</span>
+            <span>Secure socket connection verified with Curing Press Line 1 - 6.</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    let currentPanel = 'gtr';
+    let curingTimerInterval = null;
+    let productionChartInstance = null;
+
+    window.onload = function() {
+      initCharts();
+      startTelemetrySimulation();
+      estimateTreadLife();
+      calculateTyreROI();
+      adjustPressGauges();
+    };
+
+    function switchPanel(panelId) {
+      document.querySelectorAll('.dashboard-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+      
+      document.getElementById('panel-' + panelId).classList.add('active');
+      document.getElementById('menu-' + panelId).classList.add('active');
+      currentPanel = panelId;
+      
+      if (panelId === 'gtr') {
+        document.getElementById('dashboard-header-title').innerText = "GTR Tyre Industrial Manufacturing Console";
+      } else {
+        document.getElementById('dashboard-header-title').innerText = "VoltTread SaaS — Fleet Tyre Platform";
+      }
+    }
+
+    function toggleOperationalMode() {
+      const btn = document.getElementById('mode-selector');
+      const text = document.getElementById('mode-text');
+      btn.classList.toggle('active');
+      
+      if (btn.classList.contains('active')) {
+        text.innerText = "VoltTread SaaS";
+        switchPanel('saas');
+        appendLog('SYS', 'Switched operational mode to VoltTread B2B Fleet SaaS console.');
+      } else {
+        text.innerText = "Manufacturing HUD";
+        switchPanel('gtr');
+        appendLog('SYS', 'Switched operational mode to GTR Industrial Vulcanization monitor.');
+      }
+    }
+
+    function appendLog(tag, msg, isError = false) {
+      const logs = document.getElementById('console-logs');
+      const now = new Date();
+      const timeStr = `[${now.toTimeString().split(' ')[0]}]`;
+      
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      
+      let tagClass = 'log-tag';
+      if (tag === 'NET' || tag === 'SaaS') tagClass += ' sec';
+      if (isError) tagClass += ' err';
+      
+      line.innerHTML = `<span class="log-time">${timeStr}</span><span class="${tagClass}">${tag}</span><span>${msg}</span>`;
+      logs.appendChild(line);
+      logs.scrollTop = logs.scrollHeight;
+    }
+
+    // Production gauges adjustment
+    function adjustPressGauges() {
+      const type = document.getElementById('curing-select').value;
+      const tempEl = document.getElementById('gauge-temp');
+      const pressEl = document.getElementById('gauge-pressure');
+      const timerEl = document.getElementById('gauge-timer');
+      
+      if (type === 'car-01') {
+        tempEl.innerText = "168°C";
+        pressEl.innerText = "14.2 bar";
+        timerEl.innerText = "04:12";
+      } else if (type === 'truck-03') {
+        tempEl.innerText = "154°C";
+        pressEl.innerText = "18.5 bar";
+        timerEl.innerText = "08:45";
+      } else {
+        tempEl.innerText = "160°C";
+        pressEl.innerText = "16.0 bar";
+        timerEl.innerText = "12:15";
+      }
+      appendLog('SYS', `Selected curing press line: ${type.toUpperCase()}. Gauge profiles refreshed.`);
+    }
+
+    function cycleCuringProcess() {
+      const timerEl = document.getElementById('gauge-timer');
+      appendLog('SYS', 'Initiating vulcanization curing cycle process...');
+      
+      let seconds = 10;
+      timerEl.innerText = `00:${seconds}`;
+      timerEl.style.color = "var(--accent-red)";
+      
+      if (curingTimerInterval) clearInterval(curingTimerInterval);
+      
+      curingTimerInterval = setInterval(() => {
+        seconds--;
+        if (seconds < 0) {
+          clearInterval(curingTimerInterval);
+          timerEl.innerText = "CYCLE OK";
+          timerEl.style.color = "var(--accent-green)";
+          appendLog('SYS', 'Vulcanization curing cycle process completed successfully.');
+          
+          // Increment production output metrics
+          if (productionChartInstance) {
+            productionChartInstance.data.datasets[0].data[0] += 5;
+            productionChartInstance.update();
+          }
+        } else {
+          timerEl.innerText = `00:${String(seconds).padStart(2, '0')}`;
+        }
+      }, 1000);
+    }
+
+    function emergencyPurge() {
+      if (curingTimerInterval) clearInterval(curingTimerInterval);
+      document.getElementById('gauge-timer').innerText = "PURGED";
+      document.getElementById('gauge-timer').style.color = "var(--accent-gold)";
+      document.getElementById('gauge-pressure').innerText = "0.0 bar";
+      appendLog('SYS', 'EMERGENCY PURGE VALVE TRIGGERED: Releasing vulcanization press pressure!', true);
+    }
+
+    // QA Tread Defect Scanner
+    function triggerQAScan() {
+      const qaStat = document.getElementById('qa-status');
+      const qaDetails = document.getElementById('qa-details');
+      
+      qaStat.innerText = "SCANNING...";
+      qaStat.style.color = "var(--accent-cyan)";
+      appendLog('SYS', 'Computer Vision Tread Alignment Scan initialized.');
+      
+      setTimeout(() => {
+        const issues = Math.random() < 0.15;
+        if (issues) {
+          qaStat.innerText = "ALIGNMENT ERROR DETECTED";
+          qaStat.style.color = "var(--accent-red)";
+          qaDetails.innerText = "Groove Depth: 5.4mm | Width Dev: +8%";
+          appendLog('SYS', 'QA ALERT: Tire tread anomalies detected on Press Line 1!', true);
+        } else {
+          qaStat.innerText = "TREAD METRICS STABLE";
+          qaStat.style.color = "var(--accent-green)";
+          qaDetails.innerText = "Groove Depth: 8.2mm | Width Dev: 0%";
+          appendLog('SYS', 'QA PASS: Tire tread alignment parameters verified.');
+        }
+      }, 2000);
+    }
+
+    // Supply chain inventory restocks
+    function restockCarbonBlack() {
+      const pct = document.getElementById('carbon-pct');
+      const fill = document.getElementById('fill-carbon');
+      pct.innerText = '92% Stocked';
+      pct.classList.remove('critical');
+      fill.style.width = '92%';
+      fill.classList.remove('critical');
+      appendLog('NET', 'Supply Chain: Carbon Black filler restocking tanker arrived. Material storage restocked.');
+    }
+
+    function restockAllMaterials() {
+      document.getElementById('rubber-pct').innerText = '95% Stocked';
+      document.getElementById('fill-rubber').style.width = '95%';
+      
+      document.getElementById('steel-pct').innerText = '90% Stocked';
+      document.getElementById('fill-steel').style.width = '90%';
+      
+      restockCarbonBlack();
+      appendLog('NET', 'Supply Chain Sweep: Restocked all active manufacturing ingredients.');
+    }
+
+    // SaaS wear lifecycle estimator
+    function estimateTreadLife() {
+      const load = parseInt(document.getElementById('cargoLoad').value);
+      const mileage = parseInt(document.getElementById('accumMileage').value);
+      
+      document.getElementById('load-label').innerText = `${load} Tons`;
+      document.getElementById('mileage-label').innerText = `${mileage.toLocaleString()} km`;
+      
+      // Calculate remaining wear life
+      const initialLifespan = 90000; // 90k km
+      const loadFactor = load * 850;
+      const wear = mileage + loadFactor;
+      
+      const remaining = Math.max(0, initialLifespan - wear);
+      document.getElementById('lifespan-readout').innerText = `${remaining.toLocaleString()} km`;
+    }
+
+    function calculateTyreROI() {
+      const trucks = parseInt(document.getElementById('roi-trucks').value);
+      const condition = document.getElementById('roi-conditions').value;
+      
+      let baseSavings = 36000;
+      if (condition === 'rough') baseSavings = 72000;
+      
+      const totalSavings = trucks * baseSavings;
+      document.getElementById('roi-savings-lbl').innerText = `Rs ${totalSavings.toLocaleString()} / Year`;
+    }
+
+    // Charts
+    function initCharts() {
+      const pCtx = document.getElementById('productionChart').getContext('2d');
+      productionChartInstance = new Chart(pCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Car Tyres', 'Truck Tyres', 'Tractor Tyres', 'Bike Tyres'],
+          datasets: [
+            {
+              label: 'Actual Output (Units)',
+              data: [4200, 1800, 1100, 850],
+              backgroundColor: 'rgba(239, 68, 68, 0.75)',
+              borderColor: '#ef4444',
+              borderWidth: 1
+            },
+            {
+              label: 'Production Target',
+              data: [5000, 2000, 1200, 1000],
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              borderColor: 'rgba(255, 255, 255, 0.3)',
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#94a3b8' } }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#94a3b8' }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#94a3b8' }
+            }
+          }
+        }
+      });
+    }
+
+    function startTelemetrySimulation() {
+      setInterval(() => {
+        // Fluctuate TPMS sensor PSI/Temp
+        const flPsi = Math.floor(Math.random() * 6) + 99;
+        const flTemp = Math.floor(Math.random() * 4) + 63;
+        
+        const frPsi = Math.floor(Math.random() * 6) + 101;
+        const frTemp = Math.floor(Math.random() * 4) + 64;
+
+        document.getElementById('tpms-fl').innerText = `${flPsi} PSI`;
+        document.getElementById('temp-fl').innerText = `${flTemp}°C`;
+        
+        document.getElementById('tpms-fr').innerText = `${frPsi} PSI`;
+        document.getElementById('temp-fr').innerText = `${frTemp}°C`;
+
+        // Fluctuate log updates
+        const logData = [
+          { tag: 'SYS', msg: 'Vulcanization: Curing press line 2 thermal diagnostics optimal.' },
+          { tag: 'NET', msg: 'TPMS IoT: Core telemetry packet sync completed with Fleet Node 4.' },
+          { tag: 'SaaS', msg: 'VoltTread predictive analytics updated remaining life estimates.' },
+          { tag: 'SYS', msg: 'QA Scanner: Calibrated groove sensor cameras on Line 1.' }
+        ];
+        const log = logData[Math.floor(Math.random() * logData.length)];
+        appendLog(log.tag, log.msg);
+      }, 6000);
+    }
+  </script>
+</body>
+</html>
