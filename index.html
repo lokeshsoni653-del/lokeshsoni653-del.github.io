@@ -11,7 +11,7 @@
   <meta property="og:description" content="Transforming complex data into secure, elegant Python-based web applications.">
   <meta property="og:image" content="https://lokeshsoni653-del.github.io/lokesh-portfolio/avatar.png">
   <meta property="og:type" content="website"/>
-  <link rel="stylesheet" href="style.css?v=2026"/>
+  <link rel="stylesheet" href="style.css?v=2026_v2"/>
   <style>
     /* ——— Hero ——— */
     .hero {
@@ -145,6 +145,12 @@
     .feat-card__link { font-size: 0.8rem; font-weight: 600; color: var(--clr-accent); display: flex; align-items: center; gap: 0.35rem; }
     .feat-card__link:hover { opacity: 0.75; }
 
+    html, body {
+      overflow-x: hidden !important;
+      max-width: 100vw;
+      width: 100%;
+    }
+
     @media (max-width: 900px) {
       .hero__grid { grid-template-columns: 1fr; text-align: center; }
       .hero__avatar-wrap { display: none; }
@@ -152,9 +158,57 @@
       .hero__actions, .hero__stats { justify-content: center; }
       .featured__cards { grid-template-columns: 1fr 1fr; }
     }
+    @media (max-width: 768px) {
+      .nav__desktop-ctas { display: none !important; }
+      .hero {
+        min-height: auto;
+        padding-top: calc(var(--nav-h) + 1rem);
+        padding-bottom: 2.5rem;
+      }
+      .hero__label {
+        justify-content: center;
+        flex-wrap: wrap;
+        text-align: center;
+      }
+      .building-pill {
+        max-width: 100%;
+        white-space: normal;
+        word-break: break-word;
+        text-align: center;
+        justify-content: center;
+        margin-inline: auto;
+        font-size: 0.72rem;
+        padding: 0.35rem 0.75rem;
+        line-height: 1.4;
+      }
+      .hero__name {
+        font-size: clamp(2.2rem, 8.5vw, 3.2rem);
+        text-align: center;
+      }
+      .hero__bio {
+        max-width: 100%;
+        border-left: none;
+        border-top: 3px solid var(--clr-accent);
+        padding-left: 0;
+        padding-top: 0.75rem;
+        text-align: center;
+        margin-inline: auto;
+      }
+      .hero__actions {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        gap: 0.65rem;
+      }
+      .hero__actions .btn {
+        width: 100%;
+        max-width: 290px;
+        justify-content: center;
+      }
+    }
     @media (max-width: 600px) {
       .featured__cards { grid-template-columns: 1fr; }
-      .hero__stats { gap: 1.5rem; }
+      .hero__stats { gap: 1.25rem; flex-wrap: wrap; justify-content: center; }
     }
 
     /* Glowing Flagship Showcase Card */
