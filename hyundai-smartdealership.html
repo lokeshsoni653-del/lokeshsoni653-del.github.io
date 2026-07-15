@@ -5,45 +5,99 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Hyundai SmartDealership 360 | Engineered by Lokesh Kumar</title>
   <meta name="description" content="Automated Dealership Analytics, Lead Pipeline Tracking & Customer Sentiment Intelligence Engine for Hyundai Shahrah-e-Faisal, Karachi. Engineered by Lokesh Kumar.">
-  <link rel="stylesheet" href="style.css?v=2026_v9"/>
-  <!-- Chart.js & Leaflet for Live Visuals -->
+  
+  <!-- Font & Styling -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js & Leaflet GIS -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
       --hyundai-blue: #002C6C;
       --hyundai-cyan: #00AAD2;
       --hyundai-dark: #030814;
+      --hyundai-surface: #070D1A;
       --hyundai-card: #0A1224;
       --hyundai-border: #1E2D4A;
       --hyundai-accent: #38BDF8;
       --hyundai-gold: #EAB308;
+      --ff-sans: 'Inter', -apple-system, sans-serif;
+      --ff-serif: 'Playfair Display', Georgia, serif;
     }
 
     body {
       background: var(--hyundai-dark);
       color: #F1F5F9;
       font-family: var(--ff-sans);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
     }
 
+    /* Dedicated Hyundai Navbar */
+    .hyundai-navbar {
+      height: 70px;
+      background: rgba(3, 8, 20, 0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--hyundai-border);
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center;
+    }
+
+    .nav-container {
+      max-width: 1200px; width: 100%; margin: 0 auto; padding: 0 1.5rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .brand-group {
+      display: flex; align-items: center; gap: 1rem;
+    }
+
+    .hyundai-logo-text {
+      font-weight: 900; font-size: 1.3rem; letter-spacing: 0.15em; color: #FFFFFF;
+      background: linear-gradient(90deg, #FFFFFF, var(--hyundai-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .dealership-tag {
+      font-size: 0.78rem; font-weight: 600; color: var(--hyundai-cyan);
+      background: rgba(0, 170, 210, 0.12); border: 1px solid rgba(0, 170, 210, 0.3);
+      padding: 0.25rem 0.65rem; border-radius: 100px;
+    }
+
+    .engineer-link {
+      color: #94A3B8; font-size: 0.85rem; font-weight: 600; text-decoration: none;
+      background: rgba(30, 45, 74, 0.5); border: 1px solid var(--hyundai-border);
+      padding: 0.45rem 1rem; border-radius: 100px; transition: all 0.2s;
+    }
+
+    .engineer-link strong { color: var(--hyundai-cyan); }
+    .engineer-link:hover { color: #FFF; border-color: var(--hyundai-cyan); }
+
+    /* Hero Section */
     .hyundai-hero {
       background: linear-gradient(135deg, #020612 0%, #001A40 50%, #002C6C 100%);
-      padding: calc(var(--nav-h) + 2rem) 0 3rem;
+      padding: 3rem 0 3.5rem;
       border-bottom: 2px solid var(--hyundai-border);
       position: relative;
       overflow: hidden;
     }
 
     .hyundai-hero::after {
-      content: '';
-      position: absolute;
-      top: -50%; right: -20%;
+      content: ''; position: absolute; top: -50%; right: -20%;
       width: 600px; height: 600px;
       background: radial-gradient(circle, rgba(0, 170, 210, 0.15) 0%, transparent 70%);
       pointer-events: none;
     }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
 
     .designer-badge {
       display: inline-flex; align-items: center; gap: 0.6rem;
@@ -64,43 +118,27 @@
     .hyundai-title {
       font-family: var(--ff-serif);
       font-size: clamp(2.2rem, 5vw, 3.4rem);
-      line-height: 1.1;
-      color: #FFFFFF;
-      margin-bottom: 1rem;
+      line-height: 1.1; color: #FFFFFF; margin-bottom: 1rem;
     }
 
-    .hyundai-title span {
-      color: var(--hyundai-cyan);
-    }
+    .hyundai-title span { color: var(--hyundai-cyan); }
 
     .hyundai-subtitle {
-      font-size: 1.05rem;
-      color: #94A3B8;
-      max-width: 720px;
-      line-height: 1.7;
-      margin-bottom: 2rem;
+      font-size: 1.05rem; color: #94A3B8; max-width: 760px; line-height: 1.7; margin-bottom: 2rem;
     }
 
+    /* KPI Cards */
     .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.25rem;
-      margin-bottom: 2.5rem;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem;
     }
 
     .kpi-card {
-      background: var(--hyundai-card);
-      border: 1px solid var(--hyundai-border);
-      border-radius: var(--radius-md);
-      padding: 1.5rem;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s;
+      background: var(--hyundai-card); border: 1px solid var(--hyundai-border);
+      border-radius: 12px; padding: 1.5rem; position: relative; overflow: hidden; transition: all 0.3s;
     }
 
     .kpi-card:hover {
-      border-color: var(--hyundai-cyan);
-      transform: translateY(-3px);
+      border-color: var(--hyundai-cyan); transform: translateY(-3px);
       box-shadow: 0 10px 30px rgba(0, 170, 210, 0.15);
     }
 
@@ -110,159 +148,99 @@
     }
 
     .kpi-val {
-      font-family: var(--ff-serif);
-      font-size: 2.1rem;
-      font-weight: 700;
-      color: #F8FAFC;
-      margin-bottom: 0.25rem;
+      font-family: var(--ff-serif); font-size: 2.1rem; font-weight: 700; color: #F8FAFC; margin-bottom: 0.25rem;
     }
 
     .kpi-lbl {
-      font-size: 0.78rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #64748B;
+      font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #64748B;
     }
 
     .kpi-sub {
-      font-size: 0.75rem;
-      color: #38BDF8;
-      margin-top: 0.5rem;
-      display: flex; align-items: center; gap: 0.3rem;
+      font-size: 0.75rem; color: #38BDF8; margin-top: 0.5rem; display: flex; align-items: center; gap: 0.3rem;
     }
 
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 2fr 1.2fr;
-      gap: 1.5rem;
-      margin-bottom: 2.5rem;
-    }
+    /* Main Section */
+    .section { padding: 3rem 0; }
 
-    @media (max-width: 992px) {
-      .dashboard-grid { grid-template-columns: 1fr; }
-    }
-
-    .panel-card {
-      background: var(--hyundai-card);
-      border: 1px solid var(--hyundai-border);
-      border-radius: var(--radius-lg);
-      padding: 1.75rem;
-    }
-
-    .panel-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #F8FAFC;
-      margin-bottom: 1.25rem;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-
-    .panel-title span {
-      font-size: 0.78rem;
-      font-weight: 500;
-      color: #64748B;
-    }
-
-    /* Filters Bar */
     .filter-bar {
-      display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem;
+      display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.75rem; align-items: center;
     }
 
     .filter-btn {
-      background: rgba(30, 45, 74, 0.5);
-      border: 1px solid var(--hyundai-border);
-      color: #94A3B8;
-      padding: 0.45rem 1rem;
-      border-radius: 100px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
+      background: rgba(30, 45, 74, 0.5); border: 1px solid var(--hyundai-border);
+      color: #94A3B8; padding: 0.5rem 1.1rem; border-radius: 100px;
+      font-size: 0.825rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
     }
 
     .filter-btn:hover, .filter-btn.active {
-      background: var(--hyundai-cyan);
-      color: #030814;
-      border-color: var(--hyundai-cyan);
+      background: var(--hyundai-cyan); color: #030814; border-color: var(--hyundai-cyan);
+      box-shadow: 0 0 15px rgba(0, 170, 210, 0.3);
     }
 
-    /* Sentiment Table */
-    .cr-table {
-      width: 100%; border-collapse: collapse; font-size: 0.825rem;
+    .dashboard-grid {
+      display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 1.5rem; margin-bottom: 2rem;
     }
 
-    .cr-table th {
-      text-align: left; padding: 0.75rem 1rem;
-      color: #64748B; text-transform: uppercase;
-      font-size: 0.7rem; letter-spacing: 0.08em;
-      border-bottom: 1px solid var(--hyundai-border);
+    @media (max-width: 992px) { .dashboard-grid { grid-template-columns: 1fr; } }
+
+    .panel-card {
+      background: var(--hyundai-card); border: 1px solid var(--hyundai-border);
+      border-radius: 16px; padding: 1.75rem;
     }
 
-    .cr-table td {
-      padding: 0.85rem 1rem; border-bottom: 1px solid rgba(30, 45, 74, 0.4);
+    .panel-title {
+      font-size: 1.05rem; font-weight: 700; color: #F8FAFC; margin-bottom: 1.25rem;
+      display: flex; justify-content: space-between; align-items: center;
     }
 
-    .sentiment-badge {
-      display: inline-flex; align-items: center; gap: 0.3rem;
-      padding: 0.25rem 0.65rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700;
-    }
+    .panel-title span { font-size: 0.78rem; font-weight: 500; color: #64748B; }
 
+    /* Tables */
+    .cr-table { width: 100%; border-collapse: collapse; font-size: 0.825rem; }
+    .cr-table th { text-align: left; padding: 0.75rem 1rem; color: #64748B; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.08em; border-bottom: 1px solid var(--hyundai-border); }
+    .cr-table td { padding: 0.85rem 1rem; border-bottom: 1px solid rgba(30, 45, 74, 0.4); }
+
+    .sentiment-badge { display: inline-flex; align-items: center; padding: 0.25rem 0.65rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700; }
     .sentiment-badge.positive { background: rgba(34, 197, 94, 0.15); color: #4ADE80; border: 1px solid rgba(34, 197, 94, 0.3); }
     .sentiment-badge.neutral  { background: rgba(234, 179, 8, 0.15); color: #FACC15; border: 1px solid rgba(234, 179, 8, 0.3); }
     .sentiment-badge.critical { background: rgba(239, 68, 68, 0.15); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.3); }
 
-    /* Map Box */
-    #karachi-map {
-      height: 320px;
-      width: 100%;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--hyundai-border);
-    }
-
-    /* Booking Simulator Modal / Form */
-    .sim-form {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
-    }
-
-    @media (max-width: 600px) { .sim-form { grid-template-columns: 1fr; } }
+    #karachi-map { height: 320px; width: 100%; border-radius: 12px; border: 1px solid var(--hyundai-border); }
 
     .sim-input {
-      background: rgba(30, 45, 74, 0.4);
-      border: 1px solid var(--hyundai-border);
-      color: #F8FAFC;
-      padding: 0.65rem 0.9rem;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      outline: none;
-      width: 100%;
+      background: rgba(30, 45, 74, 0.4); border: 1px solid var(--hyundai-border);
+      color: #F8FAFC; padding: 0.65rem 0.9rem; border-radius: 6px; font-size: 0.85rem; outline: none; width: 100%;
     }
-
     .sim-input:focus { border-color: var(--hyundai-cyan); }
+
+    .sim-btn {
+      background: var(--hyundai-cyan); color: #030814; font-weight: 700;
+      padding: 0.75rem 1.25rem; border: none; border-radius: 6px; cursor: pointer;
+      font-size: 0.875rem; transition: transform 0.2s, background 0.2s;
+    }
+    .sim-btn:hover { background: #38BDF8; transform: translateY(-1px); }
+
+    /* Footer / Author Block */
+    .author-footer {
+      background: linear-gradient(135deg, #0A1224, #001A40); border: 1px solid var(--hyundai-border);
+      border-radius: 16px; padding: 2rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem; margin-top: 2rem;
+    }
   </style>
 </head>
 <body>
 
-<!-- Global Navigation -->
-<nav class="nav" id="main-nav">
-  <div class="nav__inner">
-    <a href="index.html" class="nav__logo">Lokesh<span>.</span></a>
-    <div class="nav__links">
-      <a href="index.html"          class="nav__link">Home</a>
-      <a href="about.html"          class="nav__link">About</a>
-      <a href="skills.html"         class="nav__link">Skills</a>
-      <a href="projects.html"       class="nav__link active">Projects</a>
-      <a href="experience.html"     class="nav__link">Experience</a>
-      <a href="education.html"      class="nav__link">Education</a>
-      <a href="certifications.html" class="nav__link">Certs</a>
-      <a href="testimonials.html"   class="nav__link">Testimonials</a>
+<!-- DEDICATED HYUNDAI NAVBAR -->
+<nav class="hyundai-navbar">
+  <div class="nav-container">
+    <div class="brand-group">
+      <span class="hyundai-logo-text">HYUNDAI</span>
+      <span class="dealership-tag">Shahrah-e-Faisal Operations Control</span>
     </div>
-    <div class="nav__desktop-ctas">
-      <a href="assets/Lokesh_Kumar_Resume.pdf" class="nav__cta" download style="background: transparent; color: var(--clr-accent); border: 1px solid var(--clr-accent);">Resume (PDF)</a>
-      <a href="contact.html" class="nav__cta">Hire Me →</a>
+    <div class="nav-right">
+      <a href="https://lokeshkumar.me" target="_blank" class="engineer-link">
+        👨‍💻 Engineered by <strong>Lokesh Kumar</strong> ↗
+      </a>
     </div>
-    <button class="dark-toggle" id="dark-toggle" title="Toggle dark mode" aria-label="Toggle dark mode"><span class="dark-toggle__knob"></span></button>
-    <button class="nav__hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
 </nav>
 
@@ -312,13 +290,13 @@
 
     <!-- Filter Buttons Bar -->
     <div class="filter-bar">
-      <span style="font-size: 0.8rem; font-weight: 700; color: #64748B; align-self: center; margin-right: 0.5rem;">FILTER MODEL:</span>
-      <button class="filter-btn active" onclick="filterModel('ALL')">All Models</button>
-      <button class="filter-btn" onclick="filterModel('Tucson')">Hyundai Tucson</button>
-      <button class="filter-btn" onclick="filterModel('Sonata')">Hyundai Sonata</button>
-      <button class="filter-btn" onclick="filterModel('Elantra')">Hyundai Elantra</button>
-      <button class="filter-btn" onclick="filterModel('Santa Fe')">Santa Fe Hybrid</button>
-      <button class="filter-btn" onclick="filterModel('Porter')">Porter H-100</button>
+      <span style="font-size: 0.8rem; font-weight: 700; color: #64748B; margin-right: 0.5rem;">FILTER BY MODEL:</span>
+      <button class="filter-btn active" data-model="ALL">All Models</button>
+      <button class="filter-btn" data-model="Tucson">Hyundai Tucson</button>
+      <button class="filter-btn" data-model="Sonata">Hyundai Sonata</button>
+      <button class="filter-btn" data-model="Elantra">Hyundai Elantra</button>
+      <button class="filter-btn" data-model="Santa Fe">Santa Fe Hybrid</button>
+      <button class="filter-btn" data-model="Porter">Porter H-100</button>
     </div>
 
     <!-- Dashboard Grid 1: Sales Admin Chart & Karachi Geo Heatmap -->
@@ -328,7 +306,7 @@
       <div class="panel-card">
         <div class="panel-title">
           <span>📊 SALES ADMIN PIPELINE</span>
-          <span>Lead Stage Distribution by Vehicle Model</span>
+          <span id="chart-subtitle">Lead Stage Distribution by Vehicle Model</span>
         </div>
         <div style="height: 300px; position: relative;">
           <canvas id="salesChart"></canvas>
@@ -388,11 +366,11 @@
           <div>
             <label style="font-size: 0.75rem; font-weight: 600; color: #64748B; display: block; margin-bottom: 0.35rem;">HYUNDAI MODEL</label>
             <select id="custModel" class="sim-input" required>
-              <option value="Tucson">Hyundai Tucson AWD</option>
-              <option value="Sonata">Hyundai Sonata 2.5L</option>
-              <option value="Elantra">Hyundai Elantra 2.0</option>
-              <option value="Santa Fe">Santa Fe Hybrid Signature</option>
-              <option value="Porter">Porter H-100 Commercial</option>
+              <option value="Hyundai Tucson">Hyundai Tucson AWD</option>
+              <option value="Hyundai Sonata">Hyundai Sonata 2.5L</option>
+              <option value="Hyundai Elantra">Hyundai Elantra 2.0</option>
+              <option value="Santa Fe Hybrid">Santa Fe Hybrid Signature</option>
+              <option value="Porter H-100">Porter H-100 Commercial</option>
             </select>
           </div>
           <div>
@@ -408,7 +386,7 @@
             <label style="font-size: 0.75rem; font-weight: 600; color: #64748B; display: block; margin-bottom: 0.35rem;">TEST DRIVE FEEDBACK / REVIEW</label>
             <input type="text" id="custReview" class="sim-input" placeholder="e.g. Smooth suspension and cabin insulation during test drive." required/>
           </div>
-          <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem; justify-content: center; background: var(--hyundai-cyan); color: #030814; font-weight: 700;">
+          <button type="submit" class="sim-btn">
             ⚡ Submit Test Drive Entry
           </button>
         </form>
@@ -419,8 +397,8 @@
 
     </div>
 
-    <!-- Architecture & Engineer Declaration -->
-    <div style="background: linear-gradient(135deg, #0A1224, #001A40); border: 1px solid var(--hyundai-border); border-radius: var(--radius-lg); padding: 2rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem;">
+    <!-- Author & Technical Endorsement -->
+    <div class="author-footer">
       <div>
         <h3 style="font-family: var(--ff-serif); font-size: 1.3rem; color: #FFF; margin-bottom: 0.35rem;">
           Engineered for Hyundai Shahrah-e-Faisal Dealership Leadership
@@ -431,8 +409,8 @@
       </div>
       <div style="display: flex; gap: 1rem; align-items: center;">
         <span style="font-size: 0.8rem; font-weight: 700; color: var(--hyundai-cyan);">DESIGNED BY LOKESH KUMAR</span>
-        <a href="contact.html" class="btn btn-primary" style="background: var(--hyundai-cyan); color: #030814; font-weight: 700;">
-          Contact Lokesh →
+        <a href="https://lokeshkumar.me" target="_blank" class="sim-btn" style="text-decoration: none;">
+          Visit Portfolio →
         </a>
       </div>
     </div>
@@ -442,11 +420,11 @@
 
 <!-- SCRIPTS & INTERACTION LOGIC -->
 <script>
-  // Initial Dataset
+  // Dataset
   const crData = [
-    { name: 'Tariq Aziz', model: 'Tucson AWD', category: 'Test Drive', sentiment: 'positive', score: '98%', text: 'Extremely impressive suspension on Shahrah-e-Faisal. Quiet cabin insulation.', zone: 'Clifton/DHA' },
-    { name: 'Zainab Shah', model: 'Sonata 2.5L', category: 'Sales Admin', sentiment: 'positive', score: '95%', text: 'PDI process was fast and booking documentation was clean.', zone: 'Shahrah-e-Faisal' },
-    { name: 'Bilal Khan', model: 'Elantra 2.0', category: 'CR Inquiry', sentiment: 'neutral', score: '72%', text: 'Inquired about estimated delivery timeframe for white color variant.', zone: 'Gulshan' },
+    { name: 'Tariq Aziz', model: 'Hyundai Tucson', category: 'Test Drive', sentiment: 'positive', score: '98%', text: 'Extremely impressive suspension on Shahrah-e-Faisal. Quiet cabin insulation.', zone: 'Clifton/DHA' },
+    { name: 'Zainab Shah', model: 'Hyundai Sonata', category: 'Sales Admin', sentiment: 'positive', score: '95%', text: 'PDI process was fast and booking documentation was clean.', zone: 'Shahrah-e-Faisal' },
+    { name: 'Bilal Khan', model: 'Hyundai Elantra', category: 'CR Inquiry', sentiment: 'neutral', score: '72%', text: 'Inquired about estimated delivery timeframe for white color variant.', zone: 'Gulshan' },
     { name: 'Kamran Raza', model: 'Santa Fe Hybrid', category: 'Maintenance', sentiment: 'positive', score: '99%', text: 'First 5,000 km checkup handled professionally by Hyundai service team.', zone: 'Clifton/DHA' },
     { name: 'Farhan Sheikh', model: 'Porter H-100', category: 'Commercial Fleet', sentiment: 'critical', score: '40%', text: 'Requested updated delivery schedule for company transport unit.', zone: 'Korangi' }
   ];
@@ -457,27 +435,47 @@
     tbody.innerHTML = data.map(item => `
       <tr>
         <td style="font-weight: 600; color: #F8FAFC;">${item.name}</td>
-        <td><span class="tag" style="background: rgba(30,45,74,0.6); color: #38BDF8; font-size:0.72rem;">${item.model}</span></td>
+        <td><span style="background: rgba(30,45,74,0.6); color: #38BDF8; font-size:0.72rem; padding: 0.2rem 0.5rem; border-radius: 4px;">${item.model}</span></td>
         <td style="color: #94A3B8;">${item.category}</td>
         <td><span class="sentiment-badge ${item.sentiment}">${item.sentiment.toUpperCase()} (${item.score})</span></td>
         <td style="color: #CBD5E1; max-width: 240px; font-size:0.8rem;">"${item.text}"</td>
-        <td><button onclick="alert('CR Action Triggered for ${item.name}')" style="color:var(--hyundai-cyan); font-size:0.75rem; font-weight:600; cursor:pointer;">Contact →</button></td>
+        <td><button onclick="alert('CR Action Triggered for ${item.name}')" style="color:var(--hyundai-cyan); background:none; border:none; font-size:0.75rem; font-weight:600; cursor:pointer;">Contact →</button></td>
       </tr>
     `).join('');
   }
   renderCRTable(crData);
 
-  // Initialize Sales Chart
+  // Model Specific Chart Datasets
+  const chartDatasets = {
+    ALL: [
+      { label: 'Tucson', data: [45, 28, 22, 14, 18], backgroundColor: '#00AAD2' },
+      { label: 'Sonata', data: [30, 18, 14, 10, 12], backgroundColor: '#38BDF8' },
+      { label: 'Elantra', data: [35, 22, 16, 12, 14], backgroundColor: '#818CF8' }
+    ],
+    Tucson: [
+      { label: 'Tucson AWD Pipeline', data: [45, 28, 22, 14, 18], backgroundColor: '#00AAD2' }
+    ],
+    Sonata: [
+      { label: 'Sonata 2.5L Pipeline', data: [30, 18, 14, 10, 12], backgroundColor: '#38BDF8' }
+    ],
+    Elantra: [
+      { label: 'Elantra 2.0 Pipeline', data: [35, 22, 16, 12, 14], backgroundColor: '#818CF8' }
+    ],
+    'Santa Fe': [
+      { label: 'Santa Fe Hybrid Pipeline', data: [20, 15, 12, 8, 10], backgroundColor: '#10B981' }
+    ],
+    Porter: [
+      { label: 'Porter H-100 Fleet Pipeline', data: [25, 20, 18, 15, 12], backgroundColor: '#EAB308' }
+    ]
+  };
+
+  // Initialize Chart
   const ctx = document.getElementById('salesChart').getContext('2d');
   let salesChart = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: ['Inquiry Lead', 'Test Drive', 'Booking Secured', 'PDI Ready', 'Delivered'],
-      datasets: [
-        { label: 'Tucson', data: [45, 28, 22, 14, 18], backgroundColor: '#00AAD2' },
-        { label: 'Sonata', data: [30, 18, 14, 10, 12], backgroundColor: '#38BDF8' },
-        { label: 'Elantra', data: [35, 22, 16, 12, 14], backgroundColor: '#818CF8' }
-      ]
+      datasets: chartDatasets.ALL
     },
     options: {
       responsive: true,
@@ -490,10 +488,35 @@
     }
   });
 
-  // Initialize Leaflet Karachi Catchment Map
+  // Attach Event Listeners to Filter Buttons
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+
+      const selectedModel = this.getAttribute('data-model');
+      
+      // Update Table
+      if (selectedModel === 'ALL') {
+        renderCRTable(crData);
+        document.getElementById('chart-subtitle').innerText = 'Lead Stage Distribution by Vehicle Model';
+      } else {
+        const filtered = crData.filter(item => item.model.toLowerCase().includes(selectedModel.toLowerCase()));
+        renderCRTable(filtered.length ? filtered : crData);
+        document.getElementById('chart-subtitle').innerText = `Filtered Lead Pipeline for ${selectedModel}`;
+      }
+
+      // Update Chart Dataset
+      const newDataset = chartDatasets[selectedModel] || chartDatasets.ALL;
+      salesChart.data.datasets = newDataset;
+      salesChart.update();
+    });
+  });
+
+  // Leaflet Map Initialization
   const map = L.map('karachi-map').setView([24.8607, 67.0611], 12);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: 'Map data &copy; OpenStreetMap & CartoDB'
+    attribution: 'Map &copy; OpenStreetMap'
   }).addTo(map);
 
   const locations = [
@@ -506,29 +529,11 @@
 
   locations.forEach(loc => {
     L.circleMarker([loc.lat, loc.lng], {
-      radius: 8,
-      fillColor: loc.color,
-      color: '#FFFFFF',
-      weight: 2,
-      opacity: 1,
-      fillOpacity: 0.85
+      radius: 8, fillColor: loc.color, color: '#FFFFFF', weight: 2, opacity: 1, fillOpacity: 0.85
     }).addTo(map).bindPopup(`<strong>${loc.name}</strong><br/>${loc.label}`);
   });
 
-  // Interactive Filter
-  function filterModel(model) {
-    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-
-    if (model === 'ALL') {
-      renderCRTable(crData);
-    } else {
-      const filtered = crData.filter(item => item.model.toLowerCase().includes(model.toLowerCase()));
-      renderCRTable(filtered.length ? filtered : crData);
-    }
-  }
-
-  // Live Form Submission
+  // Lead Submission
   function addLead() {
     const name = document.getElementById('custName').value;
     const model = document.getElementById('custModel').value;
@@ -536,13 +541,7 @@
     const review = document.getElementById('custReview').value;
 
     crData.unshift({
-      name: name,
-      model: model,
-      category: 'Test Drive',
-      sentiment: 'positive',
-      score: '96%',
-      text: review,
-      zone: zone
+      name: name, model: model, category: 'Test Drive', sentiment: 'positive', score: '96%', text: review, zone: zone
     });
 
     renderCRTable(crData);
