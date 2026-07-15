@@ -43,7 +43,7 @@
     /* Dedicated Hyundai Navbar */
     .hyundai-navbar {
       height: 70px;
-      background: rgba(3, 8, 20, 0.92);
+      background: rgba(3, 8, 20, 0.94);
       backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--hyundai-border);
       position: sticky; top: 0; z-index: 100;
@@ -51,7 +51,7 @@
     }
 
     .nav-container {
-      max-width: 1200px; width: 100%; margin: 0 auto; padding: 0 1.5rem;
+      max-width: 1240px; width: 100%; margin: 0 auto; padding: 0 1.5rem;
       display: flex; justify-content: space-between; align-items: center;
     }
 
@@ -60,7 +60,7 @@
     }
 
     .hyundai-logo-text {
-      font-weight: 900; font-size: 1.3rem; letter-spacing: 0.15em; color: #FFFFFF;
+      font-weight: 900; font-size: 1.35rem; letter-spacing: 0.15em; color: #FFFFFF;
       background: linear-gradient(90deg, #FFFFFF, var(--hyundai-cyan));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -71,6 +71,17 @@
       background: rgba(0, 170, 210, 0.12); border: 1px solid rgba(0, 170, 210, 0.3);
       padding: 0.25rem 0.65rem; border-radius: 100px;
     }
+
+    .nav-actions {
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+
+    .export-btn {
+      background: rgba(0, 170, 210, 0.15); border: 1px solid var(--hyundai-cyan);
+      color: var(--hyundai-cyan); font-size: 0.8rem; font-weight: 700;
+      padding: 0.45rem 0.9rem; border-radius: 100px; cursor: pointer; transition: all 0.2s;
+    }
+    .export-btn:hover { background: var(--hyundai-cyan); color: #030814; }
 
     .engineer-link {
       color: #94A3B8; font-size: 0.85rem; font-weight: 600; text-decoration: none;
@@ -97,7 +108,7 @@
       pointer-events: none;
     }
 
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+    .container { max-width: 1240px; margin: 0 auto; padding: 0 1.5rem; }
 
     .designer-badge {
       display: inline-flex; align-items: center; gap: 0.6rem;
@@ -112,8 +123,10 @@
 
     .designer-badge .dot {
       width: 8px; height: 8px; background: #38BDF8; border-radius: 50%;
-      box-shadow: 0 0 10px #38BDF8;
+      box-shadow: 0 0 10px #38BDF8; animation: pulse 2s infinite;
     }
+
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
     .hyundai-title {
       font-family: var(--ff-serif);
@@ -124,8 +137,19 @@
     .hyundai-title span { color: var(--hyundai-cyan); }
 
     .hyundai-subtitle {
-      font-size: 1.05rem; color: #94A3B8; max-width: 760px; line-height: 1.7; margin-bottom: 2rem;
+      font-size: 1.05rem; color: #94A3B8; max-width: 780px; line-height: 1.7; margin-bottom: 2rem;
     }
+
+    /* Live Operational Ticker */
+    .op-ticker {
+      display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center;
+      background: rgba(10, 18, 36, 0.8); border: 1px solid var(--hyundai-border);
+      border-radius: 8px; padding: 0.65rem 1.25rem; font-size: 0.78rem; color: #94A3B8;
+      margin-bottom: 2rem;
+    }
+
+    .op-ticker-item { display: flex; align-items: center; gap: 0.4rem; }
+    .op-ticker-item strong { color: #F8FAFC; }
 
     /* KPI Cards */
     .kpi-grid {
@@ -225,6 +249,10 @@
       background: linear-gradient(135deg, #0A1224, #001A40); border: 1px solid var(--hyundai-border);
       border-radius: 16px; padding: 2rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem; margin-top: 2rem;
     }
+
+    .dealership-address {
+      font-size: 0.8rem; color: #64748B; margin-top: 0.5rem; display: flex; align-items: center; gap: 0.4rem;
+    }
   </style>
 </head>
 <body>
@@ -236,7 +264,10 @@
       <span class="hyundai-logo-text">HYUNDAI</span>
       <span class="dealership-tag">Shahrah-e-Faisal Operations Control</span>
     </div>
-    <div class="nav-right">
+    <div class="nav-actions">
+      <button class="export-btn" onclick="exportDataCSV()">
+        📥 Export Data Log (CSV)
+      </button>
       <a href="https://lokeshkumar.me" target="_blank" class="engineer-link">
         👨‍💻 Engineered by <strong>Lokesh Kumar</strong> ↗
       </a>
@@ -257,6 +288,19 @@
     <p class="hyundai-subtitle">
       Automated Lead Funnel, Dealership Inventory Tracking &amp; Customer Relations (CR) Sentiment Intelligence Platform designed for <strong>Hyundai Shahrah-e-Faisal, Karachi</strong>.
     </p>
+
+    <!-- Operational Ticker Bar -->
+    <div class="op-ticker">
+      <div class="op-ticker-item">
+        <span>🟢 System Status:</span> <strong>Live Telemetry Linked</strong>
+      </div>
+      <div class="op-ticker-item">
+        <span>🏢 Facility:</span> <strong>Plot # 14-A, Block 6 PECHS, Main Shahrah-e-Faisal, Karachi</strong>
+      </div>
+      <div class="op-ticker-item">
+        <span>⚡ Server Uptime:</span> <strong>99.9%</strong>
+      </div>
+    </div>
 
     <!-- KPI Summary Row -->
     <div class="kpi-grid">
@@ -406,6 +450,9 @@
         <p style="font-size: 0.875rem; color: #94A3B8;">
           Demonstrates how data automation, inventory pipeline tracking, and sentiment AI streamline sales admin and CR workflows.
         </p>
+        <div class="dealership-address">
+          📍 Hyundai Shahrah-e-Faisal, Plot # 14-A, Block 6 PECHS, Main Shahrah-e-Faisal, Karachi
+        </div>
       </div>
       <div style="display: flex; gap: 1rem; align-items: center;">
         <span style="font-size: 0.8rem; font-weight: 700; color: var(--hyundai-cyan);">DESIGNED BY LOKESH KUMAR</span>
@@ -420,6 +467,23 @@
 
 <!-- SCRIPTS & INTERACTION LOGIC -->
 <script>
+  // Play Subtle Web Audio Chime Sound
+  function playSound(freq = 587, duration = 0.12) {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + duration);
+    } catch (e) {}
+  }
+
   // Dataset
   const crData = [
     { name: 'Tariq Aziz', model: 'Hyundai Tucson', category: 'Test Drive', sentiment: 'positive', score: '98%', text: 'Extremely impressive suspension on Shahrah-e-Faisal. Quiet cabin insulation.', zone: 'Clifton/DHA' },
@@ -439,7 +503,7 @@
         <td style="color: #94A3B8;">${item.category}</td>
         <td><span class="sentiment-badge ${item.sentiment}">${item.sentiment.toUpperCase()} (${item.score})</span></td>
         <td style="color: #CBD5E1; max-width: 240px; font-size:0.8rem;">"${item.text}"</td>
-        <td><button onclick="alert('CR Action Triggered for ${item.name}')" style="color:var(--hyundai-cyan); background:none; border:none; font-size:0.75rem; font-weight:600; cursor:pointer;">Contact →</button></td>
+        <td><button onclick="playSound(880, 0.15); alert('CR Action Triggered for ${item.name}')" style="color:var(--hyundai-cyan); background:none; border:none; font-size:0.75rem; font-weight:600; cursor:pointer;">Contact →</button></td>
       </tr>
     `).join('');
   }
@@ -491,6 +555,7 @@
   // Attach Event Listeners to Filter Buttons
   document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', function() {
+      playSound(660, 0.1);
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       this.classList.add('active');
 
@@ -535,6 +600,7 @@
 
   // Lead Submission
   function addLead() {
+    playSound(880, 0.2);
     const name = document.getElementById('custName').value;
     const model = document.getElementById('custModel').value;
     const zone = document.getElementById('custZone').value;
@@ -553,6 +619,23 @@
       document.getElementById('formAlert').style.display = 'none';
       document.getElementById('leadForm').reset();
     }, 3000);
+  }
+
+  // Export CSV Data Log Function
+  function exportDataCSV() {
+    playSound(750, 0.15);
+    let csv = "Customer Name,Vehicle Model,Category,Sentiment,Score,Review Snippet,Catchment Zone\n";
+    crData.forEach(row => {
+      csv += `"${row.name}","${row.model}","${row.category}","${row.sentiment}","${row.score}","${row.text.replace(/"/g, '""')}","${row.zone}"\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', 'Hyundai_ShahraheFaisal_Dealership_Report.csv');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 </script>
 
