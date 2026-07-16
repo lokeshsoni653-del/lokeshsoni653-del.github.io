@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Skills — Lokesh Kumar</title>
   <meta name="description" content="Lokesh Kumar's technical skills — Python, Pandas, NetworkX, Streamlit, NLP/RAG, SQL, JavaScript, and more."/>
-  <link rel="stylesheet" href="style.css?v=2026_v9"/>
+  <link rel="stylesheet" href="style.css?v=2026_v11"/>
   <style>
     .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; }
     .skills-cat { background: var(--clr-surface); border: 1px solid var(--clr-border); border-radius: var(--radius-lg); padding: 2rem; }
@@ -376,18 +376,14 @@
 
 <script>
 (function() {
-  // ── CONFIG — update CHAT_API_URL after deploying Vercel function ──
   var CHAT_API_URL = 'https://lokesh-portfolio-bot.vercel.app/api/chat';
+  var GREETING = "Hi! I'm Lokesh's AI assistant. I know everything about his 57+ projects, skills, experience, and availability. What would you like to know? 🚀";
 
-  var GREETING = "Hi! I'm Lokesh's AI assistant. I know everything about his 56+ projects, skills, experience, and availability. What would you like to know? 🚀";
+  var isOpen     = false;
+  var isLoading  = false;
+  var history    = [];
+  var chipsShown = true;
 
-  // ── State ──────────────────────────────────────────────────────
-  var isOpen       = false;
-  var isLoading    = false;
-  var history      = [];
-  var chipsShown   = true;
-
-  // ── Elements ───────────────────────────────────────────────────
   var toggle   = document.getElementById('lk-chat-toggle');
   var closeBtn = document.getElementById('lk-chat-close');
   var panel    = document.getElementById('lk-chat-panel');
@@ -397,9 +393,8 @@
   var chips    = document.getElementById('lk-chat-chips');
   var icon     = document.getElementById('lk-chat-icon');
 
-  if (!toggle) return; // safety guard
+  if (!toggle) return;
 
-  // ── Helpers ────────────────────────────────────────────────────
   function addMessage(text, role) {
     var div = document.createElement('div');
     div.className = 'lk-msg lk-msg--' + role;
@@ -433,7 +428,48 @@
     if (state) showTyping(); else hideTyping();
   }
 
-  // ── Open/Close ─────────────────────────────────────────────────
+  // ── Smart Knowledge Base Fallback Engine ──
+  function getLocalKnowledgeAnswer(q) {
+    var query = (q || '').toLowerCase();
+
+    if (query.indexOf('python') !== -1 || query.indexOf('language') !== -1 || query.indexOf('skill') !== -1 || query.indexOf('tech') !== -1) {
+      return "Lokesh is a specialist in Python & Data Engineering! His primary skills include: Python (Pandas, NumPy, NetworkX, Matplotlib, Streamlit, Folium/Leaflet GIS, NLP/RAG pipelines), JavaScript ES6+, SQL, HTML5/CSS3, Docker, and Cloud Deployments (GCP, Vercel, Netlify).";
+    }
+
+    if (query.indexOf('project') !== -1 || query.indexOf('work') !== -1 || query.indexOf('best') !== -1 || query.indexOf('built') !== -1 || query.indexOf('hyundai') !== -1) {
+      return "Lokesh has built 57+ live projects! His top flagship systems include:
+1. Hyundai SmartDealership 360 (Vercel: hyundai-smartdealership-vercel.vercel.app)
+2. Agri-Logistics IDAS Cloud Prototype
+3. AIMH Wargaming Command HUD
+4. Power Cement Line III KilnOptima HUD
+5. Saudi Pak AgriInvest Feasibility Console.
+Explore the full catalog on lokeshkumar.me/projects.html!";
+    }
+
+    if (query.indexOf('education') !== -1 || query.indexOf('college') !== -1 || query.indexOf('university') !== -1 || query.indexOf('gpa') !== -1 || query.indexOf('marks') !== -1 || query.indexOf('hsc') !== -1) {
+      return "Education & Academic Record:
+• Sindh Agriculture University, Tando Jam — BS Software Engineering (Final Year, CGPA 3.00).
+• BISE Mirpurkhas HSC Intermediate — 1036 / 1100 (94.18% Grade A-1 from Govt. Degree College Mithi).";
+    }
+
+    if (query.indexOf('certif') !== -1 || query.indexOf('course') !== -1 || query.indexOf('google') !== -1 || query.indexOf('security') !== -1) {
+      return "Lokesh holds 7+ professional certifications including:
+• Google Foundations of Cybersecurity (Coursera ID: 3NZWPQQJBMQ5)
+• Google Data Analytics Professional
+• Agile Project Management
+• Python Data Science Specialist.";
+    }
+
+    if (query.indexOf('contact') !== -1 || query.indexOf('email') !== -1 || query.indexOf('phone') !== -1 || query.indexOf('whatsapp') !== -1 || query.indexOf('hire') !== -1 || query.indexOf('job') !== -1 || query.indexOf('internship') !== -1 || query.indexOf('available') !== -1) {
+      return "Lokesh is open for Software Engineering, Data Analytics, and AI/Telematics roles! You can contact him via:
+• Email: lokeshsoni653@gmail.com
+• Phone/WhatsApp: 0303-3021048
+• Portfolio: lokeshkumar.me";
+    }
+
+    return "Lokesh Kumar is a final-year Software Engineering student specializing in automotive telematics, data engineering pipelines, and interactive web applications with 57+ live projects. How can I help you regarding his skills, projects, or background?";
+  }
+
   function openChat() {
     isOpen = true;
     panel.classList.add('open');
@@ -441,7 +477,6 @@
     toggle.setAttribute('aria-expanded', 'true');
     icon.textContent = '✕';
     input.focus();
-    // Show greeting if first time
     if (messages.children.length === 0) {
       addMessage(GREETING, 'bot');
     }
@@ -458,17 +493,14 @@
   toggle.addEventListener('click', function() { isOpen ? closeChat() : openChat(); });
   closeBtn.addEventListener('click', closeChat);
 
-  // Close on outside click
   document.addEventListener('click', function(e) {
     if (isOpen && !document.getElementById('lk-chat').contains(e.target)) closeChat();
   });
 
-  // Close on Escape
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape' && isOpen) closeChat();
   });
 
-  // ── Send Message ───────────────────────────────────────────────
   function sendMessage(text) {
     text = (text || input.value || '').trim();
     if (!text || isLoading) return;
@@ -478,27 +510,40 @@
     addMessage(text, 'user');
     setLoading(true);
 
-    // Keep last 10 history items for context
     var recentHistory = history.slice(-10);
+
+    // Fast 3.5s AbortController timeout for mobile networks
+    var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timeoutId = controller ? setTimeout(function() { controller.abort(); }, 3500) : null;
 
     fetch(CHAT_API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: text, history: recentHistory }),
+      signal: controller ? controller.signal : undefined
     })
-    .then(function(res) { return res.json(); })
+    .then(function(res) {
+      if (timeoutId) clearTimeout(timeoutId);
+      if (!res.ok) throw new Error('API HTTP error ' + res.status);
+      return res.json();
+    })
     .then(function(data) {
       setLoading(false);
-      var answer = data.answer || data.error || 'Something went wrong. Please try again!';
+      var answer = data.answer || data.error || getLocalKnowledgeAnswer(text);
       addMessage(answer, 'bot');
       history.push({ role: 'user', text: text });
       history.push({ role: 'bot',  text: answer });
-      // Trim history to last 20 items
       if (history.length > 20) history = history.slice(-20);
     })
     .catch(function() {
+      if (timeoutId) clearTimeout(timeoutId);
+      // Fall back instantly to Knowledge Base Engine on Mobile Networks / API timeouts
       setLoading(false);
-      addMessage('Network error. Please check your connection and try again!', 'bot');
+      var fallbackAnswer = getLocalKnowledgeAnswer(text);
+      addMessage(fallbackAnswer, 'bot');
+      history.push({ role: 'user', text: text });
+      history.push({ role: 'bot',  text: fallbackAnswer });
+      if (history.length > 20) history = history.slice(-20);
     });
   }
 
@@ -507,7 +552,6 @@
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   });
 
-  // ── Quick Reply Chips ──────────────────────────────────────────
   if (chips) {
     chips.querySelectorAll('.lk-chip').forEach(function(chip) {
       chip.addEventListener('click', function() {
