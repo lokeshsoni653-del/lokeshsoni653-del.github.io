@@ -10,7 +10,7 @@
   <meta property="og:description" content="Transforming complex data into secure, elegant Python-based web applications.">
   <meta property="og:image" content="https://lokeshsoni653-del.github.io/lokesh-portfolio/avatar.png">
   <meta property="og:type" content="website"/>
-  <link rel="stylesheet" href="style.css?v=2026_v11"/>
+  <link rel="stylesheet" href="style.css?v=2026_v12"/>
   <style>
     .about-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 4rem; align-items: start; }
     .about-photo-wrap { position: sticky; top: calc(var(--nav-h) + 2rem); }
@@ -473,7 +473,7 @@ Explore the full catalog on lokeshkumar.me/projects.html!";
     panel.setAttribute('aria-hidden', 'false');
     toggle.setAttribute('aria-expanded', 'true');
     icon.textContent = '✕';
-    input.focus();
+    setTimeout(function() { input.focus(); }, 100);
     if (messages.children.length === 0) {
       addMessage(GREETING, 'bot');
     }
@@ -487,11 +487,30 @@ Explore the full catalog on lokeshkumar.me/projects.html!";
     icon.textContent = '💬';
   }
 
-  toggle.addEventListener('click', function() { isOpen ? closeChat() : openChat(); });
-  closeBtn.addEventListener('click', closeChat);
+  // Mobile Touch & Tap Handler with stopPropagation to avoid race conditions
+  function handleToggleClick(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    isOpen ? closeChat() : openChat();
+  }
 
+  toggle.addEventListener('click', handleToggleClick);
+
+  closeBtn.addEventListener('click', function(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    closeChat();
+  });
+
+  // Strict check: Only close if tap is OUTSIDE panel AND OUTSIDE toggle button
   document.addEventListener('click', function(e) {
-    if (isOpen && !document.getElementById('lk-chat').contains(e.target)) closeChat();
+    if (isOpen && panel && toggle && !panel.contains(e.target) && !toggle.contains(e.target)) {
+      closeChat();
+    }
   });
 
   document.addEventListener('keydown', function(e) {
@@ -509,7 +528,6 @@ Explore the full catalog on lokeshkumar.me/projects.html!";
 
     var recentHistory = history.slice(-10);
 
-    // Fast 3.5s AbortController timeout for mobile networks
     var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
     var timeoutId = controller ? setTimeout(function() { controller.abort(); }, 3500) : null;
 
@@ -534,7 +552,6 @@ Explore the full catalog on lokeshkumar.me/projects.html!";
     })
     .catch(function() {
       if (timeoutId) clearTimeout(timeoutId);
-      // Fall back instantly to Knowledge Base Engine on Mobile Networks / API timeouts
       setLoading(false);
       var fallbackAnswer = getLocalKnowledgeAnswer(text);
       addMessage(fallbackAnswer, 'bot');
@@ -544,14 +561,19 @@ Explore the full catalog on lokeshkumar.me/projects.html!";
     });
   }
 
-  sendBtn.addEventListener('click', function() { sendMessage(); });
+  sendBtn.addEventListener('click', function(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    sendMessage();
+  });
+
   input.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   });
 
   if (chips) {
     chips.querySelectorAll('.lk-chip').forEach(function(chip) {
-      chip.addEventListener('click', function() {
+      chip.addEventListener('click', function(e) {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
         var q = this.getAttribute('data-q');
         if (q) { openChat(); sendMessage(q); }
       });
