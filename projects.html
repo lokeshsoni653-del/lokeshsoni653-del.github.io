@@ -6,7 +6,7 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Projects — Lokesh Kumar</title>
 <meta content="Lokesh Kumar's 56 live projects — built for companies like Engro, Nestlé, Telenor, Hamdard, Colgate, Akhuwat, and more." name="description"/>
-<link href="style.css?v=2026_v12" rel="stylesheet"/>
+<link href="style.css?v=2026_v13" rel="stylesheet"/>
 <style>
     .filter-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
     .filter-btn {
@@ -2467,8 +2467,8 @@ document.querySelectorAll('.projects-grid .project-card').forEach(function(card,
 
   function setLoading(state) {
     isLoading = state;
-    sendBtn.disabled = state;
-    input.disabled   = state;
+    if (sendBtn) sendBtn.disabled = state;
+    if (input) input.disabled   = state;
     if (state) showTyping(); else hideTyping();
   }
 
@@ -2481,34 +2481,19 @@ document.querySelectorAll('.projects-grid .project-card').forEach(function(card,
     }
 
     if (query.indexOf('project') !== -1 || query.indexOf('work') !== -1 || query.indexOf('best') !== -1 || query.indexOf('built') !== -1 || query.indexOf('hyundai') !== -1) {
-      return "Lokesh has built 57+ live projects! His top flagship systems include:
-1. Hyundai SmartDealership 360 (Vercel: hyundai-smartdealership-vercel.vercel.app)
-2. Agri-Logistics IDAS Cloud Prototype
-3. AIMH Wargaming Command HUD
-4. Power Cement Line III KilnOptima HUD
-5. Saudi Pak AgriInvest Feasibility Console.
-Explore the full catalog on lokeshkumar.me/projects.html!";
+      return "Lokesh has built 57+ live projects! Top flagship systems include: 1. Hyundai SmartDealership 360 (Vercel: hyundai-smartdealership-vercel.vercel.app) 2. Agri-Logistics IDAS Cloud Prototype 3. AIMH Wargaming Command HUD 4. Power Cement Line III KilnOptima HUD 5. Saudi Pak AgriInvest. Explore full catalog on lokeshkumar.me/projects.html!";
     }
 
     if (query.indexOf('education') !== -1 || query.indexOf('college') !== -1 || query.indexOf('university') !== -1 || query.indexOf('gpa') !== -1 || query.indexOf('marks') !== -1 || query.indexOf('hsc') !== -1) {
-      return "Education & Academic Record:
-• Sindh Agriculture University, Tando Jam — BS Software Engineering (Final Year, CGPA 3.00).
-• BISE Mirpurkhas HSC Intermediate — 1036 / 1100 (94.18% Grade A-1 from Govt. Degree College Mithi).";
+      return "Education & Academic Record: Sindh Agriculture University, Tando Jam — BS Software Engineering (Final Year, CGPA 3.00). BISE Mirpurkhas HSC Intermediate — 1036 / 1100 (94.18% Grade A-1 from Govt. Degree College Mithi).";
     }
 
     if (query.indexOf('certif') !== -1 || query.indexOf('course') !== -1 || query.indexOf('google') !== -1 || query.indexOf('security') !== -1) {
-      return "Lokesh holds 7+ professional certifications including:
-• Google Foundations of Cybersecurity (Coursera ID: 3NZWPQQJBMQ5)
-• Google Data Analytics Professional
-• Agile Project Management
-• Python Data Science Specialist.";
+      return "Lokesh holds 7+ professional certifications including: Google Foundations of Cybersecurity (Coursera ID: 3NZWPQQJBMQ5), Google Data Analytics Professional, Agile Project Management, Python Data Science Specialist.";
     }
 
     if (query.indexOf('contact') !== -1 || query.indexOf('email') !== -1 || query.indexOf('phone') !== -1 || query.indexOf('whatsapp') !== -1 || query.indexOf('hire') !== -1 || query.indexOf('job') !== -1 || query.indexOf('internship') !== -1 || query.indexOf('available') !== -1) {
-      return "Lokesh is open for Software Engineering, Data Analytics, and AI/Telematics roles! You can contact him via:
-• Email: lokeshsoni653@gmail.com
-• Phone/WhatsApp: 0303-3021048
-• Portfolio: lokeshkumar.me";
+      return "Lokesh is open for Software Engineering, Data Analytics, and AI/Telematics roles! Contact him via Email: lokeshsoni653@gmail.com | Phone/WhatsApp: 0303-3021048 | Portfolio: lokeshkumar.me";
     }
 
     return "Lokesh Kumar is a final-year Software Engineering student specializing in automotive telematics, data engineering pipelines, and interactive web applications with 57+ live projects. How can I help you regarding his skills, projects, or background?";
@@ -2516,25 +2501,28 @@ Explore the full catalog on lokeshkumar.me/projects.html!";
 
   function openChat() {
     isOpen = true;
-    panel.classList.add('open');
-    panel.setAttribute('aria-hidden', 'false');
-    toggle.setAttribute('aria-expanded', 'true');
-    icon.textContent = '✕';
-    setTimeout(function() { input.focus(); }, 100);
-    if (messages.children.length === 0) {
+    if (panel) {
+      panel.classList.add('open');
+      panel.setAttribute('aria-hidden', 'false');
+    }
+    if (toggle) toggle.setAttribute('aria-expanded', 'true');
+    if (icon) icon.textContent = '✕';
+    setTimeout(function() { if (input) input.focus(); }, 100);
+    if (messages && messages.children.length === 0) {
       addMessage(GREETING, 'bot');
     }
   }
 
   function closeChat() {
     isOpen = false;
-    panel.classList.remove('open');
-    panel.setAttribute('aria-hidden', 'true');
-    toggle.setAttribute('aria-expanded', 'false');
-    icon.textContent = '💬';
+    if (panel) {
+      panel.classList.remove('open');
+      panel.setAttribute('aria-hidden', 'true');
+    }
+    if (toggle) toggle.setAttribute('aria-expanded', 'false');
+    if (icon) icon.textContent = '💬';
   }
 
-  // Mobile Touch & Tap Handler with stopPropagation to avoid race conditions
   function handleToggleClick(e) {
     if (e) {
       e.preventDefault();
@@ -2543,17 +2531,20 @@ Explore the full catalog on lokeshkumar.me/projects.html!";
     isOpen ? closeChat() : openChat();
   }
 
-  toggle.addEventListener('click', handleToggleClick);
+  if (toggle) {
+    toggle.addEventListener('click', handleToggleClick);
+  }
 
-  closeBtn.addEventListener('click', function(e) {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    closeChat();
-  });
+  if (closeBtn) {
+    closeBtn.addEventListener('click', function(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      closeChat();
+    });
+  }
 
-  // Strict check: Only close if tap is OUTSIDE panel AND OUTSIDE toggle button
   document.addEventListener('click', function(e) {
     if (isOpen && panel && toggle && !panel.contains(e.target) && !toggle.contains(e.target)) {
       closeChat();
@@ -2565,9 +2556,9 @@ Explore the full catalog on lokeshkumar.me/projects.html!";
   });
 
   function sendMessage(text) {
-    text = (text || input.value || '').trim();
+    text = (text || (input ? input.value : '') || '').trim();
     if (!text || isLoading) return;
-    input.value = '';
+    if (input) input.value = '';
     hideChips();
 
     addMessage(text, 'user');
@@ -2608,14 +2599,18 @@ Explore the full catalog on lokeshkumar.me/projects.html!";
     });
   }
 
-  sendBtn.addEventListener('click', function(e) {
-    if (e) { e.preventDefault(); e.stopPropagation(); }
-    sendMessage();
-  });
+  if (sendBtn) {
+    sendBtn.addEventListener('click', function(e) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      sendMessage();
+    });
+  }
 
-  input.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-  });
+  if (input) {
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
+  }
 
   if (chips) {
     chips.querySelectorAll('.lk-chip').forEach(function(chip) {
