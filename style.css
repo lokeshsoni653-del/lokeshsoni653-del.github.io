@@ -945,3 +945,8 @@ html, body {
   }
 }
 
+
+/* Performance & Core Web Vitals Optimization */
+.hero, .page-header { content-visibility: auto; contain-intrinsic-size: 1000px; }
+img { content-visibility: auto; }
+.lk-chat__toggle { will-change: transform; transform: translateZ(0); }
