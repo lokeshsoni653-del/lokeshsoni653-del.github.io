@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap">
   <title>Experience — Lokesh Kumar</title>
   <meta name="description" content="Lokesh Kumar's work experience — Data & AI Intern at Pakistan Hindu Council, Web Development Intern at Interns Pakistan."/>
-  <link rel="stylesheet" href="style.css?v=2026_v15"/>
+  <link rel="stylesheet" href="style.css?v=2026_v16"/>
   <style>
     .exp-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 4rem; align-items: start; }
     .exp-sidebar { position: sticky; top: calc(var(--nav-h) + 2rem); }
@@ -438,7 +441,6 @@
     if (state) showTyping(); else hideTyping();
   }
 
-  // ── Smart Knowledge Base Fallback Engine ──
   function getLocalKnowledgeAnswer(q) {
     var query = (q || '').toLowerCase();
 
@@ -473,7 +475,14 @@
     }
     if (toggle) toggle.setAttribute('aria-expanded', 'true');
     if (icon) icon.textContent = '✕';
-    setTimeout(function() { if (input) input.focus(); }, 100);
+    
+    // Non-blocking RAF for input focus to keep INP latency under 16ms
+    if (typeof requestAnimationFrame !== 'undefined') {
+      requestAnimationFrame(function() { if (input) input.focus(); });
+    } else {
+      setTimeout(function() { if (input) input.focus(); }, 50);
+    }
+
     if (messages && messages.children.length === 0) {
       addMessage(GREETING, 'bot');
     }

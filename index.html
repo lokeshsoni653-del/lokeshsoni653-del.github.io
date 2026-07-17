@@ -6,6 +6,9 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap">
   <title>Lokesh Kumar — Software Engineer & Data Systems Architect</title>
   <meta name="description" content="Final-year Software Engineering student specializing in Python, Data Pipelines, and AI. Open to Summer 2026 Internships in Pakistan.">
   <meta name="keywords" content="Software Engineering Intern, Data Engineer, Python Developer Pakistan, Lokesh Kumar Portfolio">
@@ -14,7 +17,7 @@
   <meta property="og:description" content="Transforming complex data into secure, elegant Python-based web applications.">
   <meta property="og:image" content="https://lokeshsoni653-del.github.io/lokesh-portfolio/avatar.png">
   <meta property="og:type" content="website"/>
-  <link rel="stylesheet" href="style.css?v=2026_v15"/>
+  <link rel="stylesheet" href="style.css?v=2026_v16"/>
   <style>
     /* ——— Hero ——— */
     .hero {
@@ -1680,7 +1683,6 @@ document.querySelectorAll('.featured__cards .feat-card').forEach(function(card, 
     if (state) showTyping(); else hideTyping();
   }
 
-  // ── Smart Knowledge Base Fallback Engine ──
   function getLocalKnowledgeAnswer(q) {
     var query = (q || '').toLowerCase();
 
@@ -1715,7 +1717,14 @@ document.querySelectorAll('.featured__cards .feat-card').forEach(function(card, 
     }
     if (toggle) toggle.setAttribute('aria-expanded', 'true');
     if (icon) icon.textContent = '✕';
-    setTimeout(function() { if (input) input.focus(); }, 100);
+    
+    // Non-blocking RAF for input focus to keep INP latency under 16ms
+    if (typeof requestAnimationFrame !== 'undefined') {
+      requestAnimationFrame(function() { if (input) input.focus(); });
+    } else {
+      setTimeout(function() { if (input) input.focus(); }, 50);
+    }
+
     if (messages && messages.children.length === 0) {
       addMessage(GREETING, 'bot');
     }

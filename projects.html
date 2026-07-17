@@ -4,9 +4,12 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Projects — Lokesh Kumar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap">
+  <title>Projects — Lokesh Kumar</title>
 <meta content="Lokesh Kumar's 56 live projects — built for companies like Engro, Nestlé, Telenor, Hamdard, Colgate, Akhuwat, and more." name="description"/>
-<link href="style.css?v=2026_v15" rel="stylesheet"/>
+<link href="style.css?v=2026_v16" rel="stylesheet"/>
 <style>
     .filter-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
     .filter-btn {
@@ -2472,7 +2475,6 @@ document.querySelectorAll('.projects-grid .project-card').forEach(function(card,
     if (state) showTyping(); else hideTyping();
   }
 
-  // ── Smart Knowledge Base Fallback Engine ──
   function getLocalKnowledgeAnswer(q) {
     var query = (q || '').toLowerCase();
 
@@ -2507,7 +2509,14 @@ document.querySelectorAll('.projects-grid .project-card').forEach(function(card,
     }
     if (toggle) toggle.setAttribute('aria-expanded', 'true');
     if (icon) icon.textContent = '✕';
-    setTimeout(function() { if (input) input.focus(); }, 100);
+    
+    // Non-blocking RAF for input focus to keep INP latency under 16ms
+    if (typeof requestAnimationFrame !== 'undefined') {
+      requestAnimationFrame(function() { if (input) input.focus(); });
+    } else {
+      setTimeout(function() { if (input) input.focus(); }, 50);
+    }
+
     if (messages && messages.children.length === 0) {
       addMessage(GREETING, 'bot');
     }
