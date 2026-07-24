@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap">
   <title>Certifications — Lokesh Kumar</title>
   <meta name="description" content="Lokesh Kumar's certifications — IBM, DeepLearning.AI, World Bank, Great Future Talent Olympiad, and more."/>
-  <link rel="stylesheet" href="style.css?v=2026_v17"/>
+  <link rel="stylesheet" href="style.css?v=2026_v18"/>
   <style>
     .cert-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
     .cert-card {
@@ -66,6 +66,261 @@
     [data-theme="dark"] .google-theme  .cert-card__banner,
     [data-theme="dark"] .phc-theme     .cert-card__banner { background: rgba(88,166,255,0.07) !important; }
     @media(max-width:700px){ .achievement-card{grid-template-columns:1fr;} }
+
+    /* ══════════════════════════════════════════════
+       COMPONENT 1 — NESTGEN MARQUEE SPRINT BANNER
+       ══════════════════════════════════════════════ */
+    .nestgen-banner {
+      width: 100%;
+      background: linear-gradient(135deg, #0A0F1E 0%, #0D1B2A 50%, #0A0F1E 100%);
+      border-top: 1px solid rgba(99,179,237,0.18);
+      border-bottom: 1px solid rgba(99,179,237,0.18);
+      padding: 0.9rem 0;
+      overflow: hidden;
+      position: relative;
+    }
+    .nestgen-banner::before,
+    .nestgen-banner::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 80px;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .nestgen-banner::before {
+      left: 0;
+      background: linear-gradient(to right, #0A0F1E, transparent);
+    }
+    .nestgen-banner::after {
+      right: 0;
+      background: linear-gradient(to left, #0A0F1E, transparent);
+    }
+    .nestgen-banner__label {
+      position: absolute;
+      left: 1.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 3;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #63B3ED;
+      background: #0A0F1E;
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      border: 1px solid rgba(99,179,237,0.3);
+      white-space: nowrap;
+    }
+    .nestgen-track-wrap {
+      display: flex;
+      width: 100%;
+      overflow: hidden;
+    }
+    .nestgen-track {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      white-space: nowrap;
+      animation: nestgenScroll 38s linear infinite;
+      will-change: transform;
+      padding-left: 0.75rem;
+    }
+    .nestgen-track-wrap:hover .nestgen-track {
+      animation-play-state: paused;
+    }
+    @keyframes nestgenScroll {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .nestgen-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(99,179,237,0.2);
+      border-radius: 100px;
+      padding: 0.4rem 1rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #CBD5E0;
+      cursor: default;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      flex-shrink: 0;
+    }
+    .nestgen-badge:hover {
+      background: rgba(99,179,237,0.12);
+      border-color: rgba(99,179,237,0.5);
+      color: #EBF8FF;
+    }
+    .nestgen-badge__dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #63B3ED;
+      flex-shrink: 0;
+    }
+    .nestgen-badge__num {
+      font-size: 0.68rem;
+      color: #63B3ED;
+      font-weight: 700;
+    }
+
+    /* ══════════════════════════════════════════════
+       COMPONENT 2 — NESTGEN MASTER CARD
+       ══════════════════════════════════════════════ */
+    .nestgen-master-card {
+      grid-column: 1 / -1;
+      background: linear-gradient(145deg, #0D1B2A 0%, #0F2130 40%, #0A1928 100%);
+      border: 1px solid rgba(99,179,237,0.25);
+      border-radius: var(--radius-lg, 16px);
+      padding: 2rem 2.25rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    .nestgen-master-card::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 220px; height: 220px;
+      background: radial-gradient(circle, rgba(99,179,237,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .nestgen-master-card::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; left: -40px;
+      width: 160px; height: 160px;
+      background: radial-gradient(circle, rgba(56,189,248,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .nestgen-master-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.35), 0 0 0 1px rgba(99,179,237,0.4);
+      border-color: rgba(99,179,237,0.5);
+    }
+    .nestgen-mc__header {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.25rem;
+      margin-bottom: 1.25rem;
+      position: relative; z-index: 1;
+    }
+    .nestgen-mc__icon-wrap {
+      width: 52px; height: 52px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(99,179,237,0.18), rgba(56,189,248,0.1));
+      border: 1px solid rgba(99,179,237,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      flex-shrink: 0;
+    }
+    .nestgen-mc__titles { flex: 1; min-width: 0; }
+    .nestgen-mc__kicker {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #63B3ED;
+      margin-bottom: 0.3rem;
+    }
+    .nestgen-mc__title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #F7FAFC;
+      line-height: 1.25;
+      margin-bottom: 0.2rem;
+    }
+    .nestgen-mc__subtitle {
+      font-size: 0.85rem;
+      color: #90CDF4;
+      font-weight: 500;
+    }
+    .nestgen-mc__meta {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.1rem;
+      position: relative; z-index: 1;
+    }
+    .nestgen-mc__meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      color: #A0AEC0;
+      font-weight: 500;
+    }
+    .nestgen-mc__desc {
+      font-size: 0.875rem;
+      color: #94A3B8;
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+      position: relative; z-index: 1;
+    }
+    .nestgen-mc__footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      position: relative; z-index: 1;
+    }
+    .nestgen-mc__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .nestgen-mc__tag {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.25rem 0.7rem;
+      border-radius: 100px;
+      background: rgba(99,179,237,0.1);
+      border: 1px solid rgba(99,179,237,0.22);
+      color: #90CDF4;
+    }
+    .nestgen-mc__cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: linear-gradient(135deg, #2B6CB0, #2563EB);
+      color: #fff;
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 14px rgba(37,99,235,0.35);
+    }
+    .nestgen-mc__cta:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(37,99,235,0.45);
+    }
+    /* Progress bar strip across top of master card */
+    .nestgen-master-card__progress {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #63B3ED, #38BDF8, #818CF8, #63B3ED);
+      background-size: 200% 100%;
+      animation: nestgenShimmer 3s linear infinite;
+    }
+    @keyframes nestgenShimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    @media (max-width: 600px) {
+      .nestgen-master-card { padding: 1.5rem; }
+      .nestgen-mc__header { flex-direction: column; gap: 0.75rem; }
+      .nestgen-mc__footer { flex-direction: column; align-items: flex-start; }
+    }
   </style>
   <link rel="preload" as="image" href="avatar.png" type="image/png">
   <link rel="canonical" href="https://lokeshkumar.me">
@@ -112,6 +367,51 @@
   <p class="page-header__sub">Verified credentials from globally recognized institutions — IBM, DeepLearning.AI, World Bank, and more.</p>
 </header>
 
+<!-- ══════════════════════════════════════════════
+     COMPONENT 1: NESTGEN INFINITE MARQUEE BANNER
+     ══════════════════════════════════════════════ -->
+<div class="nestgen-banner" aria-label="Nestlé NESTGEN 2026 E-Learning Sprint — 16 Certificates Completed">
+  <span class="nestgen-banner__label">🏭 NESTGEN 2026 · 16-CERT SPRINT</span>
+  <div class="nestgen-track-wrap">
+    <div class="nestgen-track" id="nestgen-track">
+      <!-- 16 Badges — duplicated for seamless loop -->
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">01</span> AI-Powered Financial Planning</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">02</span> Robotics &amp; Factory Automation</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">03</span> FinTech &amp; Digital Payments</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">04</span> Data-Driven Supply Chains</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">05</span> Industry 4.0 Manufacturing</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">06</span> Smart Procurement Systems</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">07</span> Circular Economy &amp; ESG</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">08</span> Enterprise Data Analytics</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">09</span> Operational Excellence (OE)</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">10</span> Digital Transformation Strategy</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">11</span> Agile &amp; Lean Operations</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">12</span> Consumer &amp; Market Intelligence</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">13</span> Cybersecurity in Enterprise</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">14</span> AI Ethics &amp; Responsible Tech</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">15</span> Cloud Architecture &amp; SaaS</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">16</span> Leadership &amp; Change Management</span>
+      <!-- Duplicate set for seamless infinite loop -->
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">01</span> AI-Powered Financial Planning</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">02</span> Robotics &amp; Factory Automation</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">03</span> FinTech &amp; Digital Payments</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">04</span> Data-Driven Supply Chains</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">05</span> Industry 4.0 Manufacturing</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">06</span> Smart Procurement Systems</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">07</span> Circular Economy &amp; ESG</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">08</span> Enterprise Data Analytics</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">09</span> Operational Excellence (OE)</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">10</span> Digital Transformation Strategy</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">11</span> Agile &amp; Lean Operations</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">12</span> Consumer &amp; Market Intelligence</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">13</span> Cybersecurity in Enterprise</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">14</span> AI Ethics &amp; Responsible Tech</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">15</span> Cloud Architecture &amp; SaaS</span>
+      <span class="nestgen-badge"><span class="nestgen-badge__dot"></span><span class="nestgen-badge__num">16</span> Leadership &amp; Change Management</span>
+    </div>
+  </div>
+</div>
+
 <section class="section">
   <div class="container">
 
@@ -146,6 +446,53 @@
     </div>
 
     <div class="cert-grid">
+
+      <!-- ════════════════════════════════════════════
+           COMPONENT 2: NESTGEN 2026 MASTER CARD
+           ════════════════════════════════════════════ -->
+      <div class="nestgen-master-card reveal">
+        <div class="nestgen-master-card__progress"></div>
+
+        <div class="nestgen-mc__header">
+          <div class="nestgen-mc__icon-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#90CDF4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1" y="3" width="15" height="13" rx="1"/>
+              <path d="M16 8h5l-2 5"/>
+              <circle cx="5.5" cy="18.5" r="2.5"/>
+              <circle cx="18.5" cy="18.5" r="2.5"/>
+            </svg>
+          </div>
+          <div class="nestgen-mc__titles">
+            <div class="nestgen-mc__kicker">Enterprise Certification Sprint</div>
+            <div class="nestgen-mc__title">NESTGEN 2026 E-Learning Sprint</div>
+            <div class="nestgen-mc__subtitle">Nestlé Asia, Oceania &amp; Africa</div>
+          </div>
+        </div>
+
+        <div class="nestgen-mc__meta">
+          <div class="nestgen-mc__meta-item">📅 <span>July 2026</span></div>
+          <div class="nestgen-mc__meta-item">🎓 <span>16-Course Masterclass</span></div>
+          <div class="nestgen-mc__meta-item">🌏 <span>AOA Region</span></div>
+        </div>
+
+        <p class="nestgen-mc__desc">
+          Successfully completed an intensive 16-certificate sprint bridging software engineering with enterprise operations. Covered AI-Powered Financial Planning, Robotics &amp; Factory Automation, FinTech, and Data-Driven Supply Chains.
+        </p>
+
+        <div class="nestgen-mc__footer">
+          <div class="nestgen-mc__tags">
+            <span class="nestgen-mc__tag">🤖 AI &amp; Automation</span>
+            <span class="nestgen-mc__tag">📦 Supply Chain</span>
+            <span class="nestgen-mc__tag">💳 FinTech</span>
+            <span class="nestgen-mc__tag">🏭 Industry 4.0</span>
+            <span class="nestgen-mc__tag">📊 Data Analytics</span>
+            <span class="nestgen-mc__tag">🌿 ESG &amp; Circular Economy</span>
+          </div>
+          <a href="ilovepdf_merged.pdf" target="_blank" rel="noopener noreferrer" class="nestgen-mc__cta">
+            View Portfolio (16 Credentials) ↗
+          </a>
+        </div>
+      </div>
 
       <div class="cert-card google-theme reveal">
         <div class="cert-card__banner">
